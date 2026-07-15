@@ -74,7 +74,7 @@ const SOCIAL_LINKS = {
 // ========================
 // IMAGE URLS
 // ========================
-const BANNER_URL = 'https://gofile.io/d/13lPIR';
+const BANNER_URL = 'https://litter.catbox.moe/fjap9flgxguzovrm.jpg';
 
 // ========================
 // AUTHORIZATION SETTINGS
