@@ -74,7 +74,7 @@ const SOCIAL_LINKS = {
 // ========================
 // IMAGE URLS
 // ========================
-const BANNER_URL = 'https://cdn.tmp.malvryx.dev/files/mxv_39ySA4EXu.jpeg';
+const BANNER_URL = 'https://gofile.io/d/13lPIR';
 
 // ========================
 // AUTHORIZATION SETTINGS
