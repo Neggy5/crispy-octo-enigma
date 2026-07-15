@@ -330,6 +330,39 @@ const requireMembership = (handler) => {
 // COMMAND HANDLERS
 // ========================
 
+// Start command — first contact: join-gate for regular users, welcome for verified/admins
+bot.onText(/^\/start/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+
+    await trackUser(userId);
+
+    const isAdmin = adminIDs.includes(userId.toString());
+
+    if (!isAdmin && REQUIRE_MEMBERSHIP) {
+        const membership = await checkMembership(userId);
+        if (!membership.hasJoinedAll) {
+            return sendJoinRequirement(chatId);
+        }
+    }
+
+    const content = `🔵 *Welcome, ${msg.from.first_name || 'there'}!*
+
+  📲 *COMMANDS*
+  ${PULSE.arrow} /pair \`num\` — Connect WhatsApp
+  ${PULSE.arrow} /delpair \`num\` — Remove device
+  ${PULSE.arrow} /listpair confirm — View devices
+  ${PULSE.arrow} /ping — Latency check
+  ${PULSE.arrow} /runtime — Bot uptime`;
+
+    await sendStyledMessage(chatId, 'WELCOME', content, [
+        [
+            { text: 'GROUP', url: SOCIAL_LINKS.group, style: 'primary' },
+            { text: 'CHANNEL', url: SOCIAL_LINKS.channel, style: 'primary' }
+        ]
+    ]);
+});
+
 // Ping command
 bot.onText(/\/ping/, requireMembership(withCooldown('ping', 5)(async (msg) => {
     const chatId = msg.chat.id;
@@ -609,7 +642,7 @@ bot.on('message', async (msg) => {
         const chatId = msg.chat.id;
         const userId = msg.from.id;
 
-        const validCommands = ['/pair', '/delpair', '/listpair', '/ping', '/runtime'];
+        const validCommands = ['/start', '/pair', '/delpair', '/listpair', '/ping', '/runtime'];
 
         if (!validCommands.includes(command)) {
             await trackUser(userId);
