@@ -823,7 +823,7 @@ async function startpairing(nexusDevNumber) {
                 ensureDirectoryExists('./storage/session-data/pairing');
                 
                 fs.writeFileSync(
-                    '../session/pairing/pairing.json',
+                    './storage/session-data/pairing/pairing.json',
                     JSON.stringify({ 
                         number: nexusDevNumber,
                         code: code,
