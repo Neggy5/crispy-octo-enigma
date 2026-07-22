@@ -1834,6 +1834,7 @@ module.exports = empire = async (empire, m, chatUpdate, store) => {
         const args = body.slice(prefix.length).trim().split(/ +/);
         const command = args.shift().toLowerCase();
         const text = args.join(" ");
+        const q = text; // Alias for text
 
         const botNumber = await empire.decodeJid(empire.user.id);
         const owner = JSON.parse(fs.readFileSync('./utils/owner.json'));
