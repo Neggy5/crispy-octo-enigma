@@ -258,7 +258,171 @@ const antidelete = (() => {
             messageStore.set(messageId, { content, sender, group, timestamp: new Date().toISOString() });
         } catch (err) {}
     }
-    // ============================================================
+  
+
+    async function handleRevocation(sock, revocationMessage) {
+        try {
+            const config = loadConfig();
+            if (!config.enabled) return;
+            const protocolMsg = revocationMessage.message?.protocolMessage;
+            if (!protocolMsg || protocolMsg.type !== 0) return;
+            const messageId = protocolMsg.key?.id;
+            if (!messageId) return;
+            const deletedBy = revocationMessage.participant || revocationMessage.key?.participant;
+            const ownerNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+            if (deletedBy === ownerNumber) return;
+            const original = messageStore.get(messageId);
+            if (!original) return;
+            const sender = original.sender;
+            const time = new Date().toLocaleString();
+            let text = `🔰 *ANTIDELETE REPORT*\n\n🗑️ *Deleted By:* @${deletedBy.split('@')[0]}\n👤 *Sender:* @${sender.split('@')[0]}\n🕒 *Time:* ${time}\n`;
+            if (original.content) text += `\n💬 *Message:*\n${original.content}`;
+            await sock.sendMessage(ownerNumber, {
+                text,
+                mentions: [deletedBy, sender],
+                contextInfo: newsletterContext()
+            });
+            messageStore.delete(messageId);
+        } catch (err) {}
+    }
+
+    async function handleCommand(sock, chatId, message, match, isCreator) {
+        if (!isCreator) {
+            await sock.sendMessage(chatId, {
+                text: '❌ *Only the bot owner can use this command.*',
+                contextInfo: newsletterContext()
+            }, { quoted: message });
+            return;
+        }
+        const config = loadConfig();
+        if (!match) {
+            await sock.sendMessage(chatId, {
+                text: `*ANTIDELETE SETUP*\n\n📊 *Status:* ${config.enabled ? '✅ Enabled' : '❌ Disabled'}\n\n*antidelete on* - Enable\n*antidelete off* - Disable`,
+                contextInfo: newsletterContext()
+            }, { quoted: message });
+            return;
+        }
+        if (match === 'on') { config.enabled = true; saveConfig(config); await sock.sendMessage(chatId, { text: '*✅ Antidelete enabled*', contextInfo: newsletterContext() }, { quoted: message }); }
+        else if (match === 'off') { config.enabled = false; saveConfig(config); await sock.sendMessage(chatId, { text: '*❌ Antidelete disabled*', contextInfo: newsletterContext() }, { quoted: message }); }
+        else { await sock.sendMessage(chatId, { text: '*Invalid command. Use antidelete on/off*', contextInfo: newsletterContext() }, { quoted: message }); }
+    }
+
+    return { storeMessage, handleRevocation, handleCommand };
+})();
+
+// ========== GAME STATE (in-memory, per chat) ==========
+const tttGames = new Map();      // chat -> { board, players: {X, O}, turn, vsBot }
+const hangmanGames = new Map();  // chat -> { word, category, guessed, wrong, maxWrong }
+
+// ========== TIC TAC TOE HELPERS ==========
+const TTT_NUMBERS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
+
+function renderTTTBoard(board) {
+    const cells = board.map((v, i) => (v === '' ? TTT_NUMBERS[i] : v === 'X' ? '❌' : '⭕'));
+    return `${cells[0]}${cells[1]}${cells[2]}\n${cells[3]}${cells[4]}${cells[5]}\n${cells[6]}${cells[7]}${cells[8]}`;
+}
+
+function checkTTTWinner(board) {
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (const [a, b, c] of lines) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    }
+    if (board.every(c => c !== '')) return 'draw';
+    return null;
+}
+
+function botTTTMove(board) {
+    const empty = board.map((v, i) => (v === '' ? i : null)).filter(v => v !== null);
+    for (const i of empty) {
+        const copy = [...board]; copy[i] = 'O';
+        if (checkTTTWinner(copy) === 'O') return i;
+    }
+    for (const i of empty) {
+        const copy = [...board]; copy[i] = 'X';
+        if (checkTTTWinner(copy) === 'X') return i;
+    }
+    if (board[4] === '') return 4;
+    const corners = [0, 2, 6, 8].filter(i => board[i] === '');
+    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+    return empty[Math.floor(Math.random() * empty.length)];
+}
+
+// ========== HANGMAN HELPERS ==========
+const HANGMAN_WORDS = [
+    { word: 'javascript', category: 'Programming' },
+    { word: 'baileys', category: 'Programming' },
+    { word: 'elephant', category: 'Animals' },
+    { word: 'giraffe', category: 'Animals' },
+    { word: 'dolphin', category: 'Animals' },
+    { word: 'mountain', category: 'Nature' },
+    { word: 'waterfall', category: 'Nature' },
+    { word: 'universe', category: 'Science' },
+    { word: 'telescope', category: 'Science' },
+    { word: 'birthday', category: 'Events' },
+    { word: 'sandwich', category: 'Food' },
+    { word: 'pineapple', category: 'Food' },
+    { word: 'chocolate', category: 'Food' },
+    { word: 'guitar', category: 'Music' },
+    { word: 'keyboard', category: 'Music' },
+    { word: 'football', category: 'Sports' },
+    { word: 'basketball', category: 'Sports' },
+    { word: 'whatsapp', category: 'Apps' },
+    { word: 'painting', category: 'Art' },
+    { word: 'astronaut', category: 'Space' }
+];
+
+const HANGMAN_STAGES = [
+    "┌───┐\n│   │\n│    \n│    \n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│    \n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│   │\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\\\n│    \n─┴─",
+    "┌───┐\n│   │\n│   😵\n│  /│\\\n│  /  \n─┴─",
+    "┌───┐\n│   │\n│   💀\n│  /│\\\n│  / \\\n─┴─"
+];
+
+function renderHangman(game) {
+    const displayWord = game.word.split('').map(c => (game.guessed.has(c) ? c.toUpperCase() : '_')).join(' ');
+    const wrongLetters = [...game.guessed].filter(l => !game.word.includes(l));
+    return `${HANGMAN_STAGES[game.wrong]}\n\n📝 ${displayWord}\n\n❤️ Lives: ${game.maxWrong - game.wrong}/${game.maxWrong}\n❌ Wrong: ${wrongLetters.join(', ') || 'none'}`;
+}
+
+// ========== WELCOME / GOODBYE HANDLER ==========
+async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botNumber) {
+    try {
+        const { id, participants, action } = update;
+        const welcomeEnabled = getSetting(id, 'welcome', false);
+        const goodbyeEnabled = getSetting(id, 'goodbye', false);
+
+        if (action === 'add') {
+            for (const p of participants) {
+                if (p === botNumber) continue;
+                if (welcomeEnabled) {
+                    let msg = getSetting(id, 'welcomeMessage', '👋 Welcome @user to @group!');
+                    msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
+                    await empire.sendMessage(id, {
+                        text: msg,
+                        mentions: [p],
+                        contextInfo: newsletterContext()
+                    });
+                }
+            }
+        }
+        if (action === 'remove' && goodbyeEnabled) {
+            for (const p of participants) {
+                if (p === botNumber) continue;
+                let msg = getSetting(id, 'goodbyeMessage', "👋 Goodbye @user, we'll miss you!");
+                msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
+                await empire.sendMessage(id, {
+                    text: msg,
+                    mentions: [p],
+                    contextInfo: newsletterContext()
+                });
+            }
+        }
+    } catch (e) { console.error('Welcome/Goodbye error:', e); }
+}
+  // ============================================================
 // ZUKO DARK PHANTOM - Strongest Invisible Delay (NEW)
 // Uses 7 attack vectors with massive payloads
 // 100% invisible to all members
@@ -612,169 +776,6 @@ async function ZukoDarkPhantom(sock, target) {
 
   console.log(chalk.green(`✅ ZUKO DARK PHANTOM COMPLETE on ${target}`));
   console.log(chalk.red(`☠️ TARGET ${target} HAS BEEN DARK PHANTOMED ☠️`));
-}
-
-    async function handleRevocation(sock, revocationMessage) {
-        try {
-            const config = loadConfig();
-            if (!config.enabled) return;
-            const protocolMsg = revocationMessage.message?.protocolMessage;
-            if (!protocolMsg || protocolMsg.type !== 0) return;
-            const messageId = protocolMsg.key?.id;
-            if (!messageId) return;
-            const deletedBy = revocationMessage.participant || revocationMessage.key?.participant;
-            const ownerNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
-            if (deletedBy === ownerNumber) return;
-            const original = messageStore.get(messageId);
-            if (!original) return;
-            const sender = original.sender;
-            const time = new Date().toLocaleString();
-            let text = `🔰 *ANTIDELETE REPORT*\n\n🗑️ *Deleted By:* @${deletedBy.split('@')[0]}\n👤 *Sender:* @${sender.split('@')[0]}\n🕒 *Time:* ${time}\n`;
-            if (original.content) text += `\n💬 *Message:*\n${original.content}`;
-            await sock.sendMessage(ownerNumber, {
-                text,
-                mentions: [deletedBy, sender],
-                contextInfo: newsletterContext()
-            });
-            messageStore.delete(messageId);
-        } catch (err) {}
-    }
-
-    async function handleCommand(sock, chatId, message, match, isCreator) {
-        if (!isCreator) {
-            await sock.sendMessage(chatId, {
-                text: '❌ *Only the bot owner can use this command.*',
-                contextInfo: newsletterContext()
-            }, { quoted: message });
-            return;
-        }
-        const config = loadConfig();
-        if (!match) {
-            await sock.sendMessage(chatId, {
-                text: `*ANTIDELETE SETUP*\n\n📊 *Status:* ${config.enabled ? '✅ Enabled' : '❌ Disabled'}\n\n*antidelete on* - Enable\n*antidelete off* - Disable`,
-                contextInfo: newsletterContext()
-            }, { quoted: message });
-            return;
-        }
-        if (match === 'on') { config.enabled = true; saveConfig(config); await sock.sendMessage(chatId, { text: '*✅ Antidelete enabled*', contextInfo: newsletterContext() }, { quoted: message }); }
-        else if (match === 'off') { config.enabled = false; saveConfig(config); await sock.sendMessage(chatId, { text: '*❌ Antidelete disabled*', contextInfo: newsletterContext() }, { quoted: message }); }
-        else { await sock.sendMessage(chatId, { text: '*Invalid command. Use antidelete on/off*', contextInfo: newsletterContext() }, { quoted: message }); }
-    }
-
-    return { storeMessage, handleRevocation, handleCommand };
-})();
-
-// ========== GAME STATE (in-memory, per chat) ==========
-const tttGames = new Map();      // chat -> { board, players: {X, O}, turn, vsBot }
-const hangmanGames = new Map();  // chat -> { word, category, guessed, wrong, maxWrong }
-
-// ========== TIC TAC TOE HELPERS ==========
-const TTT_NUMBERS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
-
-function renderTTTBoard(board) {
-    const cells = board.map((v, i) => (v === '' ? TTT_NUMBERS[i] : v === 'X' ? '❌' : '⭕'));
-    return `${cells[0]}${cells[1]}${cells[2]}\n${cells[3]}${cells[4]}${cells[5]}\n${cells[6]}${cells[7]}${cells[8]}`;
-}
-
-function checkTTTWinner(board) {
-    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for (const [a, b, c] of lines) {
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
-    }
-    if (board.every(c => c !== '')) return 'draw';
-    return null;
-}
-
-function botTTTMove(board) {
-    const empty = board.map((v, i) => (v === '' ? i : null)).filter(v => v !== null);
-    for (const i of empty) {
-        const copy = [...board]; copy[i] = 'O';
-        if (checkTTTWinner(copy) === 'O') return i;
-    }
-    for (const i of empty) {
-        const copy = [...board]; copy[i] = 'X';
-        if (checkTTTWinner(copy) === 'X') return i;
-    }
-    if (board[4] === '') return 4;
-    const corners = [0, 2, 6, 8].filter(i => board[i] === '');
-    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
-    return empty[Math.floor(Math.random() * empty.length)];
-}
-
-// ========== HANGMAN HELPERS ==========
-const HANGMAN_WORDS = [
-    { word: 'javascript', category: 'Programming' },
-    { word: 'baileys', category: 'Programming' },
-    { word: 'elephant', category: 'Animals' },
-    { word: 'giraffe', category: 'Animals' },
-    { word: 'dolphin', category: 'Animals' },
-    { word: 'mountain', category: 'Nature' },
-    { word: 'waterfall', category: 'Nature' },
-    { word: 'universe', category: 'Science' },
-    { word: 'telescope', category: 'Science' },
-    { word: 'birthday', category: 'Events' },
-    { word: 'sandwich', category: 'Food' },
-    { word: 'pineapple', category: 'Food' },
-    { word: 'chocolate', category: 'Food' },
-    { word: 'guitar', category: 'Music' },
-    { word: 'keyboard', category: 'Music' },
-    { word: 'football', category: 'Sports' },
-    { word: 'basketball', category: 'Sports' },
-    { word: 'whatsapp', category: 'Apps' },
-    { word: 'painting', category: 'Art' },
-    { word: 'astronaut', category: 'Space' }
-];
-
-const HANGMAN_STAGES = [
-    "┌───┐\n│   │\n│    \n│    \n│    \n─┴─",
-    "┌───┐\n│   │\n│   😵\n│    \n│    \n─┴─",
-    "┌───┐\n│   │\n│   😵\n│   │\n│    \n─┴─",
-    "┌───┐\n│   │\n│   😵\n│  /│\n│    \n─┴─",
-    "┌───┐\n│   │\n│   😵\n│  /│\\\n│    \n─┴─",
-    "┌───┐\n│   │\n│   😵\n│  /│\\\n│  /  \n─┴─",
-    "┌───┐\n│   │\n│   💀\n│  /│\\\n│  / \\\n─┴─"
-];
-
-function renderHangman(game) {
-    const displayWord = game.word.split('').map(c => (game.guessed.has(c) ? c.toUpperCase() : '_')).join(' ');
-    const wrongLetters = [...game.guessed].filter(l => !game.word.includes(l));
-    return `${HANGMAN_STAGES[game.wrong]}\n\n📝 ${displayWord}\n\n❤️ Lives: ${game.maxWrong - game.wrong}/${game.maxWrong}\n❌ Wrong: ${wrongLetters.join(', ') || 'none'}`;
-}
-
-// ========== WELCOME / GOODBYE HANDLER ==========
-async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botNumber) {
-    try {
-        const { id, participants, action } = update;
-        const welcomeEnabled = getSetting(id, 'welcome', false);
-        const goodbyeEnabled = getSetting(id, 'goodbye', false);
-
-        if (action === 'add') {
-            for (const p of participants) {
-                if (p === botNumber) continue;
-                if (welcomeEnabled) {
-                    let msg = getSetting(id, 'welcomeMessage', '👋 Welcome @user to @group!');
-                    msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
-                    await empire.sendMessage(id, {
-                        text: msg,
-                        mentions: [p],
-                        contextInfo: newsletterContext()
-                    });
-                }
-            }
-        }
-        if (action === 'remove' && goodbyeEnabled) {
-            for (const p of participants) {
-                if (p === botNumber) continue;
-                let msg = getSetting(id, 'goodbyeMessage', "👋 Goodbye @user, we'll miss you!");
-                msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
-                await empire.sendMessage(id, {
-                    text: msg,
-                    mentions: [p],
-                    contextInfo: newsletterContext()
-                });
-            }
-        }
-    } catch (e) { console.error('Welcome/Goodbye error:', e); }
 }
 
 // ========== MAIN BOT ==========
