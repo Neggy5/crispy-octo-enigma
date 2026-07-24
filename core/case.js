@@ -7,6 +7,7 @@ const {
 
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 const axios = require('axios');
 const moment = require('moment-timezone');
 const yts = require('yt-search');
