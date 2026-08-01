@@ -3371,7 +3371,7 @@ case 'downloadall': {
         }
 
         if (downloadUrls.length > 10) {
-            await reply('Only the first 10 files were sent. There are ${downloadUrls.length} total.`);
+            await reply(`Only the first 10 files were sent. There are ${downloadUrls.length} total.`);
         }
 
     } catch (err) {
