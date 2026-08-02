@@ -539,7 +539,7 @@ module.exports = empire = async (empire, m, chatUpdate, store) => {
         const text = args.join(" ");
 
         const botNumber = await empire.decodeJid(empire.user.id);
-        const owner = JSON.parse(fs.readFileSync('./allfunc/owner.json'));
+        const owner = JSON.parse(fs.readFileSync('./utils/owner.json'));
 
         const senderPn = m.sender;
         const isCreator = [botNumber, ...owner]
