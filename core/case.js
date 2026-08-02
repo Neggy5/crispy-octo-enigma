@@ -81,7 +81,7 @@ try {
 // ========== AGENTROUTER (agentrouter.org) ==========
 // Get your key from https://agentrouter.org/console/token and paste it below.
 // Leave it as '' to skip AgentRouter and fall back straight to the free mirror APIs.
-const AGENTROUTER_API_KEY = 'sk-F2lavbANHe8FAKIROxC3vMe0T9thhewCCP7W6lK9UR9hcO2A';
+const AGENTROUTER_API_KEY = 'sk-PASTE_YOUR_AGENTROUTER_KEY_HERE';
 const AGENTROUTER_BASE_URL = 'https://agentrouter.org/v1';
 const AGENTROUTER_CHAT_MODEL = 'claude-3-5-haiku-20241022';
 const AGENTROUTER_DEEPSEEK_MODEL = 'deepseek-chat';
@@ -758,7 +758,8 @@ ${sec('TOOLS', [
   `${prefix}qr <text>`, `${prefix}weather <city>`,
   `${prefix}quote`, `${prefix}joke`, `${prefix}short <url>`,
   `${prefix}summarize <text>`, `${prefix}code <request>`,
-  `${prefix}grammar <text>`, `${prefix}roast @user`, `${prefix}compliment @user`
+  `${prefix}grammar <text>`, `${prefix}roast @user`, `${prefix}compliment @user`,
+  `${prefix}models`, `${prefix}model <id> <question>`
 ])}
 
 ${sec('FOOTBALL', [
@@ -2323,6 +2324,49 @@ case 'compliment': {
         }, { quoted: m });
     } catch (e) {
         reply(`❌ Failed to compliment: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'models':
+case 'aimodels': {
+    if (!AGENTROUTER_API_KEY || AGENTROUTER_API_KEY.includes('PASTE_YOUR')) {
+        return reply(`❌ AgentRouter key not set yet.\nAdd it in the AGENTROUTER_API_KEY constant near the top of the file, then try again.`);
+    }
+    await reply('🔎 Fetching live model list from AgentRouter...');
+    try {
+        const res = await axios.get(`${AGENTROUTER_BASE_URL}/models`, {
+            timeout: 20000,
+            headers: { Authorization: `Bearer ${AGENTROUTER_API_KEY}` }
+        });
+        const ids = (res.data?.data || []).map(x => x.id).filter(Boolean);
+        if (!ids.length) return reply('❌ No models returned. Check your AgentRouter key/balance.');
+        const list = ids.slice(0, 100).join('\n➤ ');
+        const extra = ids.length > 100 ? `\n\n…and ${ids.length - 100} more.` : '';
+        await empire.sendMessage(m.chat, {
+            text: `📚 *AVAILABLE MODELS (${ids.length})*\n\n➤ ${list}${extra}\n\n💡 Use any of these with:\n${prefix}model <model_id> <question>`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to fetch model list: ${e.response?.data?.error?.message || e.message}`);
+    }
+    break;
+}
+case 'model': {
+    if (args.length < 2) return reply(`🧩 Usage: ${prefix}model <model_id> <question>\nExample: ${prefix}model gpt-4o What's the capital of Japan?\n\nRun ${prefix}models to see every model ID your AgentRouter key can access.`);
+    const modelId = args[0];
+    const question = args.slice(1).join(' ');
+    await reply(`🤔 Asking *${modelId}*...`);
+    try {
+        const result = await askAIModel(question, modelId);
+        if (!result) return reply('❌ AI is currently unavailable, or that model ID is invalid — check ' + prefix + 'models.');
+        let answer = result.answer.trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `🧩 *${modelId} · ${result.source}*\n\n${answer}`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
     }
     break;
 }
