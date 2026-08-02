@@ -81,7 +81,7 @@ try {
 // ========== AGENTROUTER (agentrouter.org) ==========
 // Get your key from https://agentrouter.org/console/token and paste it below.
 // Leave it as '' to skip AgentRouter and fall back straight to the free mirror APIs.
-const AGENTROUTER_API_KEY = 'sk-PASTE_YOUR_AGENTROUTER_KEY_HERE';
+const AGENTROUTER_API_KEY = 'sk-F2lavbANHe8FAKIROxC3vMe0T9thhewCCP7W6lK9UR9hcO2A';
 const AGENTROUTER_BASE_URL = 'https://agentrouter.org/v1';
 const AGENTROUTER_CHAT_MODEL = 'claude-3-5-haiku-20241022';
 const AGENTROUTER_DEEPSEEK_MODEL = 'deepseek-chat';
