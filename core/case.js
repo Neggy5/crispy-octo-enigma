@@ -1,6 +1,6 @@
 
 
-require('./setting/config');
+require('../config/setting/config');
 const {
     default: baileys,
     getContentType,
@@ -11,9 +11,9 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const moment = require('moment-timezone');
-const { getSetting, setSetting } = require("./setting/Settings.js");
-const { toAudio, toPTT } = require('./lib/converter.js');
-const { addExif } = require('./allfunc/exif.js');
+const { getSetting, setSetting } = require("../config/setting/Settings.js");
+const { toAudio, toPTT } = require('../lib/converter.js');
+const { addExif } = require('../utils/exif.js');
 const yts = require('yt-search');
 
 // ========== GLOBALS ==========
