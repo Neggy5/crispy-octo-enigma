@@ -78,6 +78,63 @@ try {
     GoogleGenerativeAI = genAI.GoogleGenerativeAI;
 } catch (e) {}
 
+// ========== AGENTROUTER (agentrouter.org) ==========
+// Get your key from https://agentrouter.org/console/token and paste it below.
+// Leave it as '' to skip AgentRouter and fall back straight to the free mirror APIs.
+const AGENTROUTER_API_KEY = 'sk-F2lavbANHe8FAKIROxC3vMe0T9thhewCCP7W6lK9UR9hcO2A';
+const AGENTROUTER_BASE_URL = 'https://agentrouter.org/v1';
+const AGENTROUTER_CHAT_MODEL = 'claude-3-5-haiku-20241022';
+const AGENTROUTER_DEEPSEEK_MODEL = 'deepseek-chat';
+
+// Calls AgentRouter's OpenAI-compatible /chat/completions endpoint.
+// Returns the reply text, or null if the key isn't set / the call fails.
+async function askAgentRouter(prompt, model = AGENTROUTER_CHAT_MODEL) {
+    if (!AGENTROUTER_API_KEY) return null;
+    try {
+        const res = await axios.post(
+            `${AGENTROUTER_BASE_URL}/chat/completions`,
+            {
+                model,
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 1024
+            },
+            {
+                timeout: 30000,
+                headers: {
+                    Authorization: `Bearer ${AGENTROUTER_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return res.data?.choices?.[0]?.message?.content?.trim() || null;
+    } catch (e) {
+        console.log('❌ AgentRouter failed:', e.response?.data?.error?.message || e.message);
+        return null;
+    }
+}
+
+// Tries AgentRouter with a specific model, falls back to a free public API
+// if AgentRouter isn't configured or fails. Returns { answer, source } or null.
+async function askAIModel(prompt, model) {
+    const routed = await askAgentRouter(prompt, model);
+    if (routed) return { answer: routed, source: 'AgentRouter' };
+    try {
+        const res = await axios.get(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
+            params: { model: 'openai' },
+            timeout: 30000
+        });
+        if (res.data) {
+            return {
+                answer: typeof res.data === 'string' ? res.data : JSON.stringify(res.data),
+                source: 'Pollinations (fallback)'
+            };
+        }
+    } catch (e) {
+        console.log('❌ askAIModel fallback failed:', e.message);
+    }
+    return null;
+}
+
 // ========== HELPERS ==========
 function saveDB() {
     try { fs.writeFileSync(dbPath, JSON.stringify(db, null, 2)); } catch (e) {}
@@ -689,6 +746,7 @@ ${rows.map(r => `│ ➤ ${r}`).join('\n')}
 ${sec('CORE', [
   `${prefix}ping`, `${prefix}menu`, `${prefix}sticker`,
   `${prefix}ai <q>`, `${prefix}deepseek <q>`, `${prefix}ds <q>`,
+  `${prefix}gpt <q>`, `${prefix}claude <q>`, `${prefix}kimi <q>`, `${prefix}geminipro <q>`,
   `${prefix}play <song>`, `${prefix}imagine <prompt>`, `${prefix}img <prompt>`,
   `${prefix}flux <prompt>`, `${prefix}tts <text>`, `${prefix}translate`,
   `${prefix}tiktok <url>`, `${prefix}toimage`, `${prefix}getpp @user`,
@@ -698,7 +756,9 @@ ${sec('CORE', [
 
 ${sec('TOOLS', [
   `${prefix}qr <text>`, `${prefix}weather <city>`,
-  `${prefix}quote`, `${prefix}joke`, `${prefix}short <url>`
+  `${prefix}quote`, `${prefix}joke`, `${prefix}short <url>`,
+  `${prefix}summarize <text>`, `${prefix}code <request>`,
+  `${prefix}grammar <text>`, `${prefix}roast @user`, `${prefix}compliment @user`
 ])}
 
 ${sec('FOOTBALL', [
@@ -1991,9 +2051,16 @@ case 'gemini': {
     try {
         let answer = null;
         let usedApi = '';
-        
-        // ─── TRY 1: PRINCE TECHNO GEMINI API ───
-        try {
+
+        // ─── TRY 1: AGENTROUTER (Claude, via agentrouter.org) ───
+        answer = await askAgentRouter(text);
+        if (answer) {
+            usedApi = 'AgentRouter · Claude';
+            console.log('✅ AgentRouter succeeded');
+        }
+
+        // ─── TRY 2: PRINCE TECHNO GEMINI API ───
+        if (!answer) try {
             const apiUrl = `https://api.princetechn.com/api/ai/geminiai?apikey=prince&q=${encodeURIComponent(text)}`;
             const response = await axios.get(apiUrl, { 
                 timeout: 30000,
@@ -2011,7 +2078,7 @@ case 'gemini': {
             console.log('❌ Prince Techno Gemini API failed:', e.message);
         }
         
-        // ─── TRY 2: SHIZO API (Fallback) ───
+        // ─── TRY 3: SHIZO API (Fallback) ───
         if (!answer) {
             try {
                 const res = await axios.get(
@@ -2028,7 +2095,7 @@ case 'gemini': {
             }
         }
         
-        // ─── TRY 3: SIPUTZX AI API (Fallback) ───
+        // ─── TRY 4: SIPUTZX AI API (Fallback) ───
         if (!answer) {
             try {
                 const res = await axios.get(
@@ -2045,7 +2112,7 @@ case 'gemini': {
             }
         }
         
-        // ─── TRY 4: POLLINATIONS AI (Final Fallback) ───
+        // ─── TRY 5: POLLINATIONS AI (Final Fallback) ───
         if (!answer) {
             try {
                 const res = await axios.get(
@@ -2087,6 +2154,175 @@ case 'gemini': {
     } catch (e) {
         console.error('AI error:', e);
         reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+// ═══════════════════════════════════════════════════
+// MORE AI MODELS - via AgentRouter (agentrouter.org)
+// ═══════════════════════════════════════════════════
+case 'gpt':
+case 'gpt4': {
+    if (!text) return reply(`💬 Usage: ${prefix}gpt <question>\nExample: ${prefix}gpt Explain quantum computing`);
+    await reply('🤔 Thinking...');
+    try {
+        const result = await askAIModel(text, 'gpt-4o');
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `💬 *GPT-4o · ${result.source}*\n\n${answer}\n\n━━━━━━━━━━━━━━━━\n💡 *Ask anything else:* ${prefix}gpt <question>`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'claude':
+case 'sonnet': {
+    if (!text) return reply(`🎭 Usage: ${prefix}claude <question>\nExample: ${prefix}claude Write me a short poem`);
+    await reply('🤔 Thinking...');
+    try {
+        const result = await askAIModel(text, 'claude-sonnet-4-5-20250929');
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `🎭 *Claude Sonnet · ${result.source}*\n\n${answer}\n\n━━━━━━━━━━━━━━━━\n💡 *Ask anything else:* ${prefix}claude <question>`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'kimi': {
+    if (!text) return reply(`🌙 Usage: ${prefix}kimi <question>\nExample: ${prefix}kimi Help me plan my week`);
+    await reply('🤔 Thinking...');
+    try {
+        const result = await askAIModel(text, 'kimi-k2-thinking');
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `🌙 *Kimi K2 · ${result.source}*\n\n${answer}\n\n━━━━━━━━━━━━━━━━\n💡 *Ask anything else:* ${prefix}kimi <question>`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'geminipro':
+case 'gemini3': {
+    if (!text) return reply(`✨ Usage: ${prefix}geminipro <question>\nExample: ${prefix}geminipro Summarize the news today`);
+    await reply('🤔 Thinking...');
+    try {
+        const result = await askAIModel(text, 'gemini-3-pro');
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `✨ *Gemini 3 Pro · ${result.source}*\n\n${answer}\n\n━━━━━━━━━━━━━━━━\n💡 *Ask anything else:* ${prefix}geminipro <question>`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to get response: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'summarize':
+case 'summary': {
+    const quotedText = m.quoted?.text || m.quoted?.message?.conversation ||
+        m.quoted?.message?.extendedTextMessage?.text || '';
+    const input = text || quotedText;
+    if (!input) return reply(`📝 Usage: ${prefix}summarize <text>\nOr reply to a message with ${prefix}summarize`);
+    await reply('🤔 Summarizing...');
+    try {
+        const result = await askAIModel(`Summarize the following text in a few clear sentences:\n\n${input}`, AGENTROUTER_CHAT_MODEL);
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `📝 *Summary · ${result.source}*\n\n${answer}`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to summarize: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'code':
+case 'coder': {
+    if (!text) return reply(`💻 Usage: ${prefix}code <what to build/fix>\nExample: ${prefix}code python function to reverse a string`);
+    await reply('🤔 Writing code...');
+    try {
+        const result = await askAIModel(`You are a coding assistant. Answer with a short explanation and a properly formatted code block for this request:\n\n${text}`, 'claude-sonnet-4-5-20250929');
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.trim(); // keep ``` code fences intact
+        if (answer.length > 4000) answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+        await empire.sendMessage(m.chat, {
+            text: `💻 *Code · ${result.source}*\n\n${answer}`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to generate code: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'grammar':
+case 'fix': {
+    const quotedText = m.quoted?.text || m.quoted?.message?.conversation ||
+        m.quoted?.message?.extendedTextMessage?.text || '';
+    const input = text || quotedText;
+    if (!input) return reply(`✍️ Usage: ${prefix}grammar <text>\nOr reply to a message with ${prefix}grammar`);
+    await reply('🤔 Checking...');
+    try {
+        const result = await askAIModel(`Fix the grammar and spelling of this text, then reply with ONLY the corrected text, nothing else:\n\n${input}`, AGENTROUTER_CHAT_MODEL);
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        let answer = result.answer.replace(/```/g, '').trim();
+        await empire.sendMessage(m.chat, {
+            text: `✍️ *Corrected · ${result.source}*\n\n${answer}`,
+            contextInfo: newsletterContext()
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to check grammar: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'roast': {
+    const target = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null);
+    const subject = target ? `@${target.split('@')[0]}` : (text || 'me');
+    await reply('🤔 Thinking of something spicy...');
+    try {
+        const result = await askAIModel(`Write one short, playful, family-friendly roast (max 2 sentences, no slurs or real insults about appearance/race/religion) aimed at "${subject}". Keep it light and funny, like friendly banter.`, AGENTROUTER_CHAT_MODEL);
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        const answer = result.answer.replace(/```/g, '').trim();
+        await empire.sendMessage(m.chat, {
+            text: `🔥 *Roast*\n\n${answer}`,
+            mentions: target ? [target] : [],
+            contextInfo: newsletterContext(target ? { mentionedJid: [target] } : {})
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to roast: ${e.message || 'Unknown error'}`);
+    }
+    break;
+}
+case 'compliment': {
+    const target = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null);
+    const subject = target ? `@${target.split('@')[0]}` : (text || 'me');
+    await reply('🤔 Thinking of something nice...');
+    try {
+        const result = await askAIModel(`Write one short, warm, genuine compliment (max 2 sentences) aimed at "${subject}".`, AGENTROUTER_CHAT_MODEL);
+        if (!result) return reply('❌ AI is currently unavailable. Please try again later.');
+        const answer = result.answer.replace(/```/g, '').trim();
+        await empire.sendMessage(m.chat, {
+            text: `💐 *Compliment*\n\n${answer}`,
+            mentions: target ? [target] : [],
+            contextInfo: newsletterContext(target ? { mentionedJid: [target] } : {})
+        }, { quoted: m });
+    } catch (e) {
+        reply(`❌ Failed to compliment: ${e.message || 'Unknown error'}`);
     }
     break;
 }
@@ -2535,6 +2771,20 @@ case 'deep': {
     if (!text) return reply(`🧠 Usage: ${prefix}deepseek <question>\nExample: ${prefix}deepseek What is love?`);
     await reply('🧠 *Thinking with DeepSeek...*');
     try {
+        // ─── TRY 1: AGENTROUTER (DeepSeek model) ───
+        let answer = await askAgentRouter(text, AGENTROUTER_DEEPSEEK_MODEL);
+        if (answer) {
+            if (answer.length > 4000) {
+                answer = answer.slice(0, 3950) + '...\n\n📌 *Truncated due to length*';
+            }
+            await empire.sendMessage(m.chat, {
+                text: `🧠 *DeepSeek AI · AgentRouter*\n\n${answer}\n\n━━━━━━━━━━━━━━━━\n💡 *Ask anything else:* ${prefix}deepseek <question>`,
+                contextInfo: newsletterContext()
+            }, { quoted: m });
+            break;
+        }
+
+        // ─── TRY 2: PRINCE TECHNO DEEPSEEK API (Fallback) ───
         const apiUrl = `https://api.princetechn.com/api/ai/deepseek-v3?apikey=prince&q=${encodeURIComponent(text)}`;
         const response = await axios.get(apiUrl, { 
             timeout: 30000,
