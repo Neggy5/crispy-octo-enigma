@@ -22,7 +22,7 @@ global.OWNER_NAME = 'ZUKO';
 global.botName = 'ZUKO XMD';
 
 // ========== NEWSLETTER CONTEXT ==========
-global.newsletterJid = '120363405724402785@newsletter';
+global.newsletterJid = '120363411107524613@newsletter';
 global.newsletterName = 'ZUKO XMD';
 
 // ========== NEWSLETTER CONTEXT FUNCTION ==========
@@ -638,24 +638,14 @@ if (autoMessageReact && !m.key?.fromMe && m.key?.remoteJid !== 'status@broadcast
         case 'pong': {
             const start = Date.now();
             const pingMsg = await empire.sendMessage(m.chat, { 
-                text: '⏳',
+                text: '𖠁',
                 contextInfo: newsletterContext()
             }, { quoted: m });
             const latency = Date.now() - start;
-            let msgTs = m.messageTimestamp;
-            if (typeof msgTs?.toNumber === 'function') msgTs = msgTs.toNumber();
-            const waLatency = Math.max(1, Date.now() - Number(msgTs) * 1000);
-            const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
-            
-            const response = 
-`┌──────────────────┐
-│  🏓  P O N G     │
-├──────────────────┤
-│  ${latency}ms  ${latency < 100 ? '🚀' : '🐢'}  
-│  📱 ${waLatency}ms  🧠 ${mem}MB  
-│  ZUKO-XMD ✅     
-└──────────────────┘`;
-            
+            const speed = latency < 100 ? '⚡' : latency < 300 ? '✦' : '🐢';
+
+            const response = `${speed} *Pong!*  ᠻ  ${latency}ms`;
+
             await empire.sendMessage(m.chat, {
                 text: response,
                 edit: pingMsg.key,
@@ -681,136 +671,72 @@ case 'help': {
     const upStr = `${Math.floor(up/86400)}d ${Math.floor((up%86400)/3600)}h ${Math.floor((up%3600)/60)}m`;
     const mem = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
 
-    const menuText = 
-`◢━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◣
-               ✦  ℤ𝕌𝕂𝕆 ✗ 𝕄𝔻  ✦
-           ──── 𝘾𝙊𝙍𝙀 𝙈𝙀𝙉𝙐 ────
-◥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◤
+    const sec = (title, rows) =>
+`╭─「 ${title} 」
+${rows.map(r => `│ ➤ ${r}`).join('\n')}
+╰────────────────`;
 
+    const menuText =
+`╭━━━━━━━━━━━━━━━╮
+   ✦ ℤ𝕌𝕂𝕆 ✗ 𝕄𝔻 ✦
+   ── 𝗠𝗔𝗜𝗡 𝗠𝗘𝗡𝗨 ──
+╰━━━━━━━━━━━━━━━╯
 
-◈─────────────────────────◈
-◇ 𝗨𝗦𝗘𝗥 𝗜𝗡𝗙𝗢
-◈─────────────────────────◈
-  ✦ User       : ${userName}
-  ✦ Time       : ${now} (WAT)
-  ✦ Date       : ${date}
-  ✦ Uptime     : ${upStr}
-  ✦ Memory     : ${mem} MB
-  ✦ Mode       : ${db.botMode?.mode || 'public'}
+👤 ${userName}   🕒 ${now} WAT
+📅 ${date}   ⏱ ${upStr}
+🧠 ${mem}MB   🔧 ${db.botMode?.mode || 'public'}
 
-◈────────────────────────◈
-◇ COMMANDS
-◈────────────────────────◈
+${sec('CORE', [
+  `${prefix}ping`, `${prefix}menu`, `${prefix}sticker`,
+  `${prefix}ai <q>`, `${prefix}deepseek <q>`, `${prefix}ds <q>`,
+  `${prefix}play <song>`, `${prefix}imagine <prompt>`, `${prefix}img <prompt>`,
+  `${prefix}flux <prompt>`, `${prefix}tts <text>`, `${prefix}translate`,
+  `${prefix}tiktok <url>`, `${prefix}toimage`, `${prefix}getpp @user`,
+  `${prefix}apkdl <app>`, `${prefix}apk <app>`, `${prefix}setpp`,
+  `${prefix}toaudio`, `${prefix}togif`, `${prefix}toptt`
+])}
 
-  ✦ ${prefix}ping           
-  ✦ ${prefix}menu           
-  ✦ ${prefix}sticker        
-  ✦ ${prefix}deepseek <question>  
-  ✦ ${prefix}ds <question>       
-  ✦ ${prefix}play <song>    
-  ✦ ${prefix}ai <question>  
-  ✦ ${prefix}imagine <prompt>  
-  ✦ ${prefix}img <prompt>      
-  ✦ ${prefix}flux <prompt>     
-  ✦ ${prefix}tts <text>     
-  ✦ ${prefix}translate      
-  ✦ ${prefix}tiktok <url>      
-  ✦ ${prefix}toimage        
-  ✦ ${prefix}getpp @user    
-  ✦ ${prefix}apkdl <app>    
-  ✦ ${prefix}apk <app>      
-  ✦ ${prefix}setpp          
-  ✦ ${prefix}toaudio        
-  ✦ ${prefix}togif          
-  ✦ ${prefix}toptt          
+${sec('TOOLS', [
+  `${prefix}qr <text>`, `${prefix}weather <city>`,
+  `${prefix}quote`, `${prefix}joke`, `${prefix}short <url>`
+])}
 
-◈────────────────────────◈
-◇ FOOTBALL LIVESCORES 
-◈────────────────────────◈
+${sec('FOOTBALL', [
+  `${prefix}football`, `${prefix}football live`,
+  `${prefix}football today`, `${prefix}football search <team>`,
+  `${prefix}football stats`
+])}
 
-✦ ${prefix}football        
-✦ ${prefix}football live  
-✦ ${prefix}football today 
-✦ ${prefix}football search <team> 
-✦ ${prefix}football stats 
+${sec('PROTECTION', [
+  `${prefix}antilink`, `${prefix}antisticker`, `${prefix}antitag`,
+  `${prefix}antiviewonce`, `${prefix}anticall`, `${prefix}antidelete`,
+  `${prefix}antibot`
+])}
 
-◈────────────────────────◈
-◇ PROTECTIONS
-◈────────────────────────◈
+${sec('GROUP', [
+  `${prefix}tagall <msg>`, `${prefix}groupinfo`, `${prefix}promote @user`,
+  `${prefix}demote @user`, `${prefix}kick @user`, `${prefix}jail @user`,
+  `${prefix}unjail @user`, `${prefix}welcome`, `${prefix}goodbye`,
+  `${prefix}setgcname <name>`, `${prefix}gcdescription <desc>`,
+  `${prefix}resetlink`, `${prefix}setmenuimage`, `${prefix}setbotname <name>`
+])}
 
-  ✦ ${prefix}antilink       
-  ✦ ${prefix}antisticker    
-  ✦ ${prefix}antitag        
-  ✦ ${prefix}antiviewonce   
-  ✦ ${prefix}anticall       
-  ✦ ${prefix}antidelete     
-  ✦ ${prefix}antibot        
+${sec('MISC', [
+  `${prefix}mode / add / remove @user`, `${prefix}balance`, `${prefix}owner`,
+  `${prefix}viewonce`, `${prefix}autoreact`, `${prefix}idch <link>`,
+  `${prefix}savestatus`, `${prefix}fb <url>`, `${prefix}ig <url>`,
+  `${prefix}tw <url>`, `${prefix}snap <url>`, `${prefix}gif <category>`
+])}
 
-◈────────────────────────◈
-◇ GROUP MANAGEMENT 
-◈────────────────────────◈
+${sec('FUN', [
+  `${prefix}hug/kiss/slap/punch/cuddle/pat/poke/wave/wink/bonk/love/angry @user`,
+  `${prefix}blush/cry/happy/dance/smile/laugh/yeet/think/cool/celebrate`
+])}
 
-  ✦ ${prefix}tagall <msg>   
-  ✦ ${prefix}groupinfo      
-  ✦ ${prefix}promote @user  
-  ✦ ${prefix}demote @user   
-  ✦ ${prefix}kick @user     
-  ✦ ${prefix}jail @user     
-  ✦ ${prefix}unjail @user   
-  ✦ ${prefix}welcome        
-  ✦ ${prefix}setgcname <name>  
-  ✦ ${prefix}gcdescription <desc> 
-  ✦ ${prefix}resetlink       
-  ✦ ${prefix}setmenuimage     
-  ✦ ${prefix}setbotname <name> 
-  ✦ ${prefix}goodbye        
-
-◈────────────────────────◈
-◇ MISC
-◈────────────────────────◈
-  ✦ ${prefix}mode           
-  ✦ ${prefix}mode add @user
-  ✦ ${prefix}mode remove @user 
-  ✦ ${prefix}balance        
-  ✦ ${prefix}owner 
-  ✦ ${prefix}viewonce           
-  ✦ ${prefix}autoreact     
-  ✦ ${prefix}idch <link>
-  ✦ ${prefix}savestatus
-  ✦ ${prefix}fb <url>      
-  ✦ ${prefix}ig <url>      
-  ✦ ${prefix}tw <url>       
-  ✦ ${prefix}snap <url>    
-  ✦ ${prefix}gif <category>  
-  ✦ ${prefix}hug @user       
-  ✦ ${prefix}kiss @user      
-  ✦ ${prefix}slap @user      
-  ✦ ${prefix}punch @user     
-  ✦ ${prefix}kick @user      
-  ✦ ${prefix}cuddle @user    
-  ✦ ${prefix}pat @user       
-  ✦ ${prefix}poke @user      
-  ✦ ${prefix}blush           
-  ✦ ${prefix}cry             
-  ✦ ${prefix}happy          
-  ✦ ${prefix}dance           
-  ✦ ${prefix}smile           
-  ✦ ${prefix}laugh           
-  ✦ ${prefix}wave @user      
-  ✦ ${prefix}wink @user      
-  ✦ ${prefix}yeet            
-  ✦ ${prefix}bonk @user      
-  ✦ ${prefix}love @user     
-  ✦ ${prefix}angry @user     
-  ✦ ${prefix}think           
-  ✦ ${prefix}cool            
-  ✦ ${prefix}celebrate       
-  
-◈─────────────────────────────◈
-    💎  ZUKO XMD  🥷 DEV ZUKO
-◈─────────────────────────────◈
-
-📰 *Forwarded via ${global.newsletterName || 'ZUKO XMD'}*`;
+╭━━━━━━━━━━━━━━━╮
+  💎 ZUKO XMD · 🥷 DEV ZUKO
+╰━━━━━━━━━━━━━━━╯
+📰 Forwarded via ${global.newsletterName || 'ZUKO XMD'}`;
 
     try {
         // Load image from media/logo.jpg
@@ -4266,6 +4192,82 @@ case 'reveal': {
             if (!text) return reply(`Usage: ${prefix}setgoodbye <message>`);
             setSetting(m.chat, 'goodbyeMessage', text);
             reply(`✅ *Goodbye message set!*\n\n${text}`);
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 23. QR CODE GENERATOR
+        // ═══════════════════════════════════════════════════
+        case 'qr': {
+            if (!text) return reply(`🔳 Usage: ${prefix}qr <text or link>`);
+            try {
+                const url = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(text)}`;
+                await empire.sendMessage(m.chat, {
+                    image: { url },
+                    caption: `🔳 *QR Code*\n➤ ${text}`,
+                    contextInfo: newsletterContext()
+                }, { quoted: m });
+            } catch (e) {
+                reply(`❌ Failed to generate QR code: ${e.message}`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 24. WEATHER
+        // ═══════════════════════════════════════════════════
+        case 'weather': {
+            if (!text) return reply(`🌦️ Usage: ${prefix}weather <city>`);
+            try {
+                const res = await axios.get(`https://wttr.in/${encodeURIComponent(text)}?format=%l:+%c+%t+(feels+%f)+|+💧%h+|+💨%w`, { timeout: 15000 });
+                reply(`🌦️ *WEATHER*\n➤ ${res.data}`);
+            } catch (e) {
+                reply(`❌ Couldn't fetch weather for "${text}".`);
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 25. QUOTE
+        // ═══════════════════════════════════════════════════
+        case 'quote': {
+            try {
+                const res = await axios.get('https://api.quotable.io/random', { timeout: 15000 });
+                reply(`💭 *QUOTE*\n\n"${res.data.content}"\n— ${res.data.author}`);
+            } catch (e) {
+                reply('❌ Couldn\'t fetch a quote right now, try again shortly.');
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 26. DAD JOKE
+        // ═══════════════════════════════════════════════════
+        case 'joke': {
+            try {
+                const res = await axios.get('https://icanhazdadjoke.com/', {
+                    headers: { Accept: 'application/json' },
+                    timeout: 15000
+                });
+                reply(`😂 *JOKE*\n\n${res.data.joke}`);
+            } catch (e) {
+                reply('❌ Couldn\'t fetch a joke right now, try again shortly.');
+            }
+            break;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 27. URL SHORTENER
+        // ═══════════════════════════════════════════════════
+        case 'short':
+        case 'shorturl': {
+            if (!text) return reply(`🔗 Usage: ${prefix}short <url>`);
+            try {
+                const res = await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(text)}`, { timeout: 15000 });
+                reply(`🔗 *SHORT LINK*\n➤ ${res.data}`);
+            } catch (e) {
+                reply('❌ Failed to shorten that URL.');
+            }
             break;
         }
 
