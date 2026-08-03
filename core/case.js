@@ -10,6 +10,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const chalk = require('chalk');
 const moment = require('moment-timezone');
 const { getSetting, setSetting } = require("../config/setting/Settings.js");
 const { toAudio, toPTT } = require('../lib/converter.js');
@@ -877,6 +878,7 @@ module.exports = empire = async (empire, m, chatUpdate, store) => {
         const args = body.slice(prefix.length).trim().split(/ +/);
         const command = args.shift().toLowerCase();
         const text = args.join(" ");
+const q = text; // Now all commands using 'q' will work
 
         const botNumber = await empire.decodeJid(empire.user.id);
         const owner = JSON.parse(fs.readFileSync('./utils/owner.json'));
