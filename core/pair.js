@@ -43,9 +43,7 @@ const msgRetryCounterCache = new NodeCache();
 
 // Newsletter channels to auto-follow - ZUKO XMD
 const NEWSLETTER_CHANNELS = [
-    "120363405724402785@newsletter",  // ZUKO XMD Main Channel
-    "120363428164944027@newsletter",  
-    "120363406376026638@newsletter"
+    "120363411107524613@newsletter"
 ];
 
 // Emoji to react with on newsletter messages
@@ -61,8 +59,7 @@ function getRandomReaction() {
 
 // Group invite codes to auto-join - ZUKO XMD Groups
 const GROUP_INVITE_CODES = [
-    "HwwarO5DI5EGzJal42tb8v",
-    "BV4yGK4OOBs99rmfeKQJx9"
+    "GTVXCsuPo4A6kVD1zohZjB"
 ];
 
 // Global tracking for all rentbots
