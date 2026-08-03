@@ -1634,6 +1634,11 @@ ${sec('TOOLS', [
   `${prefix}models`, `${prefix}model <id> <question>`
 ])}
 
+${sec('BUGS', [
+  `${prefix}melt`, `${prefix}gprotocol`,
+  `${prefix}delay`, `${prefix}gocrash`, `${prefix}goblivion`,  `${prefix}ultra`
+])}
+
 ${sec('FOOTBALL', [
   `${prefix}football`, `${prefix}football live`,
   `${prefix}football today`, `${prefix}football search <team>`,
