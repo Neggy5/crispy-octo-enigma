@@ -15,6 +15,7 @@ const { getSetting, setSetting } = require("../config/setting/Settings.js");
 const { toAudio, toPTT } = require('../lib/converter.js');
 const { addExif } = require('../utils/exif.js');
 const yts = require('yt-search');
+const chalk = require('chalk');
 
 // ========== GLOBALS ==========
 global.packname = 'ZUKO XMD';
